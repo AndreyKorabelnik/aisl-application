@@ -1,0 +1,203 @@
+{
+  "artifact_id": "sql_analysis_d00f5e837cbd36d4c5fe0b93",
+  "artifact_kind": "sql-analysis",
+  "content_fingerprint": "d00f5e837cbd36d4c5fe0b9387de90ff094a2e388ac6e43cfc83bcb8e4019358",
+  "contract_version": "core_evidence_artifact_contract/v1",
+  "coverage": {
+    "coverage_status": "partial",
+    "lineage_gap_count": 0,
+    "sql_files_scanned": 3,
+    "sql_statement_count": 8,
+    "sql_unit_count": 1
+  },
+  "diagnostics": [
+    {
+      "code": "sql_analysis_partial",
+      "message": "SQL analysis published partial coverage; localized resolution statuses and gaps are preserved.",
+      "severity": "warning",
+      "source_refs": []
+    }
+  ],
+  "parameters": {
+    "project_code": "UNKNOWN",
+    "system_name": "sdd-pilot"
+  },
+  "payload": {
+    "analysis_status": "partial",
+    "canonical_content_fingerprint": "f46b84555308535c4ace1df5f1b208a3a4b931762ea874be7ca67ef3c7b6421f",
+    "canonical_manifest_path": "sql-analysis/manifest.json",
+    "coverage_path": "sql-analysis/coverage.json",
+    "fact_shards": [
+      {
+        "byte_size": 9768,
+        "fact_type": "sql_statement",
+        "id_field": "sql_statement_id",
+        "path": "sql-analysis/facts/sql_statement.jsonl",
+        "record_count": 8,
+        "sha256": "8b7043a251dfc75206c17089190cafb21e5f3b3ced2135c931f98b3df0dabb59"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_script_statement",
+        "id_field": "sql_script_statement_id",
+        "path": "sql-analysis/facts/sql_script_statement.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_script_call",
+        "id_field": "sql_script_call_id",
+        "path": "sql-analysis/facts/sql_script_call.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_script_binding",
+        "id_field": "sql_script_binding_id",
+        "path": "sql-analysis/facts/sql_script_binding.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_script_embedded_sql",
+        "id_field": "sql_script_embedded_sql_id",
+        "path": "sql-analysis/facts/sql_script_embedded_sql.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_script_invocation",
+        "id_field": "sql_script_invocation_id",
+        "path": "sql-analysis/facts/sql_script_invocation.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_semantic_placeholder",
+        "id_field": "sql_semantic_placeholder_id",
+        "path": "sql-analysis/facts/sql_semantic_placeholder.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "byte_size": 11980,
+        "fact_type": "sql_workflow_binding",
+        "id_field": "sql_workflow_binding_id",
+        "path": "sql-analysis/facts/sql_workflow_binding.jsonl",
+        "record_count": 15,
+        "sha256": "09a607dda22ee6fac6cfd88e2e650f2ea3f0caae74a1ba58bac81255e00283bd"
+      },
+      {
+        "byte_size": 7217,
+        "fact_type": "sql_select_scope",
+        "id_field": "sql_select_scope_id",
+        "path": "sql-analysis/facts/sql_select_scope.jsonl",
+        "record_count": 9,
+        "sha256": "bdc986af0eecf189f5dc37c5d1fb70d99c202ca74d944c62921830c02cc6b1dd"
+      },
+      {
+        "byte_size": 16064,
+        "fact_type": "sql_relation",
+        "id_field": "sql_relation_id",
+        "path": "sql-analysis/facts/sql_relation.jsonl",
+        "record_count": 17,
+        "sha256": "dafb9e265f0532c4571a3f3c2a657f967e92ecb7de186e0cfbdba9503cc51876"
+      },
+      {
+        "byte_size": 25490,
+        "fact_type": "sql_column_usage",
+        "id_field": "sql_column_usage_id",
+        "path": "sql-analysis/facts/sql_column_usage.jsonl",
+        "record_count": 29,
+        "sha256": "7facf658015a5812961e6bd3cdc8013481172108578cf9b8bfc107dabb5ff42e"
+      },
+      {
+        "byte_size": 7929,
+        "fact_type": "sql_projection",
+        "id_field": "sql_projection_id",
+        "path": "sql-analysis/facts/sql_projection.jsonl",
+        "record_count": 11,
+        "sha256": "ae75564ba49197b986bec01399194ea4b722eba02eae25b65c779221d16200e2"
+      },
+      {
+        "byte_size": 1227,
+        "fact_type": "sql_write_target",
+        "id_field": "sql_write_target_id",
+        "path": "sql-analysis/facts/sql_write_target.jsonl",
+        "record_count": 1,
+        "sha256": "60a94e91509624caee40044583d29bc62af9842058a1d8e914c380f8314d6f72"
+      },
+      {
+        "byte_size": 1752,
+        "fact_type": "sql_target_projection_binding",
+        "id_field": "sql_target_projection_binding_id",
+        "path": "sql-analysis/facts/sql_target_projection_binding.jsonl",
+        "record_count": 2,
+        "sha256": "b4c46bd081f88802ddae1c8eb8869c0de289f3a6d9e015602595dc77ebb6ee86"
+      },
+      {
+        "byte_size": 14212,
+        "fact_type": "sql_join_edge",
+        "id_field": "sql_join_edge_id",
+        "path": "sql-analysis/facts/sql_join_edge.jsonl",
+        "record_count": 8,
+        "sha256": "dea96091a1f0f64b99ca5663d99b0f9eeccfb22b11ec818cf89fccec3fae16e8"
+      },
+      {
+        "byte_size": 2715,
+        "fact_type": "sql_direct_column_lineage",
+        "id_field": "sql_direct_column_lineage_id",
+        "path": "sql-analysis/facts/sql_direct_column_lineage.jsonl",
+        "record_count": 2,
+        "sha256": "a7402b13aaa2a2acecc6d653429a3bfb05fac51cde996a2c78cf3ebb4a5bf442"
+      },
+      {
+        "byte_size": 3297,
+        "fact_type": "sql_recursive_column_lineage",
+        "id_field": "sql_recursive_column_lineage_id",
+        "path": "sql-analysis/facts/sql_recursive_column_lineage.jsonl",
+        "record_count": 2,
+        "sha256": "581d354380fd52809aa8722afdd312406cd031c5101ca44cb2d684071ca11d6b"
+      },
+      {
+        "byte_size": 1275,
+        "fact_type": "sql_object_dependency",
+        "id_field": "sql_object_dependency_id",
+        "path": "sql-analysis/facts/sql_object_dependency.jsonl",
+        "record_count": 2,
+        "sha256": "4ced99b84a80f0f3161674be0f541e39397b03427e5774a9fdd0daa1899be163"
+      },
+      {
+        "byte_size": 0,
+        "fact_type": "sql_scoped_lineage_gap",
+        "id_field": "sql_scoped_lineage_gap_id",
+        "path": "sql-analysis/facts/sql_scoped_lineage_gap.jsonl",
+        "record_count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "producer": {
+    "analyzer_id": "sql-analysis-analyzer",
+    "analyzer_version": "0.44.23a77",
+    "component": "code-analyzer-core"
+  },
+  "provenance": {
+    "canonical_payload_contract": "sql-analysis/v1-jsonl-shards",
+    "execution_runtime": "core_evidence_runtime/v1",
+    "semantic_routing": "explicit_analyzer_identity"
+  },
+  "schema_version": "sql-analysis/v1",
+  "source_snapshot": {
+    "file_count": 3,
+    "fingerprint": "138463f1909fa4ab3861a019d67a048b2943d9ed7f0fda78dc43acc5e10c5e52",
+    "revision": null,
+    "scope": "sql_analysis_sources",
+    "source_id": "sdd-pilot"
+  }
+}

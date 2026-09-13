@@ -1,0 +1,14 @@
+{
+  "api_operations": 76,
+  "api_paths": 72,
+  "capabilities_traced": 74,
+  "core_evidence_contracts": 14,
+  "delivery_modules": 19,
+  "knowledge_families": 17,
+  "materialization_contracts": 20,
+  "profile_examples_executed": 3,
+  "selected_api_paths": 17,
+  "selected_tools": 10,
+  "sql_fact_kinds": 19,
+  "tools": 61
+}

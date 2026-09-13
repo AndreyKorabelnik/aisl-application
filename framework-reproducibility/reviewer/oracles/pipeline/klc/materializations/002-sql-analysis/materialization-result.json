@@ -1,0 +1,104 @@
+{
+  "completed_at": "2026-09-12T17:00:00.029790+00:00",
+  "diagnostics": [],
+  "execution_id": "knowledge_materialization_execution_d683f8af133afc368c0a",
+  "inputs": {
+    "evidence_artifacts": [
+      {
+        "artifact_id": "sql_analysis_d00f5e837cbd36d4c5fe0b93",
+        "artifact_kind": "sql-analysis",
+        "content_fingerprint": "d00f5e837cbd36d4c5fe0b9387de90ff094a2e388ac6e43cfc83bcb8e4019358",
+        "registration_manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+        "schema_version": "sql-analysis/v1"
+      }
+    ],
+    "knowledge_artifacts": []
+  },
+  "installed_extension_set_fingerprint": "05df32b11810cc2be34b632269aa820a95dd4c32b8bd8489c25905da2a7e0561",
+  "knowledge_artifacts": [
+    {
+      "artifact_id": "knowledge_artifact_43e64144e20fcac927aa",
+      "content_fingerprint": "237a4b602e9048d916311bce0c69adcbcfba95e5f35fa7b64175afda9003629a",
+      "coverage": {},
+      "diagnostics": [],
+      "location": {
+        "kind": "knowledge-layer",
+        "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer/knowledge-layer-manifest.json",
+        "output_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer"
+      },
+      "model_kind": "sql-observed-data-usage",
+      "schema_version": "knowledge_layer_sql/v2",
+      "source_materialization_id": "sql-analysis"
+    }
+  ],
+  "materialization_id": "sql-analysis",
+  "materializer_implementation": {
+    "component": "knowledge-layer-core",
+    "kind": "built_in",
+    "materialization_id": "sql-analysis",
+    "version": "0.61.0a73"
+  },
+  "output": {
+    "counts": {
+      "sql_analysis_build": 1,
+      "sql_analysis_repository": 1,
+      "sql_column_usage": 29,
+      "sql_direct_column_lineage": 2,
+      "sql_join_edge": 8,
+      "sql_object_dependency": 2,
+      "sql_placeholder_binding_resolution": 0,
+      "sql_producer_continued_column_lineage": 0,
+      "sql_projection": 11,
+      "sql_recursive_column_lineage": 2,
+      "sql_relation": 17,
+      "sql_relation_materialization_evidence": 0,
+      "sql_relation_semantic_role": 6,
+      "sql_scoped_lineage_gap": 0,
+      "sql_script_binding": 0,
+      "sql_script_call": 0,
+      "sql_script_embedded_sql": 0,
+      "sql_script_invocation": 0,
+      "sql_script_statement": 0,
+      "sql_select_scope": 9,
+      "sql_semantic_placeholder": 0,
+      "sql_statement": 8,
+      "sql_target_projection_binding": 2,
+      "sql_workflow_binding": 15,
+      "sql_workflow_context_file": 1,
+      "sql_workflow_file_reference": 1,
+      "sql_workflow_target_column_lineage": 0,
+      "sql_workflow_target_lineage_gap": 0,
+      "sql_write_target": 1
+    },
+    "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer/knowledge-layer-manifest.json",
+    "materialized_marts": [
+      "sql-relation-field-inventory",
+      "sql-relation-semantic-roles"
+    ],
+    "path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer"
+  },
+  "producer": {
+    "component": "knowledge-layer-core",
+    "version": "0.61.0a73"
+  },
+  "published_capabilities": [
+    "common.sql-analysis",
+    "common.sql-attribute-insertion-context",
+    "common.sql-field-calculation",
+    "common.sql-relation-fields",
+    "common.sql-relation-semantic-roles",
+    "common.sql-source-inventory",
+    "common.sql-source-inventory-export",
+    "common.sql-target-column-lineage",
+    "common.sql-target-resolution",
+    "common.sql-workflow-bindings",
+    "common.sql-workflow-context"
+  ],
+  "request_fingerprint": "ec65647b9a47d24bd20318b56536def75c65491cdc53d21329f61ff81098f663",
+  "result_fingerprint": "ca9cb49fe123ea8a1cbad98e585d342d74d06a809d64a23f30537c88e83e99ce",
+  "runtime_contract_id": "knowledge_materialization_runtime/v1",
+  "schema_version": "knowledge_materialization_execution_result/v1",
+  "scope_id": "sdd-pilot",
+  "started_at": "2026-09-12T16:59:59.295005+00:00",
+  "status": "completed"
+}

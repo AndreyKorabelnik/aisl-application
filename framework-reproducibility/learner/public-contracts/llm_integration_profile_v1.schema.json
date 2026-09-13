@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "llm_integration_profile/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope", "capabilities", "knowledge_artifacts", "integration_profile", "policy", "tools", "retrieval_guidance", "generated_from"],
+  "properties": {
+    "schema_version": {"const": "llm_integration_profile/v1"},
+    "scope": {
+      "type": "object",
+      "required": ["system_id", "revision_id", "revision_binding"],
+      "properties": {
+        "system_id": {"type": "string", "minLength": 1},
+        "revision_id": {"type": "string", "minLength": 1},
+        "revision_binding": {"const": "pinned"}
+      }
+    },
+    "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "knowledge_artifacts": {"type": "array", "items": {"type": "object"}},
+    "integration_profile": {
+      "type": "object",
+      "required": ["profile_id", "profile_version", "profile_fingerprint", "fingerprint"],
+      "properties": {
+        "profile_id": {"type": "string"},
+        "profile_version": {"type": "string"},
+        "profile_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "policy": {"type": "object"},
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description", "arguments", "required_capabilities", "warnings", "api_binding"],
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "arguments": {"type": "object"},
+          "required_capabilities": {"type": "array", "items": {"type": "string"}},
+          "warnings": {"type": "array", "items": {"type": "string"}},
+          "api_binding": {
+            "type": "object",
+            "required": ["binding_kind", "method", "path_template", "operation_id", "revision_binding", "arguments"],
+            "properties": {
+              "binding_kind": {"const": "knowledge_api_http"},
+              "method": {"enum": ["GET", "POST"]},
+              "path_template": {"type": "string"},
+              "operation_id": {"type": "string"},
+              "revision_binding": {"type": "object"},
+              "arguments": {"type": "object"}
+            }
+          }
+        }
+      }
+    },
+    "retrieval_guidance": {"type": "object"},
+    "generated_from": {"type": "object"}
+  }
+}

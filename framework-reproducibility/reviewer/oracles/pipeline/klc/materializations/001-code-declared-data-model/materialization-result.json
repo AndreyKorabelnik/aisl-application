@@ -1,0 +1,176 @@
+{
+  "completed_at": "2026-09-12T16:59:58.766369+00:00",
+  "diagnostics": [],
+  "execution_id": "knowledge_materialization_execution_5103bf9b9cbb057df5fa",
+  "inputs": {
+    "evidence_artifacts": [
+      {
+        "artifact_id": "java_type_structure_166d5e82283748a925729ed7",
+        "artifact_kind": "java-type-structure-evidence",
+        "content_fingerprint": "166d5e82283748a925729ed7debe29d17f91f130996bb664960c0dfa2edc6349",
+        "registration_manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+        "schema_version": "java-type-structure-evidence/v1"
+      },
+      {
+        "artifact_id": "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5",
+        "artifact_kind": "schema-declaration-evidence",
+        "content_fingerprint": "0f5ce86c2262ba41d00fcf24f3e8ce6c86b33cf3662b6634d73ee8bfeac3a9f1",
+        "registration_manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+        "schema_version": "schema-declaration-evidence/v1"
+      }
+    ],
+    "knowledge_artifacts": []
+  },
+  "installed_extension_set_fingerprint": "05df32b11810cc2be34b632269aa820a95dd4c32b8bd8489c25905da2a7e0561",
+  "knowledge_artifacts": [
+    {
+      "artifact_id": "knowledge_artifact_e9853d23261813bd1ecc",
+      "content_fingerprint": "6ee7a2920b1b8e8d8948baf83a74c5b8d195097dbd002297f11294a947af7498",
+      "coverage": {
+        "ambiguous_type_reference_count": 0,
+        "analysis_status": "partial",
+        "evidence_source_count": 2,
+        "inline_schema_declaration_count": 1,
+        "java_files_failed": 0,
+        "java_files_in_scope": 1,
+        "java_files_parsed": 1,
+        "java_files_with_parse_errors": 0,
+        "model_gap_count": 1,
+        "openapi_document_count": 1,
+        "repository_count": 1,
+        "repository_status_counts": {
+          "partial": 1
+        },
+        "schema_declaration_count": 3,
+        "schema_field_declaration_count": 11,
+        "schema_reference_count": 3,
+        "source_coverage_by_repository": {
+          "sdd-pilot": {
+            "coverage_status": "partial",
+            "evidence_sources": [
+              {
+                "artifact_kind": "java-type-structure-evidence",
+                "coverage": {
+                  "ambiguous_type_reference_count": 0,
+                  "annotation_declaration_count": 1,
+                  "coverage_status": "complete",
+                  "enum_constant_declaration_count": 0,
+                  "field_declaration_count": 4,
+                  "inheritance_declaration_count": 1,
+                  "java_files_discovered": 1,
+                  "java_files_failed": 0,
+                  "java_files_in_scope": 1,
+                  "java_files_parsed": 1,
+                  "java_files_with_parse_errors": 0,
+                  "type_declaration_count": 3,
+                  "type_reference_count": 2,
+                  "unresolved_type_reference_count": 0,
+                  "unsupported_declaration_count": 0
+                },
+                "schema_version": "java-type-structure-evidence/v1"
+              },
+              {
+                "artifact_kind": "schema-declaration-evidence",
+                "coverage": {
+                  "candidate_structured_file_count": 1,
+                  "composition_observation_count": 0,
+                  "coverage_status": "partial",
+                  "field_declaration_count": 7,
+                  "formal_schema_document_count": 1,
+                  "inline_schema_declaration_count": 1,
+                  "json_schema_document_count": 0,
+                  "json_schema_document_parse_failed_count": 0,
+                  "openapi_document_count": 1,
+                  "openapi_document_parse_failed_count": 0,
+                  "proto_document_count": 0,
+                  "proto_document_parse_failed_count": 0,
+                  "provider_status": {
+                    "json_schema": "implemented",
+                    "openapi": "implemented",
+                    "proto": "implemented",
+                    "xsd": "implemented"
+                  },
+                  "schema_declaration_count": 3,
+                  "schema_reference_count": 3,
+                  "unresolved_schema_reference_count": 1,
+                  "xsd_document_count": 0,
+                  "xsd_document_parse_failed_count": 0
+                },
+                "schema_version": "schema-declaration-evidence/v1"
+              }
+            ]
+          }
+        },
+        "unresolved_schema_reference_count": 1,
+        "unresolved_type_reference_count": 0,
+        "unsupported_declaration_count": 0
+      },
+      "diagnostics": [],
+      "location": {
+        "kind": "knowledge-layer",
+        "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer/knowledge-layer-manifest.json",
+        "output_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer"
+      },
+      "model_kind": "code-declared-data-model",
+      "schema_version": "code-declared-data-model/v1",
+      "source_materialization_id": "code-declared-data-model"
+    }
+  ],
+  "materialization_id": "code-declared-data-model",
+  "materializer_implementation": {
+    "component": "knowledge-layer-core",
+    "kind": "built_in",
+    "materialization_id": "code-declared-data-model",
+    "version": "0.61.0a73"
+  },
+  "output": {
+    "counts": {
+      "code_declared_annotation": 1,
+      "code_declared_candidate_group": 2,
+      "code_declared_candidate_member": 2,
+      "code_declared_effective_field": 12,
+      "code_declared_enum_constant": 0,
+      "code_declared_field": 11,
+      "code_declared_inheritance": 1,
+      "code_declared_model_build": 1,
+      "code_declared_model_gap": 1,
+      "code_declared_model_source": 2,
+      "code_declared_relationship": 3,
+      "code_declared_source_unit": 2,
+      "code_declared_type": 6,
+      "code_declared_type_reference": 5
+    },
+    "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer/knowledge-layer-manifest.json",
+    "materialized_marts": [
+      "code-declared-types",
+      "code-declared-fields",
+      "code-declared-inheritance",
+      "code-declared-effective-fields",
+      "code-declared-relationships",
+      "code-declared-model-gaps",
+      "code-declared-candidate-groups",
+      "code-declared-candidate-members"
+    ],
+    "path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer"
+  },
+  "producer": {
+    "component": "knowledge-layer-core",
+    "version": "0.61.0a73"
+  },
+  "published_capabilities": [
+    "common.code-declared-data-model",
+    "common.code-declared-entities",
+    "common.code-declared-fields",
+    "common.code-declared-inheritance",
+    "common.code-declared-relationships",
+    "common.declared-model-candidates",
+    "common.declared-model-dataset"
+  ],
+  "request_fingerprint": "3318ff5c9eab7ddf3f1f9753178c9b947b89e1e20dd873d0c18da01f7c180ac0",
+  "result_fingerprint": "7e0e446ccf96f1ff4701f1eb10ab5f46bff61f00203dcef559e4e23ad12127a7",
+  "runtime_contract_id": "knowledge_materialization_runtime/v1",
+  "schema_version": "knowledge_materialization_execution_result/v1",
+  "scope_id": "sdd-pilot",
+  "started_at": "2026-09-12T16:59:58.287303+00:00",
+  "status": "completed"
+}

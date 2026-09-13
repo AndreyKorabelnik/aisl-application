@@ -1,0 +1,69 @@
+Python 3.12.14
+command: python -B -m unittest discover -s tests -v
+exit_code: 0
+test_array_order (test_compare.ComparatorTests.test_array_order) ... ok
+test_bool_is_not_int (test_compare.ComparatorTests.test_bool_is_not_int) ... ok
+test_duplicates_preserved (test_compare.ComparatorTests.test_duplicates_preserved) ... ok
+test_explicit_multiset (test_compare.ComparatorTests.test_explicit_multiset) ... ok
+test_extra_field_is_difference (test_compare.ComparatorTests.test_extra_field_is_difference) ... ok
+test_float_is_not_int (test_compare.ComparatorTests.test_float_is_not_int) ... ok
+test_ids_and_confidence_preserved (test_compare.ComparatorTests.test_ids_and_confidence_preserved) ... ok
+test_json_duplicate_keys_fail (test_compare.ComparatorTests.test_json_duplicate_keys_fail) ... ok
+test_json_nonfinite_fails (test_compare.ComparatorTests.test_json_nonfinite_fails) ... ok
+test_missing_is_not_null (test_compare.ComparatorTests.test_missing_is_not_null) ... ok
+test_nested_policy_fails (test_compare.ComparatorTests.test_nested_policy_fails) ... ok
+test_nonfinite_fails (test_compare.ComparatorTests.test_nonfinite_fails) ... ok
+test_object_order (test_compare.ComparatorTests.test_object_order) ... ok
+test_pointer_escape (test_compare.ComparatorTests.test_pointer_escape) ... ok
+test_policy_requires_arrays (test_compare.ComparatorTests.test_policy_requires_arrays) ... ok
+test_policy_typo_fails (test_compare.ComparatorTests.test_policy_typo_fails) ... ok
+test_revision_mismatch (test_compare.ComparatorTests.test_revision_mismatch) ... ok
+test_same_scope (test_compare.ComparatorTests.test_same_scope) ... ok
+test_join_ids (test_contract_vectors.ContractVectorTests.test_join_ids) ... ok
+test_oracle_boundary (test_contract_vectors.ContractVectorTests.test_oracle_boundary) ... ok
+test_publication_fingerprints (test_contract_vectors.ContractVectorTests.test_publication_fingerprints) ... ok
+test_publication_payload_hash (test_contract_vectors.ContractVectorTests.test_publication_payload_hash) ... ok
+test_broken_ref_fails (test_pack.PackTests.test_broken_ref_fails) ... ok
+test_current_pack (test_pack.PackTests.test_current_pack) ... ok
+test_escaped_ref (test_pack.PackTests.test_escaped_ref) ... ok
+test_external_ref_fails (test_pack.PackTests.test_external_ref_fails) ... ok
+test_api_vectors_and_projection (test_pipeline_vectors.PipelineVectorTests.test_api_vectors_and_projection) ... ok
+test_declared_counts_from_api (test_pipeline_vectors.PipelineVectorTests.test_declared_counts_from_api) ... ok
+test_envelope_fingerprints (test_pipeline_vectors.PipelineVectorTests.test_envelope_fingerprints) ... ok
+test_java_identity_and_resolution (test_pipeline_vectors.PipelineVectorTests.test_java_identity_and_resolution) ... ok
+test_pipeline_evidence_boundary (test_pipeline_vectors.PipelineVectorTests.test_pipeline_evidence_boundary) ... ok
+test_publication_revision_results (test_pipeline_vectors.PipelineVectorTests.test_publication_revision_results) ... ok
+test_schema_identity_and_gap (test_pipeline_vectors.PipelineVectorTests.test_schema_identity_and_gap) ... ok
+test_source_snapshots (test_pipeline_vectors.PipelineVectorTests.test_source_snapshots) ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.036s
+
+OK
+
+Structural checks (not pipeline acceptance):
+{
+  "status": "PASS",
+  "kind": "side_project_structural_checks_only",
+  "json_files": 65,
+  "local_refs_resolved": 332,
+  "selected_tools": 10,
+  "selected_api_paths": 17,
+  "profile_fixture_checks": 3,
+  "scored_readiness": false,
+  "full_json_schema_validation": "not_performed_by_this_validator",
+  "reference_pipeline": {
+    "status": "PASS",
+    "boundary": "Runner low-level diagnostic plan -> real Core and KLC subprocesses -> neutral publisher -> real ASGI API",
+    "checks": 50,
+    "schema_validation": {
+      "http_responses": 14,
+      "integration_profile": 1,
+      "klc_manifests": 2,
+      "public_catalog": 1
+    }
+  },
+  "pipeline_acceptance": "diagnostic_reference_only",
+  "kcp_full_journey": "not_run",
+  "deepseek": "not_run"
+}

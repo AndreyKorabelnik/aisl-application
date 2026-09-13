@@ -1,0 +1,243 @@
+{
+  "completed_at": "2026-09-12T17:00:00.035939+00:00",
+  "diagnostics": [],
+  "execution_fingerprint": "7a4c01eb9a387da0d47f5ac120f19f3567e8db730b2afcea4a68789627e7aab9",
+  "execution_order": [
+    "code-declared-data-model",
+    "sql-analysis"
+  ],
+  "knowledge_artifacts": [
+    {
+      "artifact_id": "knowledge_artifact_e9853d23261813bd1ecc",
+      "content_fingerprint": "6ee7a2920b1b8e8d8948baf83a74c5b8d195097dbd002297f11294a947af7498",
+      "coverage": {
+        "ambiguous_type_reference_count": 0,
+        "analysis_status": "partial",
+        "evidence_source_count": 2,
+        "inline_schema_declaration_count": 1,
+        "java_files_failed": 0,
+        "java_files_in_scope": 1,
+        "java_files_parsed": 1,
+        "java_files_with_parse_errors": 0,
+        "model_gap_count": 1,
+        "openapi_document_count": 1,
+        "repository_count": 1,
+        "repository_status_counts": {
+          "partial": 1
+        },
+        "schema_declaration_count": 3,
+        "schema_field_declaration_count": 11,
+        "schema_reference_count": 3,
+        "source_coverage_by_repository": {
+          "sdd-pilot": {
+            "coverage_status": "partial",
+            "evidence_sources": [
+              {
+                "artifact_kind": "java-type-structure-evidence",
+                "coverage": {
+                  "ambiguous_type_reference_count": 0,
+                  "annotation_declaration_count": 1,
+                  "coverage_status": "complete",
+                  "enum_constant_declaration_count": 0,
+                  "field_declaration_count": 4,
+                  "inheritance_declaration_count": 1,
+                  "java_files_discovered": 1,
+                  "java_files_failed": 0,
+                  "java_files_in_scope": 1,
+                  "java_files_parsed": 1,
+                  "java_files_with_parse_errors": 0,
+                  "type_declaration_count": 3,
+                  "type_reference_count": 2,
+                  "unresolved_type_reference_count": 0,
+                  "unsupported_declaration_count": 0
+                },
+                "schema_version": "java-type-structure-evidence/v1"
+              },
+              {
+                "artifact_kind": "schema-declaration-evidence",
+                "coverage": {
+                  "candidate_structured_file_count": 1,
+                  "composition_observation_count": 0,
+                  "coverage_status": "partial",
+                  "field_declaration_count": 7,
+                  "formal_schema_document_count": 1,
+                  "inline_schema_declaration_count": 1,
+                  "json_schema_document_count": 0,
+                  "json_schema_document_parse_failed_count": 0,
+                  "openapi_document_count": 1,
+                  "openapi_document_parse_failed_count": 0,
+                  "proto_document_count": 0,
+                  "proto_document_parse_failed_count": 0,
+                  "provider_status": {
+                    "json_schema": "implemented",
+                    "openapi": "implemented",
+                    "proto": "implemented",
+                    "xsd": "implemented"
+                  },
+                  "schema_declaration_count": 3,
+                  "schema_reference_count": 3,
+                  "unresolved_schema_reference_count": 1,
+                  "xsd_document_count": 0,
+                  "xsd_document_parse_failed_count": 0
+                },
+                "schema_version": "schema-declaration-evidence/v1"
+              }
+            ]
+          }
+        },
+        "unresolved_schema_reference_count": 1,
+        "unresolved_type_reference_count": 0,
+        "unsupported_declaration_count": 0
+      },
+      "diagnostics": [],
+      "location": {
+        "kind": "knowledge-layer",
+        "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer/knowledge-layer-manifest.json",
+        "output_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/knowledge-layer"
+      },
+      "materialization_result_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/001-code-declared-data-model/materialization-result.json",
+      "model_kind": "code-declared-data-model",
+      "schema_version": "code-declared-data-model/v1",
+      "source_materialization_id": "code-declared-data-model"
+    },
+    {
+      "artifact_id": "knowledge_artifact_43e64144e20fcac927aa",
+      "content_fingerprint": "237a4b602e9048d916311bce0c69adcbcfba95e5f35fa7b64175afda9003629a",
+      "coverage": {},
+      "diagnostics": [],
+      "location": {
+        "kind": "knowledge-layer",
+        "manifest_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer/knowledge-layer-manifest.json",
+        "output_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/knowledge-layer"
+      },
+      "materialization_result_path": "/tmp/sdd-pipeline-fqxywemq/klc/materializations/002-sql-analysis/materialization-result.json",
+      "model_kind": "sql-observed-data-usage",
+      "schema_version": "knowledge_layer_sql/v2",
+      "source_materialization_id": "sql-analysis"
+    }
+  ],
+  "knowledge_layer_core": {
+    "execution_isolation": "one_process_per_materialization",
+    "runtime_contract_id": "knowledge_materialization_runtime/v1",
+    "version": "0.61.0a73"
+  },
+  "materialization_catalog": {
+    "catalog_fingerprint": "62848868906c8d25c792cdab59cfbdd021c8eb1e1da30935aca8d503cdc0e512",
+    "path": "/workspace/scratch/439f6e9c0d9d/reference/f495/source/packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/knowledge-materialization-catalog.json"
+  },
+  "materialization_executions": [
+    {
+      "completed_at": "2026-09-12T16:59:58.766369+00:00",
+      "input_artifact_ids": [
+        "java_type_structure_166d5e82283748a925729ed7",
+        "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5"
+      ],
+      "input_knowledge_artifact_ids": [],
+      "knowledge_artifact_ids": [
+        "knowledge_artifact_e9853d23261813bd1ecc"
+      ],
+      "materialization_execution_id": "knowledge_materialization_execution_5103bf9b9cbb057df5fa",
+      "materialization_id": "code-declared-data-model",
+      "output_manifest": "materializations/001-code-declared-data-model/knowledge-layer/knowledge-layer-manifest.json",
+      "producer": {
+        "component": "knowledge-layer-core",
+        "version": "0.61.0a73"
+      },
+      "published_capabilities": [
+        "common.code-declared-data-model",
+        "common.code-declared-entities",
+        "common.code-declared-fields",
+        "common.code-declared-inheritance",
+        "common.code-declared-relationships",
+        "common.declared-model-candidates",
+        "common.declared-model-dataset"
+      ],
+      "request": "materializations/001-code-declared-data-model/materialization-request.json",
+      "result": "materializations/001-code-declared-data-model/materialization-result.json",
+      "started_at": "2026-09-12T16:59:58.287303+00:00",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-09-12T17:00:00.029790+00:00",
+      "input_artifact_ids": [
+        "sql_analysis_d00f5e837cbd36d4c5fe0b93"
+      ],
+      "input_knowledge_artifact_ids": [],
+      "knowledge_artifact_ids": [
+        "knowledge_artifact_43e64144e20fcac927aa"
+      ],
+      "materialization_execution_id": "knowledge_materialization_execution_d683f8af133afc368c0a",
+      "materialization_id": "sql-analysis",
+      "output_manifest": "materializations/002-sql-analysis/knowledge-layer/knowledge-layer-manifest.json",
+      "producer": {
+        "component": "knowledge-layer-core",
+        "version": "0.61.0a73"
+      },
+      "published_capabilities": [
+        "common.sql-analysis",
+        "common.sql-attribute-insertion-context",
+        "common.sql-field-calculation",
+        "common.sql-relation-fields",
+        "common.sql-relation-semantic-roles",
+        "common.sql-source-inventory",
+        "common.sql-source-inventory-export",
+        "common.sql-target-column-lineage",
+        "common.sql-target-resolution",
+        "common.sql-workflow-bindings",
+        "common.sql-workflow-context"
+      ],
+      "request": "materializations/002-sql-analysis/materialization-request.json",
+      "result": "materializations/002-sql-analysis/materialization-result.json",
+      "started_at": "2026-09-12T16:59:59.295005+00:00",
+      "status": "completed"
+    }
+  ],
+  "published_capabilities": [
+    "common.code-declared-data-model",
+    "common.code-declared-entities",
+    "common.code-declared-fields",
+    "common.code-declared-inheritance",
+    "common.code-declared-relationships",
+    "common.declared-model-candidates",
+    "common.declared-model-dataset",
+    "common.sql-analysis",
+    "common.sql-attribute-insertion-context",
+    "common.sql-field-calculation",
+    "common.sql-relation-fields",
+    "common.sql-relation-semantic-roles",
+    "common.sql-source-inventory",
+    "common.sql-source-inventory-export",
+    "common.sql-target-column-lineage",
+    "common.sql-target-resolution",
+    "common.sql-workflow-bindings",
+    "common.sql-workflow-context"
+  ],
+  "resolution_plan": {
+    "path": "/tmp/sdd-pipeline-fqxywemq/plan.json",
+    "plan_fingerprint": "058bf7b67f8d71622725c8a55155a7addacb9aedf20185e7e4114b237c2540b3"
+  },
+  "runner": {
+    "producer": "static-analysis-runner",
+    "version": "0.10.54"
+  },
+  "schema_version": "knowledge_materialization_execution_run/v1",
+  "scope_id": "sdd-pilot",
+  "semantic_policy": {
+    "capability_publication": "completed_materialization_results_only",
+    "klc_dispatch": "materialization_id_to_klc_owned_handler",
+    "runner_dispatch": "generic_contract_driven"
+  },
+  "sources": [
+    {
+      "manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+      "repo_id": "sdd-pilot",
+      "revision": {
+        "content_sha256": "cf0a3d5cc49e34c00dd797db8bc2abc4d6edd45a83c37682d7af3b3f810cd228",
+        "kind": "content",
+        "revision": "sha256:cf0a3d5cc49e34c00dd797db8bc2abc4d6edd45a83c37682d7af3b3f810cd228"
+      }
+    }
+  ],
+  "started_at": "2026-09-12T16:59:57.745438+00:00",
+  "status": "completed"
+}

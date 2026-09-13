@@ -1,0 +1,122 @@
+{
+  "analysis_status": "partial",
+  "artifact": "sql_analysis_coverage",
+  "column_usages": {
+    "by_resolution_status": {
+      "ambiguous": 1,
+      "resolved": 28
+    },
+    "source_inventory": {
+      "non_source_values": {
+        "generated_value_usages": 0,
+        "semantic_parameter_usages": 0
+      },
+      "policy": "semantic parameters and generated LATERAL/EXPLODE values are reported separately and do not reduce source-field resolution",
+      "resolved_by_relation_kind": {
+        "cte": 2,
+        "physical": 26
+      },
+      "resolved_source_field_usages": 28,
+      "source_field_candidate_usages": 29,
+      "source_field_resolution_rate": 0.965517,
+      "status": "partial",
+      "total_observed_usages": 29,
+      "unresolved_by_basis": {
+        "ambiguous_unqualified": 1
+      },
+      "unresolved_by_status": {
+        "ambiguous": 1
+      },
+      "unresolved_source_field_usages": 1
+    }
+  },
+  "coverage_policy": "partial_facts_are_published_with_localized_resolution_status_and_gaps",
+  "direct_lineage": {
+    "by_status": {
+      "confirmed_direct": 2
+    }
+  },
+  "fact_counts": {
+    "sql_column_usage": 29,
+    "sql_direct_column_lineage": 2,
+    "sql_join_edge": 8,
+    "sql_object_dependency": 2,
+    "sql_projection": 11,
+    "sql_recursive_column_lineage": 2,
+    "sql_relation": 17,
+    "sql_scoped_lineage_gap": 0,
+    "sql_script_binding": 0,
+    "sql_script_call": 0,
+    "sql_script_embedded_sql": 0,
+    "sql_script_invocation": 0,
+    "sql_script_statement": 0,
+    "sql_select_scope": 9,
+    "sql_semantic_placeholder": 0,
+    "sql_statement": 8,
+    "sql_target_projection_binding": 2,
+    "sql_workflow_binding": 15,
+    "sql_write_target": 1
+  },
+  "gaps": {
+    "by_kind": {},
+    "total": 0
+  },
+  "joins": {
+    "by_resolution_status": {
+      "confirmed": 7,
+      "partial": 1
+    },
+    "by_type": {
+      "cross": 1,
+      "inner": 6,
+      "left": 1
+    },
+    "physical_join_confirmed": 6
+  },
+  "projections": {
+    "by_resolution_status": {
+      "resolved": 11
+    }
+  },
+  "recursive_lineage": {
+    "by_status": {
+      "confirmed": 2
+    },
+    "by_terminal_source_kind": {
+      "column": 2
+    }
+  },
+  "relations": {
+    "by_definition_status": {
+      "not_applicable": 16,
+      "resolved": 1
+    },
+    "by_kind": {
+      "cte": 1,
+      "physical": 16
+    }
+  },
+  "schema_version": "sql-analysis/v1",
+  "script_invocations": {
+    "by_resolution_status": {}
+  },
+  "semantic_placeholders": {
+    "by_resolution_status": {}
+  },
+  "source_inventory": {
+    "files_scanned": 3,
+    "script_statements": 0,
+    "sql_statements": 8,
+    "sql_units": 1
+  },
+  "target_projection_bindings": {
+    "by_mapping_status": {
+      "confirmed": 2
+    }
+  },
+  "write_targets": {
+    "by_resolution_status": {
+      "resolved": 1
+    }
+  }
+}

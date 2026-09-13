@@ -1,0 +1,41 @@
+{
+  "active": true,
+  "base_revision_id": null,
+  "bundle": "/tmp/sdd-pipeline-fqxywemq/publication.zip",
+  "bundle_schema_version": "aisl_publication_bundle/v3",
+  "bundle_sha256": "97eb82be9770b508c5c090e13525729c46fbc6206ad0b8efac1d29baa42c1f77",
+  "capabilities": [
+    "common.code-declared-data-model",
+    "common.code-declared-entities",
+    "common.code-declared-fields",
+    "common.code-declared-inheritance",
+    "common.code-declared-relationships",
+    "common.declared-model-candidates",
+    "common.declared-model-dataset",
+    "common.sql-analysis",
+    "common.sql-attribute-insertion-context",
+    "common.sql-field-calculation",
+    "common.sql-relation-fields",
+    "common.sql-relation-semantic-roles",
+    "common.sql-source-inventory",
+    "common.sql-source-inventory-export",
+    "common.sql-target-column-lineage",
+    "common.sql-target-resolution",
+    "common.sql-workflow-bindings",
+    "common.sql-workflow-context"
+  ],
+  "knowledge_artifact_count": 2,
+  "model_kinds": [
+    "code-declared-data-model",
+    "sql-observed-data-usage"
+  ],
+  "produced_knowledge_artifact_count": 2,
+  "publication_descriptor_path": "/tmp/aisl-import-qv5xrz3e/payload/publication-descriptor.json",
+  "publication_descriptor_sha256": "8a6d835c2e8321eb80b3f8cfb4443a0ac74b18a4f9c5bb68494708dd08a92c68",
+  "publication_fingerprint": "872ec1d5233e99b7d7c31d9329c8af6b9c692debe1e72e6f30fcff8be102b010",
+  "retained_knowledge_artifact_count": 0,
+  "revision_id": "rev-08005fc81dcf2b53908d4a65",
+  "state": "active",
+  "status": "published",
+  "system_id": "sdd-pilot"
+}

@@ -1,0 +1,199 @@
+{
+  "artifact_id": "knowledge_layer",
+  "artifacts": {
+    "database": "knowledge-layer.duckdb",
+    "manifest": "knowledge-layer-manifest.json"
+  },
+  "build_id": "sql_knowledge_layer_build_7be6018ba94576591265",
+  "build_status": "complete",
+  "capabilities": [
+    "common.sql-analysis",
+    "common.sql-relation-fields",
+    "common.sql-source-inventory",
+    "common.sql-source-inventory-export",
+    "common.sql-relation-semantic-roles",
+    "common.sql-target-column-lineage",
+    "common.sql-field-calculation",
+    "common.sql-workflow-bindings",
+    "common.sql-workflow-context",
+    "common.sql-target-resolution",
+    "common.sql-attribute-insertion-context"
+  ],
+  "counts": {
+    "sql_analysis_build": 1,
+    "sql_analysis_repository": 1,
+    "sql_column_usage": 29,
+    "sql_direct_column_lineage": 2,
+    "sql_join_edge": 8,
+    "sql_object_dependency": 2,
+    "sql_placeholder_binding_resolution": 0,
+    "sql_producer_continued_column_lineage": 0,
+    "sql_projection": 11,
+    "sql_recursive_column_lineage": 2,
+    "sql_relation": 17,
+    "sql_relation_materialization_evidence": 0,
+    "sql_relation_semantic_role": 6,
+    "sql_scoped_lineage_gap": 0,
+    "sql_script_binding": 0,
+    "sql_script_call": 0,
+    "sql_script_embedded_sql": 0,
+    "sql_script_invocation": 0,
+    "sql_script_statement": 0,
+    "sql_select_scope": 9,
+    "sql_semantic_placeholder": 0,
+    "sql_statement": 8,
+    "sql_target_projection_binding": 2,
+    "sql_workflow_binding": 15,
+    "sql_workflow_context_file": 1,
+    "sql_workflow_file_reference": 1,
+    "sql_workflow_target_column_lineage": 0,
+    "sql_workflow_target_lineage_gap": 0,
+    "sql_write_target": 1
+  },
+  "database_path": "knowledge-layer.duckdb",
+  "deterministic": true,
+  "llm_generated": false,
+  "manifest_path": "knowledge-layer-manifest.json",
+  "materialized_marts": [
+    "sql-relation-field-inventory",
+    "sql-relation-semantic-roles"
+  ],
+  "metadata": {
+    "environment_config_path": null,
+    "relation_materialization_evidence_artifact_id": null,
+    "relation_materialization_evidence_fingerprint": null,
+    "source_analysis_status": "partial",
+    "source_content_fingerprint": "f46b84555308535c4ace1df5f1b208a3a4b931762ea874be7ca67ef3c7b6421f",
+    "source_sql_schema_version": "sql-analysis/v1",
+    "sql_schema_version": "knowledge_layer_sql/v2"
+  },
+  "modes": [
+    "sql"
+  ],
+  "producer": "knowledge-layer-core",
+  "producer_version": "0.61.0a73",
+  "repository_count": 1,
+  "repository_ids": [
+    "sdd-pilot"
+  ],
+  "schema_version": "knowledge_layer/v1",
+  "scope_id": "sdd-pilot",
+  "scope_type": "repository",
+  "source_evidence": [
+    {
+      "analysis_fingerprint": "f46b84555308535c4ace1df5f1b208a3a4b931762ea874be7ca67ef3c7b6421f",
+      "analysis_status": "partial",
+      "artifact_kind": "sql-analysis",
+      "imported_counts": {
+        "sql_column_usage": 29,
+        "sql_direct_column_lineage": 2,
+        "sql_join_edge": 8,
+        "sql_object_dependency": 2,
+        "sql_projection": 11,
+        "sql_recursive_column_lineage": 2,
+        "sql_relation": 17,
+        "sql_scoped_lineage_gap": 0,
+        "sql_script_binding": 0,
+        "sql_script_call": 0,
+        "sql_script_embedded_sql": 0,
+        "sql_script_invocation": 0,
+        "sql_script_statement": 0,
+        "sql_select_scope": 9,
+        "sql_semantic_placeholder": 0,
+        "sql_statement": 8,
+        "sql_target_projection_binding": 2,
+        "sql_workflow_binding": 15,
+        "sql_write_target": 1
+      },
+      "repo_id": "sdd-pilot",
+      "schema_version": "sql-analysis/v1"
+    }
+  ],
+  "validation": {
+    "duplicate_fact_ids": {
+      "sql_column_usage": 0,
+      "sql_direct_column_lineage": 0,
+      "sql_join_edge": 0,
+      "sql_object_dependency": 0,
+      "sql_projection": 0,
+      "sql_recursive_column_lineage": 0,
+      "sql_relation": 0,
+      "sql_scoped_lineage_gap": 0,
+      "sql_script_binding": 0,
+      "sql_script_call": 0,
+      "sql_script_embedded_sql": 0,
+      "sql_script_invocation": 0,
+      "sql_script_statement": 0,
+      "sql_select_scope": 0,
+      "sql_semantic_placeholder": 0,
+      "sql_statement": 0,
+      "sql_target_projection_binding": 0,
+      "sql_workflow_binding": 0,
+      "sql_write_target": 0
+    },
+    "fact_count_checks": {
+      "sql_column_usage": true,
+      "sql_direct_column_lineage": true,
+      "sql_join_edge": true,
+      "sql_object_dependency": true,
+      "sql_projection": true,
+      "sql_recursive_column_lineage": true,
+      "sql_relation": true,
+      "sql_scoped_lineage_gap": true,
+      "sql_script_binding": true,
+      "sql_script_call": true,
+      "sql_script_embedded_sql": true,
+      "sql_script_invocation": true,
+      "sql_script_statement": true,
+      "sql_select_scope": true,
+      "sql_semantic_placeholder": true,
+      "sql_statement": true,
+      "sql_target_projection_binding": true,
+      "sql_workflow_binding": true,
+      "sql_write_target": true
+    },
+    "fact_counts_match_manifest": true,
+    "orphan_column_relation_references": 0,
+    "producer_continued_direct_lineage": {
+      "candidate_direct_rows": 0,
+      "continued_rows": 0,
+      "continued_source_rows": 0,
+      "matched_relation_materialization_evidence": 0
+    },
+    "relation_materialization_evidence_count": 0,
+    "relation_materialization_evidence_partial_count": 0,
+    "relation_semantic_roles": {
+      "by_role": {
+        "external_source": 5,
+        "internal_intermediate": 1
+      },
+      "by_status": {
+        "confirmed": 6
+      },
+      "hidden_by_default": 1,
+      "total_relations": 6,
+      "visible_by_default": 5
+    },
+    "repository_row_present": true,
+    "status": "complete",
+    "workflow_context": {
+      "ambiguous_file_reference_count": 0,
+      "environment_binding_count": 0,
+      "environment_config_path": null,
+      "file_reference_count": 1,
+      "known_file_count": 2,
+      "placeholder_binding_by_status": {},
+      "placeholder_binding_resolution_count": 0,
+      "resolved_file_reference_count": 0,
+      "unresolved_file_reference_count": 1,
+      "workflow_context_count": 1,
+      "workflow_context_file_count": 1
+    },
+    "workflow_target_column_lineage": {
+      "gap_count": 0,
+      "lineage_path_count": 0,
+      "target_projection_count": 0,
+      "workflow_transform_count": 0
+    }
+  }
+}

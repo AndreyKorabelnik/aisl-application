@@ -1,0 +1,212 @@
+{
+  "changed_file_count": 36,
+  "changes": [
+    {
+      "new_sha256": "6000ce27f6343a0583d5df14783778076dc5fbfa70d9324af0f8263fdeedeed7",
+      "old_sha256": "29dfae092534864c9cbd914a29bce423f97e8c4026639d73b7a66feec8d2c6f4",
+      "path": "ARCHITECTURE.md"
+    },
+    {
+      "new_sha256": "8dfba87755818627263930b70060294b72b95c48d61b9c24d7b7bd51853cb6ec",
+      "old_sha256": "47798dbfb6e12c4cad4d0a0272dffc7fffa84c892945fdae6a3405eb66e3614e",
+      "path": "CANONICAL_STATE.md"
+    },
+    {
+      "new_sha256": "2ba5d73f7d78c92255d795b1627f6d211fc8152ca2c3030b09416d916864137d",
+      "old_sha256": "0a8ca3efb4301b4a190d034d9776a2e79dcb93091f4714e2fab2ea96c151f034",
+      "path": "DEVELOPMENT.md"
+    },
+    {
+      "new_sha256": "bdc9115696f6f24191172a4b5725423e013ea910c0a57055fc5004508dce9485",
+      "old_sha256": "2c2b8cd0b0d266d16f788e66c3aae69b9ae815e4534bfe53f66823b32c6a6e9b",
+      "path": "NEXT_DEVELOPMENT_PLAN.md"
+    },
+    {
+      "new_sha256": "f032e3ff5725f2d31ec99c9141af4d4bda3268ec73a49bd6845e6c90d7ca2be0",
+      "old_sha256": "a491642557064fc5bec9d7dce8707a77314aec02419ce6afb8b817c02375e2c2",
+      "path": "README.md"
+    },
+    {
+      "new_sha256": "d685688727c0a8b565322e59a6e2a04d435dfdf316a2e8d836b243f63d1d26b6",
+      "old_sha256": "5841131c0c3d27223acb884f2d4649dfa9922c912933343973683d2025369b23",
+      "path": "SOURCE_MANIFEST_SHA256.json"
+    },
+    {
+      "new_sha256": "5dff771be56cb0f5ae02b8d1602cb0a5bb1ea6bf571a720cc96ae2f2ee000e00",
+      "old_sha256": "84baafc90aa1cf4cc6d84b6f22c94cafe534308c42696b7c8ed71e48e1ae3444",
+      "path": "consumer/aisl-consumer-suite/apps/aisl-workbench/public/vendor/aisl-sdk/VENDORED_FROM.txt"
+    },
+    {
+      "new_sha256": "2d667b24b0927bc5b43da11aad7df18240954d64ebf70c4d65e6dcca8ccdcfcf",
+      "old_sha256": "9829fdcb0a21c9ed912441177d38771ea44c4af149734aa070350e9ef0e0e3b5",
+      "path": "consumer/aisl-consumer-suite/apps/aisl-workbench/public/vendor/aisl-sdk/generated/contract.js"
+    },
+    {
+      "new_sha256": "c35a6984b68a5544f2703aa58b716f118178ae6e4c9ec6f67698dc518efe63a1",
+      "old_sha256": "304ee74090c149b24dd0a0c279da94cdff8469db1dda00a60560626a54c4cfec",
+      "path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/VERSION"
+    },
+    {
+      "new_sha256": "b5c183929f12403ae7d512d8a9cd3de81e97c3c7d4dab039ee0eea1b9290755b",
+      "old_sha256": "95505be2a8a4066f4b3f07d9ba389cf3f5c12c84b86a3d26c0e4ad48990996cc",
+      "path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/openapi/knowledge-api-v1.json"
+    },
+    {
+      "new_sha256": "32904d59d84b86e681c685eb90d35c3810fdfa82532e957a6b942d4c38d5c33a",
+      "old_sha256": "c27c9d3cf347b945fc2d73f9a6d545171c728edcd5e7964e83c13b3783dc515d",
+      "path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/openapi/knowledge-api-v1.sha256"
+    },
+    {
+      "new_sha256": "692d2c6754171d242d86813cea243ba1eaaafc37d287bd8a0aedd1f813a396b8",
+      "old_sha256": "9e8b1eaf47e3fb931c12f0912a9559518df15532049980657789a884537a3b79",
+      "path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/package.json"
+    },
+    {
+      "new_sha256": "43acfac93eb72d305494a58c435d8ff768eb02959232100064bc8a141ec3933b",
+      "old_sha256": "ad1844a5793e44d4627286f3da928aff20888a61eb04784ce612c42881711873",
+      "path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/src/generated/contract.ts"
+    },
+    {
+      "new_sha256": "1ee509f7df3dda22fcea961111bd03e321bfb1cf71de6fa425cc0d261e93cc53",
+      "old_sha256": "37793795d2d88532a8c0f3e76e68ddc876735f250a8f92f23c3366551de8e5e0",
+      "path": "packages/code-analyzer-core/code_analyzer_core/__init__.py"
+    },
+    {
+      "new_sha256": "a0508ff4145f615527e2c76120352645f356669c0bfd4a7ecf288533e29d65e6",
+      "old_sha256": "bdf7cfc77473c59fb9f1c63b33d0262cd74862915b32bb0f1fd77662ba980736",
+      "path": "packages/code-analyzer-core/code_analyzer_core/sql_profile.py"
+    },
+    {
+      "new_sha256": "caa19364a54c790174faa338141e607774906ae24f518adf54ded1446981cb05",
+      "old_sha256": "476d7e17adf2873b29b9c74cf2d5ff7fe1b0739af107e67c8f41c8ed0a10eaba",
+      "path": "packages/code-analyzer-core/pyproject.toml"
+    },
+    {
+      "new_sha256": "dc33e09c75abba497a227b89e6821a70f723e0a4e9793e94cc9deb163a9fcfbc",
+      "old_sha256": "49aee170ab796de0e0cf3bd55472d366dc0373b617b56c8634700ba51e526fe1",
+      "path": "packages/code-analyzer-core/tests/test_sql_scoped_columns.py"
+    },
+    {
+      "new_sha256": "c6526d75ef9fbb330d6a2a16da71078f71db5f880f1cf4a26ba45c0dd6b555f2",
+      "old_sha256": "547f98668cade3b5aa6a3c7525554e18ee707684455651989e8c7b8ca8af55ca",
+      "path": "packages/code-analyzer-core/tests/test_sql_script_structure.py"
+    },
+    {
+      "new_sha256": "1cff70707e2db157266a93f27fe81d52b80cddb8633b62ba0f0f3067c6c45c7e",
+      "old_sha256": "ac33e2f8a6e1bead4fc30545de605caddde8b9a2be4e8f9eecab73fc74b856bb",
+      "path": "packages/knowledge-api/knowledge_api/contract_v1/models.py"
+    },
+    {
+      "new_sha256": "4f6f53d4546f0f80f4c715418f7ae1ff2f00eca02176e3ee32602f32136eac91",
+      "old_sha256": "9d4ba827aff87a555210944ccd922c314e484cd10cee4dab6e35a74510d22a1e",
+      "path": "packages/knowledge-api/knowledge_api/contract_v1/service.py"
+    },
+    {
+      "new_sha256": "f1dd2063482870e91c4c307a07a9dd58248a64ca9fecadab63e3951db78fb70f",
+      "old_sha256": "c64580e0a1b2861ba16462eaf6562f8c8030c7a112f64b7154135543ab4ff453",
+      "path": "packages/knowledge-api/knowledge_api/version.py"
+    },
+    {
+      "new_sha256": "caaa1bf1e52794d0869678981af79f471a58ae8734d93bd25c12bd483c172a1b",
+      "old_sha256": "f67e11d11a84f18f7533f6b824251683d822ec3a1f4db4e38ccbb227ca4ca1e6",
+      "path": "packages/knowledge-api/pyproject.toml"
+    },
+    {
+      "new_sha256": "b5c183929f12403ae7d512d8a9cd3de81e97c3c7d4dab039ee0eea1b9290755b",
+      "old_sha256": "95505be2a8a4066f4b3f07d9ba389cf3f5c12c84b86a3d26c0e4ad48990996cc",
+      "path": "packages/knowledge-api/schemas/knowledge-v1.openapi.json"
+    },
+    {
+      "new_sha256": "1337906410469b056b20eb7e444cbf7f58a34e01da34828dd3840fef4d65c216",
+      "old_sha256": "9b177110a55f422329b493fc6f13d0b74770ab578c713c14d59d8aba60061c1c",
+      "path": "packages/knowledge-api/tests/test_consumer_sql_context_api.py"
+    },
+    {
+      "new_sha256": "1a28ad90a7fcd4765a079b0d5d361b37b49b7dd61603e4f5078d480cd2b03526",
+      "old_sha256": "874020a0d487ff2aa0f39630208e85b2f3df80d482836170a6b1f84eae76f4d8",
+      "path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/bundle-manifest.json"
+    },
+    {
+      "new_sha256": "32b287fc563927aeea2ab3cb040e8e8f827b50e4ff4165a8be8eda7522025f15",
+      "old_sha256": "afdc0b0d120b8f13b23ed3041f11e5db6bc4516aec2eaf7c3711a9872418b989",
+      "path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/core-analysis-catalog.json"
+    },
+    {
+      "new_sha256": "c4cb63da32ca42d3614f98e62ebfef14ea702d3eba9d55d7693fd83139d2d3df",
+      "old_sha256": "251c363d77fe48cbe3cce68dd7646c8421c3cfa08e33c84a26800759e7aad077",
+      "path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/core-evidence-contract-catalog.json"
+    },
+    {
+      "new_sha256": "ce1c198bc47f5b075c67726fb3b3972a2aa79b545b4b8f4dabe5aad573ed20bc",
+      "old_sha256": "2e119c75189b558508a5b4321c7de34595e733b7c482d9c5dfd042924b400f66",
+      "path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/knowledge-catalog.json"
+    },
+    {
+      "new_sha256": "5d60919d7b175245d64b149892070c62f761e95ac576272ef125a437a6c978c3",
+      "old_sha256": "3b1cd49d279cf57ac7fc4f17ae973f741da29eeaaad6a2533ad1c4137acb5132",
+      "path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/knowledge-materialization-catalog.json"
+    },
+    {
+      "new_sha256": "77bf2d20f3a12ee3828fd945d7d9222b1243591ba04a2572201b26f78ef1752e",
+      "old_sha256": "ca58563e754e852389720d671c28bc9874e96f5111c0164cf8779f08d1db14c9",
+      "path": "packages/knowledge-control-plane/tests/test_knowledge_execution.py"
+    },
+    {
+      "new_sha256": "81f11d29456b4ec1ec137faa34973a741fa03371206b1a148f303cc1df77bedc",
+      "old_sha256": "564c77674f848fd725d3887aacdab1860040768293a1cb494e293a8203d44019",
+      "path": "packages/knowledge-integration/knowledge_integration/tool_catalog.py"
+    },
+    {
+      "new_sha256": "0b495976d07520ffa0c47459ccd7686f71ee7f810a5b926fec18bea104a78dc8",
+      "old_sha256": "83068de9d85d8dc9a63749747a0c99a07c1c60e3cdd342ea46c072a233ae117f",
+      "path": "packages/knowledge-integration/pyproject.toml"
+    },
+    {
+      "new_sha256": "3066a9cced6cc22982f2c96ff33a8f07d61e81681382815710b98465520eca3b",
+      "old_sha256": "d91d9b30cdf6c01cb1a8d368416b3f315a58b274c89f0438940591bd67bd63a7",
+      "path": "packages/knowledge-integration/tests/test_integration_profile.py"
+    },
+    {
+      "new_sha256": "3dd527445c38a490786dca4cd37220121e3ad90438b6671224879582ec70cbb1",
+      "old_sha256": "90e20d7b844724e50857a363e1e98f8ac6d5150e973deda873174c01e81eabdc",
+      "path": "packages/prepared-knowledge-runtime/prepared_knowledge_runtime/query.py"
+    },
+    {
+      "new_sha256": "7ccc0072086d3f9baef2be02d988d86c0d2ee3ba8ba47a35a2f918d0eb348633",
+      "old_sha256": "9ee5b727b0b567d89262585d5927060df75741990531c9c908ba2a5d72b41063",
+      "path": "packages/prepared-knowledge-runtime/prepared_knowledge_runtime/version.py"
+    },
+    {
+      "new_sha256": "7bbff580a03ea5c9a02004f2eb4d5fdc0d06c3571e90470a0ae9477eb5a8174b",
+      "old_sha256": "55cbce15833ab2e854d7087fff93d02dde11bbb6977e9ea92212402fd3f7991d",
+      "path": "packages/prepared-knowledge-runtime/pyproject.toml"
+    }
+  ],
+  "checks": [
+    {
+      "name": "test_control_flow_embedded_insert_reuses_canonical_sql_join_owner",
+      "owner_test": "packages/code-analyzer-core/tests/test_sql_script_structure.py",
+      "status": "PASS"
+    },
+    {
+      "name": "test_assignment_embedded_select_remains_deferred_script_evidence",
+      "owner_test": "packages/code-analyzer-core/tests/test_sql_script_structure.py",
+      "status": "PASS"
+    },
+    {
+      "name": "test_unqualified_column_ignores_non_binding_hint_read_when_declared_source_is_unique",
+      "owner_test": "packages/code-analyzer-core/tests/test_sql_scoped_columns.py",
+      "status": "PASS"
+    },
+    {
+      "name": "materialization_tool_exact_capability_gate",
+      "status": "PASS"
+    }
+  ],
+  "framework_modified": false,
+  "from": "F4.92",
+  "scope": "Read-only drift review and 3 existing owner tests plus profile capability gate; not full Framework regression",
+  "status": "PASS",
+  "to": "F4.95",
+  "to_archive_sha256": "fb3b7134194eddb9d6ac25b184ef046516b368b1aec513c2a29d61a397cd88f3"
+}

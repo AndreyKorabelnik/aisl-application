@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "repository-topology"
+version = "0.1.0a8"
+description = "Deterministic cross-repository topology derived from Repository Inventory artifacts"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+repository-topology = "repository_topology.cli:main"
+
+[tool.setuptools]
+packages = ["repository_topology"]
+
+[tool.setuptools.package-data]
+repository_topology = ["resources/*.json"]

@@ -1,0 +1,120 @@
+{
+  "artifact_bytes_utf8": "{\"value\":1}\n",
+  "bundle_manifest": {
+    "bundle_fingerprint": "53c9a7657a4e69154561e1ddf3618ec0087e282d7e3fd045464bd1924e4f4466",
+    "descriptor": {
+      "byte_size": 1544,
+      "path": "payload/publication-descriptor.json",
+      "schema_version": "aisl_publication_descriptor/v1",
+      "sha256": "fe4ce68f8286d074726b27e9510e460d4a7d41f4d2f84ade2dec7d87b57cb64a"
+    },
+    "members": [
+      {
+        "byte_size": 1544,
+        "path": "payload/publication-descriptor.json",
+        "sha256": "fe4ce68f8286d074726b27e9510e460d4a7d41f4d2f84ade2dec7d87b57cb64a"
+      },
+      {
+        "byte_size": 12,
+        "path": "payload/products/001-synthetic-result/001-result-result.json",
+        "sha256": "3a37782e8974c48eebf2a0517c866ad15641c53b3d31993188796b56aeb79624"
+      }
+    ],
+    "schema_version": "aisl_publication_bundle/v3"
+  },
+  "descriptor": {
+    "base_revision_id": null,
+    "producer": {
+      "producer_contract_ref": "sdd-probe/v1",
+      "producer_ref": "sdd-probe/1"
+    },
+    "products": [
+      {
+        "artifact_id": "synthetic-result",
+        "capabilities": [
+          "synthetic.read"
+        ],
+        "content_fingerprint": "340de0773405d435fe53c167747201ad7ffee011f315cacc5d73d24caaef0916",
+        "coverage": {},
+        "diagnostics": [],
+        "exact_dependency_product_ids": [],
+        "model_kind": "synthetic-product",
+        "origin_kind": "observed",
+        "physical_artifacts": [
+          {
+            "byte_size": 12,
+            "filename": "result.json",
+            "media_type": "application/json",
+            "member_path": "payload/products/001-synthetic-result/001-result-result.json",
+            "role": "result",
+            "sha256": "3a37782e8974c48eebf2a0517c866ad15641c53b3d31993188796b56aeb79624"
+          }
+        ],
+        "producer_contract_ref": "sdd-probe/v1",
+        "producer_ref": "sdd-probe/1",
+        "product_slot_id": "synthetic:result",
+        "provenance": {
+          "basis": "synthetic contract probe"
+        },
+        "schema_version": "synthetic-product/v1",
+        "upstream_dependencies": []
+      }
+    ],
+    "publication_defaults": {
+      "activate": true,
+      "labels": [
+        "a",
+        "z"
+      ],
+      "metadata": {}
+    },
+    "publication_fingerprint": "547d4ab5b18948f906fbddc9df3c1f0e0a88f6b8e571c8900e4cdbcf81316239",
+    "schema_version": "aisl_publication_descriptor/v1",
+    "system": {
+      "display_name": "Synthetic system",
+      "system_id": "synthetic-system"
+    }
+  },
+  "evidence_level": "current_builder_and_validator_not_server_import",
+  "negative_cases": [
+    {
+      "case": "duplicate_slot",
+      "error_type": "PublicationError",
+      "message": "publication contains duplicate product_slot_id"
+    },
+    {
+      "case": "duplicate_artifact_id",
+      "error_type": "PublicationError",
+      "message": "publication contains duplicate product artifact_id"
+    },
+    {
+      "case": "self_dependency",
+      "error_type": "PublicationError",
+      "message": "product cannot depend on itself"
+    },
+    {
+      "case": "invalid_origin",
+      "error_type": "PublicationError",
+      "message": "product origin_kind must be observed or derived"
+    },
+    {
+      "case": "tampered_fingerprint",
+      "error_type": "PublicationError",
+      "message": "publication descriptor fingerprint is invalid"
+    }
+  ],
+  "zip_members": {
+    "bundle-manifest.json": {
+      "bytes": 769,
+      "sha256": "3615f189a372e6c28a845bb44e4ac6f34aca5ffec2ed1c0573315a9a1fe143ee"
+    },
+    "payload/products/001-synthetic-result/001-result-result.json": {
+      "bytes": 12,
+      "sha256": "3a37782e8974c48eebf2a0517c866ad15641c53b3d31993188796b56aeb79624"
+    },
+    "payload/publication-descriptor.json": {
+      "bytes": 1544,
+      "sha256": "fe4ce68f8286d074726b27e9510e460d4a7d41f4d2f84ade2dec7d87b57cb64a"
+    }
+  }
+}

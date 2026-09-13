@@ -1,0 +1,337 @@
+{
+  "check_count": 50,
+  "checks": [
+    {
+      "detail": "completed",
+      "name": "runner_completed",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "java_three_types",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "java_four_fields",
+      "status": "PASS"
+    },
+    {
+      "detail": [
+        {
+          "code": "external_schema_reference_not_resolved",
+          "details": {
+            "provider": "openapi",
+            "reference_role": "field_type"
+          },
+          "message": "Schema reference 'unavailable.json#/components/schemas/External' is preserved but not resolved in schema-declaration-evidence/v1.",
+          "severity": "warning",
+          "source_refs": [
+            {
+              "extractor": "openapi_schema_scanner",
+              "line_end": 1,
+              "line_start": 1,
+              "locator": "#/components/schemas/Customer/properties/external",
+              "repository_relative_path": "declared-openapi.json"
+            }
+          ]
+        }
+      ],
+      "name": "schema_external_ref_gap",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "schema_partial_not_complete",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "two_materializations",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "manifest_schema_code-declared-data-model",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "materialization_complete_code-declared-data-model",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "manifest_schema_sql-observed-data-usage",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "materialization_complete_sql-observed-data-usage",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "active": true,
+        "base_revision_id": null,
+        "bundle": "/tmp/sdd-pipeline-fqxywemq/publication.zip",
+        "bundle_schema_version": "aisl_publication_bundle/v3",
+        "bundle_sha256": "97eb82be9770b508c5c090e13525729c46fbc6206ad0b8efac1d29baa42c1f77",
+        "capabilities": [
+          "common.code-declared-data-model",
+          "common.code-declared-entities",
+          "common.code-declared-fields",
+          "common.code-declared-inheritance",
+          "common.code-declared-relationships",
+          "common.declared-model-candidates",
+          "common.declared-model-dataset",
+          "common.sql-analysis",
+          "common.sql-attribute-insertion-context",
+          "common.sql-field-calculation",
+          "common.sql-relation-fields",
+          "common.sql-relation-semantic-roles",
+          "common.sql-source-inventory",
+          "common.sql-source-inventory-export",
+          "common.sql-target-column-lineage",
+          "common.sql-target-resolution",
+          "common.sql-workflow-bindings",
+          "common.sql-workflow-context"
+        ],
+        "knowledge_artifact_count": 2,
+        "model_kinds": [
+          "code-declared-data-model",
+          "sql-observed-data-usage"
+        ],
+        "produced_knowledge_artifact_count": 2,
+        "publication_descriptor_path": "/tmp/aisl-import-qv5xrz3e/payload/publication-descriptor.json",
+        "publication_descriptor_sha256": "8a6d835c2e8321eb80b3f8cfb4443a0ac74b18a4f9c5bb68494708dd08a92c68",
+        "publication_fingerprint": "872ec1d5233e99b7d7c31d9329c8af6b9c692debe1e72e6f30fcff8be102b010",
+        "retained_knowledge_artifact_count": 0,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "state": "active",
+        "status": "published",
+        "system_id": "sdd-pilot"
+      },
+      "name": "bundle_published",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "duplicate_publish_idempotent",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_1",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_1",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_2",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_2",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_3",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_3",
+      "status": "PASS"
+    },
+    {
+      "detail": 8,
+      "name": "eight_api_joins",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "pagination_unique_ids",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "api_expression_links_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/query-context_4",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_4",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "context_projection_omits_expression_links",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_5",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_5",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_6",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_6",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_7",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_7",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_data-model/declared-summary_8",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_8",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_data-model/declared-objects_9",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_9",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_llm-integration-profile_10",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_10",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_public-knowledge-catalog_11",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_11",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "profile_public_schema",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "catalog_public_schema",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "second_revision_distinct",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_12",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_12",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "old_revision_unchanged_after_new_publish",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_13",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_13",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "new_revision_same_knowledge_rows",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_sql/joins_14",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "response_schema_14",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "api_read_independent_of_producer_paths",
+      "status": "PASS"
+    }
+  ],
+  "execution_boundary": "Runner low-level diagnostic plan -> real Core and KLC subprocesses -> neutral publisher -> real ASGI API",
+  "framework_manifest_verified": 828,
+  "framework_source_unchanged": true,
+  "not_executed": [
+    "KCP high-level planning",
+    "KCP publication adapter",
+    "external TCP deployment",
+    "DeepSeek"
+  ],
+  "reference_archive_sha256": "fb3b7134194eddb9d6ac25b184ef046516b368b1aec513c2a29d61a397cd88f3",
+  "reference_baseline": "F4.95",
+  "runtime": {
+    "dependencies": "reviewer/runtime-requirements.txt",
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "python": "3.12.14"
+  },
+  "schema_validation": {
+    "http_responses": 14,
+    "integration_profile": 1,
+    "klc_manifests": 2,
+    "public_catalog": 1
+  },
+  "status": "PASS"
+}

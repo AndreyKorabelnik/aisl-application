@@ -1,0 +1,117 @@
+{
+  "checks": [
+    {
+      "detail": 8,
+      "name": "core_eight_join_clauses",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "core_expression_link_present",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "core_cross_has_no_fabricated_pairs",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "core_ambiguous_stays_partial",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "core_cte_not_physical",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "core_multicolumn_join",
+      "status": "PASS"
+    },
+    {
+      "detail": 19,
+      "name": "core_fact_shards_repeat_equal",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_repeat_byte_equal",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_descriptor_valid",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_labels_canonical",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_no_local_path",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_duplicate_slot",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_duplicate_artifact_id",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_self_dependency",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_invalid_origin",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "builder_tampered_fingerprint",
+      "status": "PASS"
+    }
+  ],
+  "framework_manifest_verified": 828,
+  "level": "core_sql_and_bundle_builder_only",
+  "pipeline_acceptance": "NOT_RUN",
+  "provenance": [
+    {
+      "path": "packages/aisl-publication/aisl_publication/builder.py",
+      "sha256": "2db986502174a0a72a9685bf8cd720a63e869cfa7b4f53dfb5d73e71c471d320"
+    },
+    {
+      "path": "packages/code-analyzer-core/code_analyzer_core/sql_profile.py",
+      "sha256": "a0508ff4145f615527e2c76120352645f356669c0bfd4a7ecf288533e29d65e6"
+    },
+    {
+      "path": "packages/code-analyzer-core/code_analyzer_core/prepared_artifacts/sql_analysis_evidence.py",
+      "sha256": "f9451e75d8dcd7e4d620a540e583b002f73679fa5e2c9a2542eefe9a5b998e41"
+    },
+    {
+      "path": "packages/knowledge-api/knowledge_api/publication_bundle.py",
+      "sha256": "b5da068de92018af579ef9ee9c9118d4cdd6c5e02317b6eff9b6b0015c60ed62"
+    },
+    {
+      "path": "packages/knowledge-api/knowledge_api/contract_v1/service.py",
+      "sha256": "4f6f53d4546f0f80f4c715418f7ae1ff2f00eca02176e3ee32602f32136eac91"
+    }
+  ],
+  "python": "3.12.14",
+  "pyyaml": "6.0.3",
+  "reference_archive_sha256": "fb3b7134194eddb9d6ac25b184ef046516b368b1aec513c2a29d61a397cd88f3",
+  "reference_baseline": "F4.95",
+  "server_import": "NOT_RUN",
+  "sqlglot": "30.13.0",
+  "sqlglot_wheel_sha256": "08f87ff7b052246d61b731628c8c2db0bc91f2c9e69f5ba68a1d160a9f5b49b1",
+  "status": "PASS"
+}

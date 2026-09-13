@@ -1,0 +1,14 @@
+{
+  "analyzer_execution_count": 3,
+  "artifact_kinds": [
+    "java-type-structure-evidence",
+    "schema-declaration-evidence",
+    "sql-analysis"
+  ],
+  "evidence_artifact_count": 3,
+  "failure": null,
+  "repo_id": "sdd-pilot",
+  "run_fingerprint": "3760ac0f17930c3021db91f727692fc254c0547af77caa2189bd7574def3dca4",
+  "schema_version": "static_repository_analysis_run_summary/v1",
+  "status": "completed"
+}

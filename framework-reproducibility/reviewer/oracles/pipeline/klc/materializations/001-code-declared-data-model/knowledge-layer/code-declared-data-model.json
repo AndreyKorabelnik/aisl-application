@@ -1,0 +1,122 @@
+{
+  "schema_version": "code-declared-data-model/v1",
+  "scope_id": "sdd-pilot",
+  "repository_ids": [
+    "sdd-pilot"
+  ],
+  "source_schema_version": "declared-structure-evidence-set/v1",
+  "supported_source_schema_versions": [
+    "java-type-structure-evidence/v1",
+    "schema-declaration-evidence/v1",
+    "declared-data-model-evidence/v1"
+  ],
+  "counts": {
+    "code_declared_model_build": 1,
+    "code_declared_model_source": 2,
+    "code_declared_source_unit": 2,
+    "code_declared_type": 6,
+    "code_declared_field": 11,
+    "code_declared_inheritance": 1,
+    "code_declared_type_reference": 5,
+    "code_declared_annotation": 1,
+    "code_declared_enum_constant": 0,
+    "code_declared_effective_field": 12,
+    "code_declared_relationship": 3,
+    "code_declared_model_gap": 1,
+    "code_declared_candidate_group": 2,
+    "code_declared_candidate_member": 2
+  },
+  "coverage": {
+    "analysis_status": "partial",
+    "repository_count": 1,
+    "repository_status_counts": {
+      "partial": 1
+    },
+    "evidence_source_count": 2,
+    "java_files_in_scope": 1,
+    "java_files_parsed": 1,
+    "java_files_failed": 0,
+    "java_files_with_parse_errors": 0,
+    "openapi_document_count": 1,
+    "schema_declaration_count": 3,
+    "inline_schema_declaration_count": 1,
+    "schema_field_declaration_count": 11,
+    "schema_reference_count": 3,
+    "unresolved_schema_reference_count": 1,
+    "unresolved_type_reference_count": 0,
+    "ambiguous_type_reference_count": 0,
+    "unsupported_declaration_count": 0,
+    "model_gap_count": 1,
+    "source_coverage_by_repository": {
+      "sdd-pilot": {
+        "coverage_status": "partial",
+        "evidence_sources": [
+          {
+            "artifact_kind": "java-type-structure-evidence",
+            "schema_version": "java-type-structure-evidence/v1",
+            "coverage": {
+              "ambiguous_type_reference_count": 0,
+              "annotation_declaration_count": 1,
+              "coverage_status": "complete",
+              "enum_constant_declaration_count": 0,
+              "field_declaration_count": 4,
+              "inheritance_declaration_count": 1,
+              "java_files_discovered": 1,
+              "java_files_failed": 0,
+              "java_files_in_scope": 1,
+              "java_files_parsed": 1,
+              "java_files_with_parse_errors": 0,
+              "type_declaration_count": 3,
+              "type_reference_count": 2,
+              "unresolved_type_reference_count": 0,
+              "unsupported_declaration_count": 0
+            }
+          },
+          {
+            "artifact_kind": "schema-declaration-evidence",
+            "schema_version": "schema-declaration-evidence/v1",
+            "coverage": {
+              "candidate_structured_file_count": 1,
+              "composition_observation_count": 0,
+              "coverage_status": "partial",
+              "field_declaration_count": 7,
+              "formal_schema_document_count": 1,
+              "inline_schema_declaration_count": 1,
+              "json_schema_document_count": 0,
+              "json_schema_document_parse_failed_count": 0,
+              "openapi_document_count": 1,
+              "openapi_document_parse_failed_count": 0,
+              "proto_document_count": 0,
+              "proto_document_parse_failed_count": 0,
+              "provider_status": {
+                "json_schema": "implemented",
+                "openapi": "implemented",
+                "proto": "implemented",
+                "xsd": "implemented"
+              },
+              "schema_declaration_count": 3,
+              "schema_reference_count": 3,
+              "unresolved_schema_reference_count": 1,
+              "xsd_document_count": 0,
+              "xsd_document_parse_failed_count": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  "semantic_notes": {
+    "physical_schema_substitution": false,
+    "persistence_interpretation": false,
+    "business_association_inference": false,
+    "candidate_groups_are_technical_discovery_metadata": true
+  },
+  "candidate_projection": {
+    "algorithm": "technical_name_field_signature/v2",
+    "counts": {
+      "code_declared_candidate_group": 2,
+      "code_declared_candidate_member": 2
+    },
+    "default_excludes_inline_declarations": true
+  }
+}

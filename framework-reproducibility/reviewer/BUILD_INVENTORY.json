@@ -1,0 +1,407 @@
+{
+  "delivery_composition": {
+    "assembly_owner": "tools/build-aisl-deliveries.py",
+    "deliveries": {
+      "aisl-client": {
+        "source_modules": [
+          "consumer/aisl-consumer-suite/packages/aisl-sdk",
+          "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript",
+          "consumer/aisl-consumer-suite/tools/aisl-cli"
+        ]
+      },
+      "aisl-producer": {
+        "source_modules": [
+          "packages/source-syntax-primitives",
+          "packages/code-analyzer-core",
+          "packages/static-analysis-runner",
+          "packages/knowledge-layer-core",
+          "packages/prepared-knowledge-runtime",
+          "packages/aisl-publication",
+          "packages/knowledge-control-plane",
+          "packages/technology-extension-runtime",
+          "extensions/tsa-change-vector-extension",
+          "extensions/plp-data-model-extension",
+          "extensions/sber-sql-dm-helper-extension"
+        ]
+      },
+      "aisl-server": {
+        "source_modules": [
+          "packages/aisl-publication",
+          "packages/knowledge-api",
+          "packages/knowledge-integration",
+          "packages/prepared-knowledge-runtime"
+        ]
+      },
+      "aisl-ui": {
+        "source_modules": [
+          "consumer/aisl-consumer-suite/packages/aisl-sdk",
+          "consumer/aisl-consumer-suite/apps/aisl-agent-runtime",
+          "consumer/aisl-consumer-suite/apps/aisl-ui-runtime",
+          "consumer/aisl-consumer-suite/apps/aisl-workbench"
+        ]
+      }
+    },
+    "note": "Source canonical contains the full active code base. This map is the single current clean-delivery composition consumed directly by tools/build-aisl-deliveries.py. Each unique source module is built once through its package-level pyproject.toml or package.json owner, then assembled into exactly the four existing boundaries. aisl-publication is the producer-neutral AISL publication contract/bundle owner shared by producer and server; source-syntax-primitives is packaged with aisl-producer because Core depends on it. First-party TSA, PLP and Sber SQL DM helper Technology Extensions are available in producer but never auto-activated; activation is explicit through the existing Technology Extension selection/Gate-A path. aisl-agent-runtime and aisl-ui-runtime are internal components of aisl-ui; Agent Runtime has no standalone/external delivery lifecycle; no fifth delivery exists. Report Templates are external Integration Content and execute through the same generic revision-pinned Integration Profile/tool path as other LLM tasks; there is no reporting-specific runtime or delivery. The top-level integration-content directory is external LLM-facing runtime content selected by AISL_INTEGRATION_CONTENT_DIR; it is not a fifth delivery, is not embedded in the knowledge-integration wheel, and can be updated independently of Python code.",
+    "schema_version": "source_to_delivery_map/v1"
+  },
+  "packages": [
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "aisl-sdk>=0.3.0,<0.4",
+        "httpx>=0.27,<1.0"
+      ],
+      "entry_points": {},
+      "name": "aisl-agent-runtime",
+      "requires_python": ">=3.10",
+      "source_module": "consumer/aisl-consumer-suite/apps/aisl-agent-runtime",
+      "version": "0.2.8"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "aisl-sdk>=0.3.0,<0.4",
+        "aisl-agent-runtime>=0.2.3,<0.3"
+      ],
+      "entry_points": {
+        "aisl-ui": "aisl_ui_runtime.cli:main"
+      },
+      "name": "aisl-ui-runtime",
+      "requires_python": ">=3.10",
+      "source_module": "consumer/aisl-consumer-suite/apps/aisl-ui-runtime",
+      "version": "0.1.3"
+    },
+    {
+      "dependencies": {},
+      "engines": {
+        "node": ">=18"
+      },
+      "entry_points": {
+        "aisl-workbench": "bin/aisl-workbench.mjs"
+      },
+      "name": "aisl-workbench",
+      "source_module": "consumer/aisl-consumer-suite/apps/aisl-workbench",
+      "version": "0.5.17"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "httpx>=0.27,<1.0"
+      ],
+      "entry_points": {},
+      "name": "aisl-sdk",
+      "requires_python": ">=3.10",
+      "source_module": "consumer/aisl-consumer-suite/packages/aisl-sdk",
+      "version": "0.3.6"
+    },
+    {
+      "dependencies": {},
+      "engines": {
+        "node": ">=18"
+      },
+      "entry_points": {},
+      "name": "aisl-sdk-typescript",
+      "source_module": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript",
+      "version": "0.3.16"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "aisl-sdk>=0.3.2,<0.4.0"
+      ],
+      "entry_points": {
+        "aisl": "aisl_cli.cli:main"
+      },
+      "name": "aisl-cli",
+      "requires_python": ">=3.10",
+      "source_module": "consumer/aisl-consumer-suite/tools/aisl-cli",
+      "version": "0.2.2"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "technology-extension-runtime>=0.2.2,<1",
+        "code-analyzer-core>=0.44.23a23,<0.45"
+      ],
+      "entry_points": {},
+      "name": "plp-data-model-technology-extension",
+      "requires_python": ">=3.10",
+      "source_module": "extensions/plp-data-model-extension",
+      "version": "0.3.3"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "technology-extension-runtime>=0.2.2,<1",
+        "code-analyzer-core>=0.44.23a71,<0.45"
+      ],
+      "entry_points": {},
+      "name": "sber-sql-dm-helper-technology-extension",
+      "requires_python": ">=3.10",
+      "source_module": "extensions/sber-sql-dm-helper-extension",
+      "version": "0.1.0"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "technology-extension-runtime>=0.2.2,<1",
+        "code-analyzer-core>=0.44.23a20,<0.45"
+      ],
+      "entry_points": {},
+      "name": "tsa-change-vector-technology-extension",
+      "requires_python": ">=3.10",
+      "source_module": "extensions/tsa-change-vector-extension",
+      "version": "0.1.4"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [],
+      "entry_points": {},
+      "name": "aisl-publication",
+      "requires_python": ">=3.10",
+      "source_module": "packages/aisl-publication",
+      "version": null
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "technology-extension-runtime>=0.2.3,<1",
+        "typer>=0.12.2",
+        "pydantic>=2.0",
+        "PyYAML>=6.0",
+        "sqlglot==30.13.0",
+        "networkx>=3.0",
+        "jinja2>=3.1.0",
+        "rapidfuzz>=3.0.0",
+        "rich>=13.0.0",
+        "tree-sitter>=0.25.0,<0.27",
+        "source-syntax-primitives==0.1.0a7",
+        "tree-sitter-postgres==1.2.4"
+      ],
+      "entry_points": {
+        "code-analyzer-core": "code_analyzer_core.cli:app"
+      },
+      "name": "code-analyzer-core",
+      "requires_python": ">=3.11",
+      "source_module": "packages/code-analyzer-core",
+      "version": "0.44.23a77"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "fastapi>=0.115",
+        "knowledge-integration>=0.1.20a5,<0.2.0",
+        "pydantic>=2.7",
+        "uvicorn>=0.30",
+        "jsonschema>=4.23",
+        "prepared-knowledge-runtime>=0.1.0,<0.2.0",
+        "aisl-publication==0.1.0a2"
+      ],
+      "entry_points": {
+        "knowledge-api": "knowledge_api.cli:main",
+        "knowledge-api-export-openapi": "knowledge_api.contract_openapi_export:main"
+      },
+      "name": "knowledge-api",
+      "requires_python": ">=3.10",
+      "source_module": "packages/knowledge-api",
+      "version": "0.40.9a12"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=77"
+        ]
+      },
+      "dependencies": [
+        "fastapi>=0.137,<1",
+        "pydantic>=2.13,<3",
+        "uvicorn>=0.30,<1",
+        "httpx>=0.27,<1",
+        "PyYAML>=6,<7",
+        "static-analysis-runner==0.10.54",
+        "aisl-publication==0.1.0a2"
+      ],
+      "entry_points": {
+        "knowledge-control-plane": "knowledge_control_plane.cli:main"
+      },
+      "name": "knowledge-control-plane",
+      "requires_python": ">=3.11",
+      "source_module": "packages/knowledge-control-plane",
+      "version": "1.2.0a129"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [],
+      "entry_points": {},
+      "name": "knowledge-integration",
+      "requires_python": ">=3.10",
+      "source_module": "packages/knowledge-integration",
+      "version": "0.1.21a5"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "duckdb>=1.1.0",
+        "prepared-knowledge-runtime>=0.1.0,<1.0.0",
+        "technology-extension-runtime>=0.2.3,<1.0.0"
+      ],
+      "entry_points": {
+        "knowledge-layer-materialization-contracts": "knowledge_layer_core.materialization_contracts_cli:main",
+        "knowledge-layer-materialize": "knowledge_layer_core.materialization_runtime_cli:main"
+      },
+      "name": "knowledge-layer-core",
+      "requires_python": ">=3.10",
+      "source_module": "packages/knowledge-layer-core",
+      "version": "0.61.0a73"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "duckdb>=1.1.0"
+      ],
+      "entry_points": {},
+      "name": "prepared-knowledge-runtime",
+      "requires_python": ">=3.10",
+      "source_module": "packages/prepared-knowledge-runtime",
+      "version": "0.1.0.post30"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68",
+          "wheel"
+        ]
+      },
+      "dependencies": [
+        "tree-sitter==0.26.0",
+        "tree-sitter-java==0.23.5",
+        "sqlglot==30.13.0",
+        "proto-schema-parser==2.1.0",
+        "antlr4-python3-runtime==4.13.2",
+        "jproperties==2.1.2",
+        "hocon-parser==1.13.0"
+      ],
+      "entry_points": {},
+      "name": "source-syntax-primitives",
+      "requires_python": ">=3.11",
+      "source_module": "packages/source-syntax-primitives",
+      "version": "0.1.0a7"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=68"
+        ]
+      },
+      "dependencies": [
+        "technology-extension-runtime>=0.2.3,<1",
+        "typer>=0.12.2",
+        "PyYAML>=6.0"
+      ],
+      "entry_points": {
+        "static-analysis-runner": "static_analysis_runner.cli:app"
+      },
+      "name": "static-analysis-runner",
+      "requires_python": ">=3.10",
+      "source_module": "packages/static-analysis-runner",
+      "version": "0.10.54"
+    },
+    {
+      "build_system": {
+        "build-backend": "setuptools.build_meta",
+        "requires": [
+          "setuptools>=77"
+        ]
+      },
+      "dependencies": [],
+      "entry_points": {
+        "technology-extension-runtime": "technology_extension_runtime.cli:main"
+      },
+      "name": "technology-extension-runtime",
+      "requires_python": ">=3.11",
+      "source_module": "packages/technology-extension-runtime",
+      "version": "0.2.3"
+    }
+  ]
+}

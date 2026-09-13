@@ -1,0 +1,28 @@
+{
+  "execution_fingerprint": "7a4c01eb9a387da0d47f5ac120f19f3567e8db730b2afcea4a68789627e7aab9",
+  "knowledge_artifact_count": 2,
+  "materialization_count": 2,
+  "published_capabilities": [
+    "common.code-declared-data-model",
+    "common.code-declared-entities",
+    "common.code-declared-fields",
+    "common.code-declared-inheritance",
+    "common.code-declared-relationships",
+    "common.declared-model-candidates",
+    "common.declared-model-dataset",
+    "common.sql-analysis",
+    "common.sql-attribute-insertion-context",
+    "common.sql-field-calculation",
+    "common.sql-relation-fields",
+    "common.sql-relation-semantic-roles",
+    "common.sql-source-inventory",
+    "common.sql-source-inventory-export",
+    "common.sql-target-column-lineage",
+    "common.sql-target-resolution",
+    "common.sql-workflow-bindings",
+    "common.sql-workflow-context"
+  ],
+  "schema_version": "knowledge_materialization_execution_summary/v1",
+  "scope_id": "sdd-pilot",
+  "status": "completed"
+}

@@ -1,0 +1,320 @@
+{
+  "analyzer_executions": [
+    {
+      "analyzer_execution_id": "core_analyzer_execution_633c7c99bb5035916c8620dc",
+      "analyzer_id": "java-type-structure-analyzer",
+      "analyzer_implementation": {
+        "analyzer_id": "java-type-structure-analyzer",
+        "analyzer_version": "0.44.23a77",
+        "component": "code-analyzer-core",
+        "kind": "built_in",
+        "version": "0.44.23a77"
+      },
+      "analyzer_version": "0.44.23a77",
+      "artifact_ids": [
+        "java_type_structure_166d5e82283748a925729ed7"
+      ],
+      "parameters": {},
+      "required_by": [],
+      "semantic_outputs": [
+        {
+          "artifact_kind": "java-type-structure-evidence",
+          "schema_version": "java-type-structure-evidence/v1"
+        }
+      ],
+      "source_snapshot_fingerprints": [
+        "9f01e28a90c4681922955cd4e5cb2c963c90661ec688ed676fe777938fff83a6"
+      ],
+      "source_snapshot_ids": [
+        "sdd-pilot"
+      ],
+      "status": "completed"
+    },
+    {
+      "analyzer_execution_id": "core_analyzer_execution_7a00fe7c2cab9a74f78f7e47",
+      "analyzer_id": "schema-declaration-analyzer",
+      "analyzer_implementation": {
+        "analyzer_id": "schema-declaration-analyzer",
+        "analyzer_version": "0.44.23a77",
+        "component": "code-analyzer-core",
+        "kind": "built_in",
+        "version": "0.44.23a77"
+      },
+      "analyzer_version": "0.44.23a77",
+      "artifact_ids": [
+        "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5"
+      ],
+      "parameters": {},
+      "required_by": [],
+      "semantic_outputs": [
+        {
+          "artifact_kind": "schema-declaration-evidence",
+          "schema_version": "schema-declaration-evidence/v1"
+        }
+      ],
+      "source_snapshot_fingerprints": [
+        "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5"
+      ],
+      "source_snapshot_ids": [
+        "sdd-pilot"
+      ],
+      "status": "partial"
+    },
+    {
+      "analyzer_execution_id": "core_analyzer_execution_e1ce11d152497fa182f5a5e4",
+      "analyzer_id": "sql-analysis-analyzer",
+      "analyzer_implementation": {
+        "analyzer_id": "sql-analysis-analyzer",
+        "analyzer_version": "0.44.23a77",
+        "component": "code-analyzer-core",
+        "kind": "built_in",
+        "version": "0.44.23a77"
+      },
+      "analyzer_version": "0.44.23a77",
+      "artifact_ids": [
+        "sql_analysis_d00f5e837cbd36d4c5fe0b93"
+      ],
+      "parameters": {},
+      "required_by": [],
+      "semantic_outputs": [
+        {
+          "artifact_kind": "sql-analysis",
+          "schema_version": "sql-analysis/v1"
+        }
+      ],
+      "source_snapshot_fingerprints": [
+        "138463f1909fa4ab3861a019d67a048b2943d9ed7f0fda78dc43acc5e10c5e52"
+      ],
+      "source_snapshot_ids": [
+        "sdd-pilot"
+      ],
+      "status": "partial"
+    }
+  ],
+  "diagnostics": [],
+  "evidence_artifacts": [
+    {
+      "artifact_id": "java_type_structure_166d5e82283748a925729ed7",
+      "artifact_kind": "java-type-structure-evidence",
+      "content_fingerprint": "166d5e82283748a925729ed7debe29d17f91f130996bb664960c0dfa2edc6349",
+      "contract_version": "core_evidence_artifact_contract/v1",
+      "coverage": {
+        "ambiguous_type_reference_count": 0,
+        "annotation_declaration_count": 1,
+        "coverage_status": "complete",
+        "enum_constant_declaration_count": 0,
+        "field_declaration_count": 4,
+        "inheritance_declaration_count": 1,
+        "java_files_discovered": 1,
+        "java_files_failed": 0,
+        "java_files_in_scope": 1,
+        "java_files_parsed": 1,
+        "java_files_with_parse_errors": 0,
+        "type_declaration_count": 3,
+        "type_reference_count": 2,
+        "unresolved_type_reference_count": 0,
+        "unsupported_declaration_count": 0
+      },
+      "diagnostics": {
+        "code_counts": {},
+        "count": 0,
+        "severity_counts": {}
+      },
+      "location": {
+        "bytes": 9860,
+        "kind": "file",
+        "path": "evidence/java-type-structure-evidence.json",
+        "sha256": "2a97368fe2b57d26e3726702bb349b7b88ec469916466c4bc4e4d32a05e5c04c"
+      },
+      "producer_analyzer_execution_id": "core_analyzer_execution_633c7c99bb5035916c8620dc",
+      "provenance": {
+        "core_artifact_provenance": {
+          "execution_runtime": "core_evidence_runtime/v1",
+          "parser_provider": "tree_sitter",
+          "semantic_routing": "explicit_analyzer_identity"
+        },
+        "producer": {
+          "analyzer_id": "java-type-structure-analyzer",
+          "analyzer_version": "0.44.23a77",
+          "component": "code-analyzer-core"
+        },
+        "required_by": [],
+        "source_snapshot": {
+          "file_count": 1,
+          "fingerprint": "9f01e28a90c4681922955cd4e5cb2c963c90661ec688ed676fe777938fff83a6",
+          "revision": null,
+          "scope": "java_source_files",
+          "source_id": "sdd-pilot"
+        }
+      },
+      "schema_version": "java-type-structure-evidence/v1",
+      "status": "completed"
+    },
+    {
+      "artifact_id": "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5",
+      "artifact_kind": "schema-declaration-evidence",
+      "content_fingerprint": "0f5ce86c2262ba41d00fcf24f3e8ce6c86b33cf3662b6634d73ee8bfeac3a9f1",
+      "contract_version": "core_evidence_artifact_contract/v1",
+      "coverage": {
+        "candidate_structured_file_count": 1,
+        "composition_observation_count": 0,
+        "coverage_status": "partial",
+        "field_declaration_count": 7,
+        "formal_schema_document_count": 1,
+        "inline_schema_declaration_count": 1,
+        "json_schema_document_count": 0,
+        "json_schema_document_parse_failed_count": 0,
+        "openapi_document_count": 1,
+        "openapi_document_parse_failed_count": 0,
+        "proto_document_count": 0,
+        "proto_document_parse_failed_count": 0,
+        "provider_status": {
+          "json_schema": "implemented",
+          "openapi": "implemented",
+          "proto": "implemented",
+          "xsd": "implemented"
+        },
+        "schema_declaration_count": 3,
+        "schema_reference_count": 3,
+        "unresolved_schema_reference_count": 1,
+        "xsd_document_count": 0,
+        "xsd_document_parse_failed_count": 0
+      },
+      "diagnostics": {
+        "code_counts": {
+          "external_schema_reference_not_resolved": 1
+        },
+        "count": 1,
+        "severity_counts": {
+          "warning": 1
+        }
+      },
+      "location": {
+        "bytes": 14880,
+        "kind": "file",
+        "path": "evidence/schema-declaration-evidence.json",
+        "sha256": "0d815e86e85cf2ce4ff96b56c596563179ef17fe3ade1d4dd3873fb3d9f4c6ac"
+      },
+      "producer_analyzer_execution_id": "core_analyzer_execution_7a00fe7c2cab9a74f78f7e47",
+      "provenance": {
+        "core_artifact_provenance": {
+          "producer": {
+            "analyzer_id": "schema-declaration-analyzer",
+            "analyzer_version": "0.44.23a77",
+            "component": "code-analyzer-core"
+          },
+          "source_snapshot": {
+            "file_count": 1,
+            "fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5",
+            "revision": null,
+            "scope": "declared_schema_contracts",
+            "source_id": "sdd-pilot"
+          }
+        },
+        "producer": {
+          "analyzer_id": "schema-declaration-analyzer",
+          "analyzer_version": "0.44.23a77",
+          "component": "code-analyzer-core"
+        },
+        "required_by": [],
+        "source_snapshot": {
+          "file_count": 1,
+          "fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5",
+          "revision": null,
+          "scope": "declared_schema_contracts",
+          "source_id": "sdd-pilot"
+        }
+      },
+      "schema_version": "schema-declaration-evidence/v1",
+      "status": "partial"
+    },
+    {
+      "artifact_id": "sql_analysis_d00f5e837cbd36d4c5fe0b93",
+      "artifact_kind": "sql-analysis",
+      "content_fingerprint": "d00f5e837cbd36d4c5fe0b9387de90ff094a2e388ac6e43cfc83bcb8e4019358",
+      "contract_version": "core_evidence_artifact_contract/v1",
+      "coverage": {
+        "coverage_status": "partial",
+        "lineage_gap_count": 0,
+        "sql_files_scanned": 3,
+        "sql_statement_count": 8,
+        "sql_unit_count": 1
+      },
+      "diagnostics": {
+        "code_counts": {
+          "sql_analysis_partial": 1
+        },
+        "count": 1,
+        "severity_counts": {
+          "warning": 1
+        }
+      },
+      "location": {
+        "bytes": 7529,
+        "kind": "file",
+        "path": "evidence/sql-analysis-evidence.json",
+        "sha256": "bcf468e7ac498352739b0ba0b0887e3952f806fcf7ab6fe53deb1859d7c9e008"
+      },
+      "producer_analyzer_execution_id": "core_analyzer_execution_e1ce11d152497fa182f5a5e4",
+      "provenance": {
+        "core_artifact_provenance": {
+          "canonical_payload_contract": "sql-analysis/v1-jsonl-shards",
+          "execution_runtime": "core_evidence_runtime/v1",
+          "semantic_routing": "explicit_analyzer_identity"
+        },
+        "producer": {
+          "analyzer_id": "sql-analysis-analyzer",
+          "analyzer_version": "0.44.23a77",
+          "component": "code-analyzer-core"
+        },
+        "required_by": [],
+        "source_snapshot": {
+          "file_count": 3,
+          "fingerprint": "138463f1909fa4ab3861a019d67a048b2943d9ed7f0fda78dc43acc5e10c5e52",
+          "revision": null,
+          "scope": "sql_analysis_sources",
+          "source_id": "sdd-pilot"
+        }
+      },
+      "schema_version": "sql-analysis/v1",
+      "status": "partial"
+    }
+  ],
+  "execution_id": "core_evidence_execution_5cf00b1dd249f1b378305f98",
+  "producer": {
+    "component": "code-analyzer-core",
+    "version": "0.44.23a77"
+  },
+  "request_fingerprint": "64b3e23f1b48100a4598af2b3624111f2b5b91128ec70358cdd8a28d84944390",
+  "result_fingerprint": "611649f7dad66d26b2b43fad208bb4fb74c0d73217d054af9b081bd922a28639",
+  "runtime_contract_id": "core_evidence_runtime/v1",
+  "schema_version": "core_evidence_execution_result/v1",
+  "source": {
+    "source_id": "sdd-pilot",
+    "source_kind": "repository"
+  },
+  "source_snapshots": [
+    {
+      "file_count": 3,
+      "fingerprint": "138463f1909fa4ab3861a019d67a048b2943d9ed7f0fda78dc43acc5e10c5e52",
+      "revision": null,
+      "scope": "sql_analysis_sources",
+      "source_id": "sdd-pilot"
+    },
+    {
+      "file_count": 1,
+      "fingerprint": "9f01e28a90c4681922955cd4e5cb2c963c90661ec688ed676fe777938fff83a6",
+      "revision": null,
+      "scope": "java_source_files",
+      "source_id": "sdd-pilot"
+    },
+    {
+      "file_count": 1,
+      "fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5",
+      "revision": null,
+      "scope": "declared_schema_contracts",
+      "source_id": "sdd-pilot"
+    }
+  ],
+  "status": "partial"
+}

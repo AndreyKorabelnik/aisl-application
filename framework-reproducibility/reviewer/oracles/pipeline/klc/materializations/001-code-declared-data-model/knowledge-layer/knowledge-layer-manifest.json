@@ -1,0 +1,208 @@
+{
+  "artifact_id": "knowledge_layer",
+  "artifacts": {
+    "database": "knowledge-layer.duckdb",
+    "manifest": "knowledge-layer-manifest.json",
+    "model_summary": "code-declared-data-model.json"
+  },
+  "build_id": "code_declared_data_model_build_83bdf351ce719f7102c8",
+  "build_status": "complete",
+  "capabilities": [
+    "common.code-declared-data-model",
+    "common.code-declared-entities",
+    "common.code-declared-fields",
+    "common.code-declared-relationships",
+    "common.code-declared-inheritance",
+    "common.declared-model-candidates",
+    "common.declared-model-dataset"
+  ],
+  "counts": {
+    "code_declared_annotation": 1,
+    "code_declared_candidate_group": 2,
+    "code_declared_candidate_member": 2,
+    "code_declared_effective_field": 12,
+    "code_declared_enum_constant": 0,
+    "code_declared_field": 11,
+    "code_declared_inheritance": 1,
+    "code_declared_model_build": 1,
+    "code_declared_model_gap": 1,
+    "code_declared_model_source": 2,
+    "code_declared_relationship": 3,
+    "code_declared_source_unit": 2,
+    "code_declared_type": 6,
+    "code_declared_type_reference": 5
+  },
+  "database_path": "knowledge-layer.duckdb",
+  "deterministic": true,
+  "llm_generated": false,
+  "manifest_path": "knowledge-layer-manifest.json",
+  "materialized_marts": [
+    "code-declared-types",
+    "code-declared-fields",
+    "code-declared-inheritance",
+    "code-declared-effective-fields",
+    "code-declared-relationships",
+    "code-declared-model-gaps",
+    "code-declared-candidate-groups",
+    "code-declared-candidate-members"
+  ],
+  "metadata": {
+    "candidate_projection": {
+      "algorithm": "technical_name_field_signature/v2",
+      "default_excludes_inline_declarations": true,
+      "semantic_status": "technical_discovery_only"
+    },
+    "coverage": {
+      "ambiguous_type_reference_count": 0,
+      "analysis_status": "partial",
+      "evidence_source_count": 2,
+      "inline_schema_declaration_count": 1,
+      "java_files_failed": 0,
+      "java_files_in_scope": 1,
+      "java_files_parsed": 1,
+      "java_files_with_parse_errors": 0,
+      "model_gap_count": 1,
+      "openapi_document_count": 1,
+      "repository_count": 1,
+      "repository_status_counts": {
+        "partial": 1
+      },
+      "schema_declaration_count": 3,
+      "schema_field_declaration_count": 11,
+      "schema_reference_count": 3,
+      "source_coverage_by_repository": {
+        "sdd-pilot": {
+          "coverage_status": "partial",
+          "evidence_sources": [
+            {
+              "artifact_kind": "java-type-structure-evidence",
+              "coverage": {
+                "ambiguous_type_reference_count": 0,
+                "annotation_declaration_count": 1,
+                "coverage_status": "complete",
+                "enum_constant_declaration_count": 0,
+                "field_declaration_count": 4,
+                "inheritance_declaration_count": 1,
+                "java_files_discovered": 1,
+                "java_files_failed": 0,
+                "java_files_in_scope": 1,
+                "java_files_parsed": 1,
+                "java_files_with_parse_errors": 0,
+                "type_declaration_count": 3,
+                "type_reference_count": 2,
+                "unresolved_type_reference_count": 0,
+                "unsupported_declaration_count": 0
+              },
+              "schema_version": "java-type-structure-evidence/v1"
+            },
+            {
+              "artifact_kind": "schema-declaration-evidence",
+              "coverage": {
+                "candidate_structured_file_count": 1,
+                "composition_observation_count": 0,
+                "coverage_status": "partial",
+                "field_declaration_count": 7,
+                "formal_schema_document_count": 1,
+                "inline_schema_declaration_count": 1,
+                "json_schema_document_count": 0,
+                "json_schema_document_parse_failed_count": 0,
+                "openapi_document_count": 1,
+                "openapi_document_parse_failed_count": 0,
+                "proto_document_count": 0,
+                "proto_document_parse_failed_count": 0,
+                "provider_status": {
+                  "json_schema": "implemented",
+                  "openapi": "implemented",
+                  "proto": "implemented",
+                  "xsd": "implemented"
+                },
+                "schema_declaration_count": 3,
+                "schema_reference_count": 3,
+                "unresolved_schema_reference_count": 1,
+                "xsd_document_count": 0,
+                "xsd_document_parse_failed_count": 0
+              },
+              "schema_version": "schema-declaration-evidence/v1"
+            }
+          ]
+        }
+      },
+      "unresolved_schema_reference_count": 1,
+      "unresolved_type_reference_count": 0,
+      "unsupported_declaration_count": 0
+    },
+    "legacy_policy": "not_supported",
+    "model_schema_version": "code-declared-data-model/v1",
+    "semantic_routing": "artifact_kind_plus_schema_version",
+    "source_schema_version": "declared-structure-evidence-set/v1",
+    "supported_source_schema_versions": [
+      "java-type-structure-evidence/v1",
+      "schema-declaration-evidence/v1",
+      "declared-data-model-evidence/v1"
+    ]
+  },
+  "modes": [
+    "data-model"
+  ],
+  "producer": "knowledge-layer-core",
+  "producer_version": "0.61.0a73",
+  "repository_count": 1,
+  "repository_ids": [
+    "sdd-pilot"
+  ],
+  "schema_version": "knowledge_layer/v1",
+  "scope_id": "sdd-pilot",
+  "scope_type": "repository",
+  "source_evidence": [
+    {
+      "artifact_id": "java_type_structure_166d5e82283748a925729ed7",
+      "artifact_kind": "java-type-structure-evidence",
+      "content_fingerprint": "166d5e82283748a925729ed7debe29d17f91f130996bb664960c0dfa2edc6349",
+      "imported_counts": {
+        "code_declared_annotation": 1,
+        "code_declared_effective_field": 5,
+        "code_declared_enum_constant": 0,
+        "code_declared_field": 4,
+        "code_declared_inheritance": 1,
+        "code_declared_model_gap": 0,
+        "code_declared_relationship": 1,
+        "code_declared_source_unit": 1,
+        "code_declared_type": 3,
+        "code_declared_type_reference": 2
+      },
+      "repo_id": "sdd-pilot",
+      "schema_version": "java-type-structure-evidence/v1",
+      "source_snapshot_fingerprint": "9f01e28a90c4681922955cd4e5cb2c963c90661ec688ed676fe777938fff83a6"
+    },
+    {
+      "artifact_id": "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5",
+      "artifact_kind": "schema-declaration-evidence",
+      "content_fingerprint": "0f5ce86c2262ba41d00fcf24f3e8ce6c86b33cf3662b6634d73ee8bfeac3a9f1",
+      "imported_counts": {
+        "code_declared_annotation": 0,
+        "code_declared_effective_field": 7,
+        "code_declared_enum_constant": 0,
+        "code_declared_field": 7,
+        "code_declared_inheritance": 0,
+        "code_declared_model_gap": 1,
+        "code_declared_relationship": 2,
+        "code_declared_source_unit": 1,
+        "code_declared_type": 3,
+        "code_declared_type_reference": 3
+      },
+      "repo_id": "sdd-pilot",
+      "schema_version": "schema-declaration-evidence/v1",
+      "source_snapshot_fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5"
+    }
+  ],
+  "validation": {
+    "duplicate_effective_field_names": 0,
+    "mismatched_candidate_member_counts": 0,
+    "orphan_candidate_members": 0,
+    "orphan_effective_fields": 0,
+    "orphan_fields": 0,
+    "semantic_routing": "artifact_kind_plus_schema_version",
+    "source_count_matches": true,
+    "status": "complete"
+  }
+}

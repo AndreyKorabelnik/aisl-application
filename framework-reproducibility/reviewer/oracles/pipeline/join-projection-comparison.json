@@ -1,0 +1,266 @@
+{
+  "bulk_expression_join": {
+    "additional_predicates": [],
+    "column_pairs": [],
+    "condition_kind": "on",
+    "evidence_maturity_level": "confirmed",
+    "evidence_refs": [
+      {
+        "file": "sql-cases.sql",
+        "line_start": 18
+      }
+    ],
+    "expression_links": [
+      {
+        "left_columns": [
+          {
+            "column": "region",
+            "column_usage_id": "sql_column_usage_sdd-pilot_90021ef6287ce3ff",
+            "relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+            "relation_name": "customer",
+            "resolution_status": "resolved"
+          },
+          {
+            "column": "id",
+            "column_usage_id": "sql_column_usage_sdd-pilot_d5a250e262945c02",
+            "relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+            "relation_name": "customer",
+            "resolution_status": "resolved"
+          }
+        ],
+        "left_expression": "CONCAT(a.region, a.id)",
+        "left_relation_ids": [
+          "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+        ],
+        "left_relation_names": [
+          "customer"
+        ],
+        "operator": "=",
+        "predicate": "CONCAT(a.region, a.id) = b.external_key",
+        "predicate_role": "equality_expression",
+        "resolution_status": "confirmed",
+        "right_columns": [
+          {
+            "column": "external_key",
+            "column_usage_id": "sql_column_usage_sdd-pilot_5722107921923dcb",
+            "relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+            "relation_name": "profile",
+            "resolution_status": "resolved"
+          }
+        ],
+        "right_expression": "b.external_key",
+        "right_relation_ids": [
+          "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+        ],
+        "right_relation_names": [
+          "profile"
+        ]
+      }
+    ],
+    "file": "sql-cases.sql",
+    "join_ordinal": 1,
+    "join_type": "inner",
+    "left_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+    "left_relation_ids": [
+      "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+    ],
+    "left_relation_names": [
+      "customer"
+    ],
+    "line_start": 18,
+    "participating_relation_ids": [
+      "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+      "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+    ],
+    "physical_join_confirmed": true,
+    "predicate": "CONCAT(a.region, a.id) = b.external_key",
+    "query_id": "query_sdd-pilot_000007",
+    "repo_id": "sdd-pilot",
+    "resolution_reasons": [],
+    "resolution_status": "confirmed",
+    "right_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+    "right_relation_kind": "physical",
+    "right_relation_name": "profile",
+    "scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9",
+    "sql_join_edge_id": "sql_join_edge_sdd-pilot_d533ec4fc02309ab",
+    "temporal_or_range_predicates": [],
+    "using_columns": []
+  },
+  "query_context": {
+    "child_scopes": [],
+    "counts": {
+      "child_scopes": 0,
+      "joins": 1,
+      "projections": 1,
+      "scope_relations": 2
+    },
+    "diagnostics": [],
+    "joins": [
+      {
+        "column_pairs": [],
+        "condition_kind": "on",
+        "evidence_refs": [
+          {
+            "file": "sql-cases.sql",
+            "line_start": 18
+          }
+        ],
+        "join_ordinal": 1,
+        "join_type": "inner",
+        "left_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+        "left_relation_ids": [
+          "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+        ],
+        "left_relation_names": [
+          "customer"
+        ],
+        "participating_relation_ids": [
+          "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+          "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+        ],
+        "physical_join_confirmed": true,
+        "predicate": "CONCAT(a.region, a.id) = b.external_key",
+        "resolution_status": "confirmed",
+        "right_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+        "right_relation_kind": "physical",
+        "right_relation_name": "profile",
+        "sql_join_edge_id": "sql_join_edge_sdd-pilot_d533ec4fc02309ab",
+        "using_columns": []
+      }
+    ],
+    "projections": [
+      {
+        "evidence_refs": [
+          {
+            "file": "sql-cases.sql",
+            "line_start": 18
+          }
+        ],
+        "expression": "a.id",
+        "expression_kind": "direct_column",
+        "is_wildcard": false,
+        "output_name": "id",
+        "projection_ordinal": 1,
+        "resolution_basis": "scoped_ast",
+        "resolution_status": "resolved",
+        "source_column_usage_ids": [
+          "sql_column_usage_sdd-pilot_b3b1ae125d933488"
+        ],
+        "sql_projection_id": "sql_projection_sdd-pilot_b153d04ddca381a1"
+      }
+    ],
+    "query_context_schema_version": "sql-query-context/v1",
+    "query_id": "query_sdd-pilot_000007",
+    "repo_id": "sdd-pilot",
+    "revision_id": "rev-08005fc81dcf2b53908d4a65",
+    "schema_version": "knowledge_api/v1",
+    "scope": {
+      "column_usage_count": 4,
+      "evidence_refs": [
+        {
+          "file": "sql-cases.sql",
+          "line_start": 18
+        }
+      ],
+      "file": "sql-cases.sql",
+      "line_start": 18,
+      "output_columns": [
+        "id"
+      ],
+      "output_contract_basis": "explicit_select_projections",
+      "output_contract_status": "complete",
+      "output_contract_wildcard_provenance": [],
+      "projection_count": 1,
+      "query_id": "query_sdd-pilot_000007",
+      "relation_count": 2,
+      "scope_kind": "statement",
+      "sql_select_scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9"
+    },
+    "scope_candidates": [],
+    "scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9",
+    "scope_relations": [
+      {
+        "alias": "a",
+        "definition_status": "not_applicable",
+        "evidence_refs": [
+          {
+            "file": "sql-cases.sql",
+            "line_start": 18
+          }
+        ],
+        "logical_name": "customer",
+        "observed_fields": [
+          {
+            "name": "id",
+            "usage_roles": [
+              "join",
+              "projection"
+            ]
+          },
+          {
+            "name": "region",
+            "usage_roles": [
+              "join"
+            ]
+          }
+        ],
+        "output_columns": [],
+        "output_contract_basis": "not_applicable",
+        "output_contract_status": "not_applicable",
+        "output_contract_wildcard_provenance": [],
+        "relation_kind": "physical",
+        "relation_name": "customer",
+        "source_scope_ids": [],
+        "sql_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+        "template_name": "customer",
+        "usage_role": "from"
+      },
+      {
+        "alias": "b",
+        "definition_status": "not_applicable",
+        "evidence_refs": [
+          {
+            "file": "sql-cases.sql",
+            "line_start": 18
+          }
+        ],
+        "logical_name": "profile",
+        "observed_fields": [
+          {
+            "name": "external_key",
+            "usage_roles": [
+              "join"
+            ]
+          }
+        ],
+        "output_columns": [],
+        "output_contract_basis": "not_applicable",
+        "output_contract_status": "not_applicable",
+        "output_contract_wildcard_provenance": [],
+        "relation_kind": "physical",
+        "relation_name": "profile",
+        "source_scope_ids": [],
+        "sql_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+        "template_name": "profile",
+        "usage_role": "join"
+      }
+    ],
+    "selection_status": "selected",
+    "statement": {
+      "evidence_refs": [
+        {
+          "file": "sql-cases.sql",
+          "line_start": 18
+        }
+      ],
+      "file": "sql-cases.sql",
+      "line_end": 19,
+      "line_start": 18,
+      "query_id": "query_sdd-pilot_000007",
+      "sql_statement_id": "query_sdd-pilot_000007",
+      "statement_type": "select",
+      "unit_kind": "sql_file"
+    },
+    "system_id": "sdd-pilot"
+  }
+}

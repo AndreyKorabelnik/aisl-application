@@ -1,0 +1,24 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Synthetic declared-model fixture", "version": "1.0.0"},
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Customer": {
+        "type": "object",
+        "required": ["id", "profile"],
+        "properties": {
+          "id": {"type": "string"},
+          "profile": {"$ref": "#/components/schemas/Profile"},
+          "nickname": {"type": ["string", "null"]},
+          "metadata": {"type": "object", "properties": {"origin": {"type": "string"}}},
+          "external": {"$ref": "unavailable.json#/components/schemas/External"}
+        }
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {"name": {"type": "string"}}
+      }
+    }
+  }
+}

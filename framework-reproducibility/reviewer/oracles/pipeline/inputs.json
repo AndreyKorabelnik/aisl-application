@@ -1,0 +1,14 @@
+{
+  "Sample.java": {
+    "sha256": "875b7e031b23b57b8a2488eb497890058eb1f483cbfb417ff729a7d9cf88f70c",
+    "text": "package synthetic.fixture;\n\nclass BaseEntity {\n    protected String id;\n}\n\nfinal class Customer extends BaseEntity {\n    @Deprecated\n    private String nickname;\n    private Profile profile;\n}\n\nfinal class Profile {\n    private String name;\n}\n"
+  },
+  "declared-openapi.json": {
+    "sha256": "8c0843a407201de5417e27ecd3866bfd7a2cacc23811d34b8e0e7f103f6302a8",
+    "text": "{\n  \"openapi\": \"3.1.0\",\n  \"info\": {\"title\": \"Synthetic declared-model fixture\", \"version\": \"1.0.0\"},\n  \"paths\": {},\n  \"components\": {\n    \"schemas\": {\n      \"Customer\": {\n        \"type\": \"object\",\n        \"required\": [\"id\", \"profile\"],\n        \"properties\": {\n          \"id\": {\"type\": \"string\"},\n          \"profile\": {\"$ref\": \"#/components/schemas/Profile\"},\n          \"nickname\": {\"type\": [\"string\", \"null\"]},\n          \"metadata\": {\"type\": \"object\", \"properties\": {\"origin\": {\"type\": \"string\"}}},\n          \"external\": {\"$ref\": \"unavailable.json#/components/schemas/External\"}\n        }\n      },\n      \"Profile\": {\n        \"type\": \"object\",\n        \"properties\": {\"name\": {\"type\": \"string\"}}\n      }\n    }\n  }\n}\n"
+  },
+  "sql-cases.sql": {
+    "sha256": "a49a9b32f2f5eb3c59811390d87098fcb369e57a87ec86cccec99251af2db395",
+    "text": "-- Draft visible inputs. Canonical output and statement isolation remain pending.\nSELECT a.id, b.name\nFROM customer a LEFT JOIN profile b\n  ON a.id = b.customer_id AND a.region = b.region AND b.enabled = 1;\n\nSELECT a.id FROM event a JOIN validity b\n  ON a.event_time >= b.start_time AND a.event_time < b.end_time;\n\nSELECT a.id FROM customer a JOIN profile b USING (id);\n\nSELECT a.id FROM customer a CROSS JOIN region b;\n\nSELECT a.id FROM customer a JOIN profile b ON id = b.id;\n\nWITH chosen AS (SELECT id FROM customer)\nSELECT c.id FROM chosen c JOIN profile p ON c.id = p.customer_id;\n\nSELECT a.id FROM customer a JOIN profile b\n  ON CONCAT(a.region, a.id) = b.external_key;\n\nINSERT INTO target_profile (customer_id, label)\nSELECT c.id, p.name FROM customer c JOIN profile p ON c.id = p.customer_id;\n"
+  }
+}

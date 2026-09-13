@@ -1,0 +1,425 @@
+{
+  "artifact_id": "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5",
+  "artifact_kind": "schema-declaration-evidence",
+  "content_fingerprint": "0f5ce86c2262ba41d00fcf24f3e8ce6c86b33cf3662b6634d73ee8bfeac3a9f1",
+  "contract_version": "core_evidence_artifact_contract/v1",
+  "coverage": {
+    "candidate_structured_file_count": 1,
+    "composition_observation_count": 0,
+    "coverage_status": "partial",
+    "field_declaration_count": 7,
+    "formal_schema_document_count": 1,
+    "inline_schema_declaration_count": 1,
+    "json_schema_document_count": 0,
+    "json_schema_document_parse_failed_count": 0,
+    "openapi_document_count": 1,
+    "openapi_document_parse_failed_count": 0,
+    "proto_document_count": 0,
+    "proto_document_parse_failed_count": 0,
+    "provider_status": {
+      "json_schema": "implemented",
+      "openapi": "implemented",
+      "proto": "implemented",
+      "xsd": "implemented"
+    },
+    "schema_declaration_count": 3,
+    "schema_reference_count": 3,
+    "unresolved_schema_reference_count": 1,
+    "xsd_document_count": 0,
+    "xsd_document_parse_failed_count": 0
+  },
+  "diagnostics": [
+    {
+      "code": "external_schema_reference_not_resolved",
+      "details": {
+        "provider": "openapi",
+        "reference_role": "field_type"
+      },
+      "message": "Schema reference 'unavailable.json#/components/schemas/External' is preserved but not resolved in schema-declaration-evidence/v1.",
+      "severity": "warning",
+      "source_refs": [
+        {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/external",
+          "repository_relative_path": "declared-openapi.json"
+        }
+      ]
+    }
+  ],
+  "parameters": {},
+  "payload": {
+    "composition_observations": [],
+    "field_declarations": [
+      {
+        "additional_properties": null,
+        "declared_type_expression": "string",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_57ff2a362e8b0ad7c614e06f",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "name",
+        "normalized_type_expression": "string",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_4115f24666cd13a13f437e89",
+        "required": false,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Profile/properties/name",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "string"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "string",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_acad66b00985c9adc1b2fd3c",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "origin",
+        "normalized_type_expression": "string",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_68b4daaa701c8bcb430ee1db",
+        "required": false,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/metadata/properties/origin",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "string"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "External",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_c6901e0fb5738cf5e79f1bf7",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "external",
+        "normalized_type_expression": "External",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "required": false,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/external",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "External"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "string",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_3d84153710f7575d128b2d90",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "id",
+        "normalized_type_expression": "string",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "required": true,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/id",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "string"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "object",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_a05bf866fd8fce7c7a59bf51",
+        "format": null,
+        "inline_schema_id": "declared_schema_68b4daaa701c8bcb430ee1db",
+        "name": "metadata",
+        "normalized_type_expression": "object",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "required": false,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/metadata",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "object"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "string|null",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_a2adeb2ded36f6741644967b",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "nickname",
+        "normalized_type_expression": "string|null",
+        "nullable": true,
+        "owner_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "required": false,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/nickname",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "string",
+          "null"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declared_type_expression": "Profile",
+        "description": null,
+        "enum_values": [],
+        "field_id": "schema_field_3e1ee1a88d4f0c3c7ec372f1",
+        "format": null,
+        "inline_schema_id": null,
+        "name": "profile",
+        "normalized_type_expression": "Profile",
+        "nullable": false,
+        "owner_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "required": true,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/profile",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "type_variants": [
+          "Profile"
+        ]
+      }
+    ],
+    "schema_declarations": [
+      {
+        "additional_properties": null,
+        "declaration_role": null,
+        "description": null,
+        "enum_values": [],
+        "inline": false,
+        "nullable": false,
+        "parent_schema_id": null,
+        "provider_qualified_name": null,
+        "qualified_name": "openapi:declared-openapi.json#/components/schemas/Customer",
+        "required_fields": [
+          "id",
+          "profile"
+        ],
+        "schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "schema_kind": "object",
+        "schema_locator": "#/components/schemas/Customer",
+        "schema_name": "Customer",
+        "source_contract_version": "3.1.0",
+        "source_format": "openapi",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "source_unit_id": "schema_source_unit_fc588ca976d04feea0b7601a",
+        "type_variants": [
+          "object"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declaration_role": null,
+        "description": null,
+        "enum_values": [],
+        "inline": true,
+        "nullable": false,
+        "parent_schema_id": "declared_schema_d90e4d89205f1af9baa93ec9",
+        "provider_qualified_name": null,
+        "qualified_name": "openapi:declared-openapi.json#/components/schemas/Customer/properties/metadata",
+        "required_fields": [],
+        "schema_id": "declared_schema_68b4daaa701c8bcb430ee1db",
+        "schema_kind": "object",
+        "schema_locator": "#/components/schemas/Customer/properties/metadata",
+        "schema_name": "Customer.metadata",
+        "source_contract_version": "3.1.0",
+        "source_format": "openapi",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/metadata",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "source_unit_id": "schema_source_unit_fc588ca976d04feea0b7601a",
+        "type_variants": [
+          "object"
+        ]
+      },
+      {
+        "additional_properties": null,
+        "declaration_role": null,
+        "description": null,
+        "enum_values": [],
+        "inline": false,
+        "nullable": false,
+        "parent_schema_id": null,
+        "provider_qualified_name": null,
+        "qualified_name": "openapi:declared-openapi.json#/components/schemas/Profile",
+        "required_fields": [],
+        "schema_id": "declared_schema_4115f24666cd13a13f437e89",
+        "schema_kind": "object",
+        "schema_locator": "#/components/schemas/Profile",
+        "schema_name": "Profile",
+        "source_contract_version": "3.1.0",
+        "source_format": "openapi",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Profile",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "source_unit_id": "schema_source_unit_fc588ca976d04feea0b7601a",
+        "type_variants": [
+          "object"
+        ]
+      }
+    ],
+    "schema_reference_observations": [
+      {
+        "candidate_schema_ids": [],
+        "declared_ref": "#/components/schemas/Profile",
+        "declared_type_expression": "Profile",
+        "owner_id": "schema_field_3e1ee1a88d4f0c3c7ec372f1",
+        "owner_kind": "field",
+        "reference_id": "schema_ref_05fe23091c496c706ec407a2",
+        "reference_role": "field_type",
+        "referenced_schema_name": "Profile",
+        "resolution_status": "resolved",
+        "resolved_schema_id": "declared_schema_4115f24666cd13a13f437e89",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/profile",
+          "repository_relative_path": "declared-openapi.json"
+        }
+      },
+      {
+        "candidate_schema_ids": [],
+        "declared_ref": null,
+        "declared_type_expression": "object",
+        "owner_id": "schema_field_a05bf866fd8fce7c7a59bf51",
+        "owner_kind": "field",
+        "reference_id": "schema_ref_013a70ca95c07a85481d2057",
+        "reference_role": "inline_object",
+        "referenced_schema_name": "Customer.metadata",
+        "resolution_status": "resolved",
+        "resolved_schema_id": "declared_schema_68b4daaa701c8bcb430ee1db",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/metadata",
+          "repository_relative_path": "declared-openapi.json"
+        }
+      },
+      {
+        "candidate_schema_ids": [],
+        "declared_ref": "unavailable.json#/components/schemas/External",
+        "declared_type_expression": "External",
+        "owner_id": "schema_field_c6901e0fb5738cf5e79f1bf7",
+        "owner_kind": "field",
+        "reference_id": "schema_ref_ebbaeec8c97f13ea770e8bb0",
+        "reference_role": "field_type",
+        "referenced_schema_name": "External",
+        "resolution_status": "external_not_resolved",
+        "resolved_schema_id": null,
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#/components/schemas/Customer/properties/external",
+          "repository_relative_path": "declared-openapi.json"
+        }
+      }
+    ],
+    "source_units": [
+      {
+        "bytes": 714,
+        "classification_basis": "parsed_root_openapi_or_swagger_marker",
+        "content_sha256": "8c0843a407201de5417e27ecd3866bfd7a2cacc23811d34b8e0e7f103f6302a8",
+        "contract_kind": "openapi",
+        "contract_version": "3.1.0",
+        "parse_error_count": 0,
+        "parse_status": "success",
+        "repository_relative_path": "declared-openapi.json",
+        "source_ref": {
+          "extractor": "openapi_schema_scanner",
+          "line_end": 1,
+          "line_start": 1,
+          "locator": "#",
+          "repository_relative_path": "declared-openapi.json"
+        },
+        "source_unit_id": "schema_source_unit_fc588ca976d04feea0b7601a",
+        "syntax": "json"
+      }
+    ]
+  },
+  "producer": {
+    "analyzer_id": "schema-declaration-analyzer",
+    "analyzer_version": "0.44.23a77",
+    "component": "code-analyzer-core"
+  },
+  "provenance": {
+    "producer": {
+      "analyzer_id": "schema-declaration-analyzer",
+      "analyzer_version": "0.44.23a77",
+      "component": "code-analyzer-core"
+    },
+    "source_snapshot": {
+      "file_count": 1,
+      "fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5",
+      "revision": null,
+      "scope": "declared_schema_contracts",
+      "source_id": "sdd-pilot"
+    }
+  },
+  "schema_version": "schema-declaration-evidence/v1",
+  "source_snapshot": {
+    "file_count": 1,
+    "fingerprint": "f859c0031076a943b6a1b8d74e81464590901054ede998de3185d1a193df66c5",
+    "revision": null,
+    "scope": "declared_schema_contracts",
+    "source_id": "sdd-pilot"
+  }
+}

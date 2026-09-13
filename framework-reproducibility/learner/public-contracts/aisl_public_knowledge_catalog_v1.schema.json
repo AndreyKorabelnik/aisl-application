@@ -1,0 +1,450 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aisl.example/schemas/aisl_public_knowledge_catalog_v1.schema.json",
+  "title": "AISL public knowledge catalog",
+  "description": "Descriptive, non-executable inventory of public knowledge exposed for one exact AISL revision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_kind",
+    "execution_semantics",
+    "scope",
+    "capabilities",
+    "knowledge_artifacts",
+    "resources",
+    "advisory_profiles",
+    "conventions",
+    "generated_from",
+    "catalog_fingerprint"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aisl_public_knowledge_catalog/v1"
+    },
+    "catalog_kind": {
+      "const": "descriptive"
+    },
+    "execution_semantics": {
+      "const": "none"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "knowledge_artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/resource"
+      }
+    },
+    "advisory_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/advisoryProfile"
+      }
+    },
+    "conventions": {
+      "$ref": "#/$defs/conventions"
+    },
+    "generated_from": {
+      "$ref": "#/$defs/generatedFrom"
+    },
+    "catalog_fingerprint": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullableFingerprint": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "stringSet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system_id",
+        "revision_id",
+        "revision_binding"
+      ],
+      "properties": {
+        "system_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision_id": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "not": {
+                "enum": [
+                  "active",
+                  "latest"
+                ]
+              }
+            }
+          ]
+        },
+        "revision_binding": {
+          "const": "pinned"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "model_kind",
+        "schema_version",
+        "product_slot_id",
+        "origin_kind",
+        "producer_ref",
+        "producer_contract_ref",
+        "content_fingerprint",
+        "capabilities",
+        "exact_dependency_product_ids",
+        "coverage_available",
+        "diagnostic_count",
+        "provenance_available"
+      ],
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "model_kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "product_slot_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "origin_kind": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "producer_ref": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "producer_contract_ref": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "content_fingerprint": {
+          "$ref": "#/$defs/nullableFingerprint"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "exact_dependency_product_ids": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "coverage_available": {
+          "type": "boolean"
+        },
+        "diagnostic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provenance_available": {
+          "type": "boolean"
+        }
+      }
+    },
+    "recordContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_kind",
+        "schema_version",
+        "stable_identifier_fields",
+        "relationship_fields",
+        "provenance_fields",
+        "confidence_basis_fields",
+        "ambiguity_gap_fields"
+      ],
+      "properties": {
+        "record_kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "stable_identifier_fields": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/stringSet"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "relationship_fields": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "provenance_fields": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "confidence_basis_fields": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "ambiguity_gap_fields": {
+          "$ref": "#/$defs/stringSet"
+        }
+      }
+    },
+    "accessHandle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handle_id",
+        "access_kind",
+        "revision_binding",
+        "operation_id",
+        "integration_tool",
+        "pagination"
+      ],
+      "properties": {
+        "handle_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "access_kind": {
+          "enum": [
+            "discover",
+            "read",
+            "traverse",
+            "bulk"
+          ]
+        },
+        "revision_binding": {
+          "const": "scope.revision_id"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "integration_tool": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "pagination": {
+          "type": "boolean"
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "operation_id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "properties": {
+            "integration_tool": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "availabilityBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_capabilities",
+        "matched_capabilities",
+        "artifact_ids"
+      ],
+      "properties": {
+        "required_capabilities": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "matched_capabilities": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "artifact_ids": {
+          "$ref": "#/$defs/stringSet"
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "title",
+        "description",
+        "resource_scope",
+        "availability",
+        "availability_basis",
+        "record_contracts",
+        "access_handles",
+        "limitations"
+      ],
+      "properties": {
+        "resource_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "resource_scope": {
+          "const": "revision_local"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "degraded",
+            "unavailable"
+          ]
+        },
+        "availability_basis": {
+          "$ref": "#/$defs/availabilityBasis"
+        },
+        "record_contracts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/recordContract"
+          }
+        },
+        "access_handles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/accessHandle"
+          }
+        },
+        "limitations": {
+          "$ref": "#/$defs/stringSet"
+        }
+      }
+    },
+    "advisoryProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_version",
+        "profile_fingerprint",
+        "relevant_resource_ids",
+        "semantics"
+      ],
+      "properties": {
+        "profile_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "profile_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "profile_fingerprint": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "relevant_resource_ids": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "semantics": {
+          "const": "advisory_only"
+        }
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stable_identity",
+        "relationships",
+        "provenance",
+        "confidence_basis",
+        "ambiguity_gaps",
+        "cross_system_correspondence",
+        "physical_storage"
+      ],
+      "properties": {
+        "stable_identity": {
+          "const": "use_declared_identifier_fields_only"
+        },
+        "relationships": {
+          "const": "published_revision_edges_only"
+        },
+        "provenance": {
+          "const": "preserve_published_references"
+        },
+        "confidence_basis": {
+          "const": "preserve_published_values"
+        },
+        "ambiguity_gaps": {
+          "const": "preserve_and_propagate"
+        },
+        "cross_system_correspondence": {
+          "const": "consumer_owned_not_aisl_fact"
+        },
+        "physical_storage": {
+          "const": "not_part_of_public_contract"
+        }
+      }
+    },
+    "generatedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilities_fingerprint",
+        "knowledge_artifacts_fingerprint",
+        "resource_descriptors_fingerprint",
+        "advisory_profiles_fingerprint"
+      ],
+      "properties": {
+        "capabilities_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "knowledge_artifacts_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "resource_descriptors_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        },
+        "advisory_profiles_fingerprint": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

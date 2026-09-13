@@ -1,0 +1,60 @@
+{
+  "analyzer_invocations": [
+    {
+      "analyzer_id": "java-type-structure-analyzer",
+      "analyzer_version": "0.44.23a77",
+      "evidence_requirements": [
+        {
+          "artifact_kind": "java-type-structure-evidence",
+          "parameters": {},
+          "required_by": [],
+          "schema_version": "java-type-structure-evidence/v1"
+        }
+      ]
+    },
+    {
+      "analyzer_id": "schema-declaration-analyzer",
+      "analyzer_version": "0.44.23a77",
+      "evidence_requirements": [
+        {
+          "artifact_kind": "schema-declaration-evidence",
+          "parameters": {},
+          "required_by": [],
+          "schema_version": "schema-declaration-evidence/v1"
+        }
+      ]
+    },
+    {
+      "analyzer_id": "sql-analysis-analyzer",
+      "analyzer_version": "0.44.23a77",
+      "evidence_requirements": [
+        {
+          "artifact_kind": "sql-analysis",
+          "parameters": {},
+          "required_by": [],
+          "schema_version": "sql-analysis/v1"
+        }
+      ]
+    }
+  ],
+  "installed_extension_set": {
+    "extension_set_fingerprint": "05df32b11810cc2be34b632269aa820a95dd4c32b8bd8489c25905da2a7e0561",
+    "extensions": [],
+    "policy_fingerprint": "2e923902f1b7047f9121c4ca2f9ba38ec676a2bdf47d3920c8783d8738a3ab84",
+    "schema_version": "installed_extension_set/v1",
+    "spi_version": "technology-extension-spi/v1"
+  },
+  "orchestration": {
+    "core_evidence_catalog_fingerprint": "b97db13e9939aafa1e2f779f3ae4e97960e088c9726b5506663746279f2f97f0",
+    "dispatch": "explicit_analyzer_identity",
+    "producer": "static-analysis-runner",
+    "resolution_plan_fingerprint": "058bf7b67f8d71622725c8a55155a7addacb9aedf20185e7e4114b237c2540b3",
+    "runner_version": "0.10.54"
+  },
+  "request_fingerprint": "64b3e23f1b48100a4598af2b3624111f2b5b91128ec70358cdd8a28d84944390",
+  "schema_version": "core_evidence_execution_request/v2",
+  "source": {
+    "source_id": "sdd-pilot",
+    "source_kind": "repository"
+  }
+}

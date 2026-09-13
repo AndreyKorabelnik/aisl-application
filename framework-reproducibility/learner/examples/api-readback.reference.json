@@ -1,0 +1,4090 @@
+{
+  "kind": "visible_reference_only",
+  "responses": [
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [
+              "b.enabled = 1"
+            ],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ad1bb7b067419197",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.id = b.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_e42e7e2d0ba39d77",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              },
+              {
+                "left_column": "region",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_e30dea80aa2e4278",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.region = b.region",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "region",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_f8a20407ffae4123",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 1
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "left",
+            "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 1,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9",
+              "sql_relation_sdd-pilot_785439073dbf1776"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.id = b.customer_id AND a.region = b.region AND b.enabled = 1",
+            "query_id": "query_sdd-pilot_000001",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_070ddadea9b3f148",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d6314cc9e018c77b",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ab0a5613993de08a",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": ">=",
+                "predicate": "a.event_time >= b.start_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "start_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_2bf6917d23f16cd5",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              },
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_39eda1d08c07c8e7",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": "<",
+                "predicate": "a.event_time < b.end_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "end_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_49f2db4e18748695",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 6
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a"
+            ],
+            "left_relation_names": [
+              "event"
+            ],
+            "line_start": 6,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+              "sql_relation_sdd-pilot_71129504161613ba"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.event_time >= b.start_time AND a.event_time < b.end_time",
+            "query_id": "query_sdd-pilot_000002",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+            "right_relation_kind": "physical",
+            "right_relation_name": "validity",
+            "scope_id": "sql_select_scope_sdd-pilot_7398ed9b50190493",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8a330be1ee531b40",
+            "temporal_or_range_predicates": [
+              "a.event_time >= b.start_time",
+              "a.event_time < b.end_time"
+            ],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": null,
+                "left_relation_candidate_ids": [],
+                "left_relation_candidate_names": [],
+                "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "USING (id)",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "id",
+                "right_column_usage_id": null,
+                "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "using",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 9
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 9,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0",
+              "sql_relation_sdd-pilot_02e64474a634987e"
+            ],
+            "physical_join_confirmed": true,
+            "query_id": "query_sdd-pilot_000003",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_9ce09fa2dd1714f9",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8f346fb694cd3bcd",
+            "temporal_or_range_predicates": [],
+            "using_columns": [
+              "id"
+            ]
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 0,
+          "total": 8
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 0,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [],
+            "column_pairs": [],
+            "condition_kind": "cross",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 11
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "cross",
+            "left_relation_id": "sql_relation_sdd-pilot_96d4c6f5e2ac997c",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_96d4c6f5e2ac997c"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 11,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_96d4c6f5e2ac997c",
+              "sql_relation_sdd-pilot_6780ed750c18fde9"
+            ],
+            "physical_join_confirmed": true,
+            "query_id": "query_sdd-pilot_000004",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_6780ed750c18fde9",
+            "right_relation_kind": "physical",
+            "right_relation_name": "region",
+            "scope_id": "sql_select_scope_sdd-pilot_c12027d4087f1b67",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_640f2bb3f76279a3",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_0dd67bfbee33ae5e",
+                "left_relation_id": null,
+                "left_relation_name": null,
+                "operator": "=",
+                "predicate": "id = b.id",
+                "predicate_role": "equality_key",
+                "resolution_status": "partial",
+                "right_column": "id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_34aed16f451a5a21",
+                "right_relation_id": "sql_relation_sdd-pilot_8316ac161131cca2",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "unresolved",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 13
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_cddf7ec4eb9944ea",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_cddf7ec4eb9944ea"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 13,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_cddf7ec4eb9944ea",
+              "sql_relation_sdd-pilot_8316ac161131cca2"
+            ],
+            "physical_join_confirmed": false,
+            "predicate": "id = b.id",
+            "query_id": "query_sdd-pilot_000005",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [
+              "predicate_column_unresolved_or_ambiguous"
+            ],
+            "resolution_status": "partial",
+            "right_relation_id": "sql_relation_sdd-pilot_8316ac161131cca2",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_adc8ab8d161e12ec",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_0d55fe006424113e",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_1ac154df620b8927",
+                "left_relation_id": "sql_relation_sdd-pilot_11c0b3f7ca83d769",
+                "left_relation_name": "chosen",
+                "operator": "=",
+                "predicate": "c.id = p.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_2de9347af2abea48",
+                "right_relation_id": "sql_relation_sdd-pilot_91b573886844b925",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "unresolved",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 15
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_11c0b3f7ca83d769",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_11c0b3f7ca83d769"
+            ],
+            "left_relation_names": [
+              "chosen"
+            ],
+            "line_start": 15,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_11c0b3f7ca83d769",
+              "sql_relation_sdd-pilot_91b573886844b925"
+            ],
+            "physical_join_confirmed": false,
+            "predicate": "c.id = p.customer_id",
+            "query_id": "query_sdd-pilot_000006",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_91b573886844b925",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_51ee61df1eb4493d",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_a357f6797dffab38",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 3,
+          "total": 8
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 3,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [],
+            "column_pairs": [],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 18
+              }
+            ],
+            "expression_links": [
+              {
+                "left_columns": [
+                  {
+                    "column": "region",
+                    "column_usage_id": "sql_column_usage_sdd-pilot_90021ef6287ce3ff",
+                    "relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+                    "relation_name": "customer",
+                    "resolution_status": "resolved"
+                  },
+                  {
+                    "column": "id",
+                    "column_usage_id": "sql_column_usage_sdd-pilot_d5a250e262945c02",
+                    "relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+                    "relation_name": "customer",
+                    "resolution_status": "resolved"
+                  }
+                ],
+                "left_expression": "CONCAT(a.region, a.id)",
+                "left_relation_ids": [
+                  "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+                ],
+                "left_relation_names": [
+                  "customer"
+                ],
+                "operator": "=",
+                "predicate": "CONCAT(a.region, a.id) = b.external_key",
+                "predicate_role": "equality_expression",
+                "resolution_status": "confirmed",
+                "right_columns": [
+                  {
+                    "column": "external_key",
+                    "column_usage_id": "sql_column_usage_sdd-pilot_5722107921923dcb",
+                    "relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+                    "relation_name": "profile",
+                    "resolution_status": "resolved"
+                  }
+                ],
+                "right_expression": "b.external_key",
+                "right_relation_ids": [
+                  "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+                ],
+                "right_relation_names": [
+                  "profile"
+                ]
+              }
+            ],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 18,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+              "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "CONCAT(a.region, a.id) = b.external_key",
+            "query_id": "query_sdd-pilot_000007",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d533ec4fc02309ab",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_6941c31244df79c0",
+                "left_relation_id": "sql_relation_sdd-pilot_2f95086375c6dcfd",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "c.id = p.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_d7ea3d71a8306701",
+                "right_relation_id": "sql_relation_sdd-pilot_f5725755f9aaaf0e",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 21
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_2f95086375c6dcfd",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_2f95086375c6dcfd"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 21,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_2f95086375c6dcfd",
+              "sql_relation_sdd-pilot_f5725755f9aaaf0e"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "c.id = p.customer_id",
+            "query_id": "query_sdd-pilot_000008",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_f5725755f9aaaf0e",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_3019b9241a1ae6c5",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_4e525602de68ceac",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 6,
+          "total": 8
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 6,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "child_scopes": [],
+        "counts": {
+          "child_scopes": 0,
+          "joins": 1,
+          "projections": 1,
+          "scope_relations": 2
+        },
+        "diagnostics": [],
+        "joins": [
+          {
+            "column_pairs": [],
+            "condition_kind": "on",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 18
+              }
+            ],
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_2197c50a41b7e3f6"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+              "sql_relation_sdd-pilot_3b3e68e03c42a7b4"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "CONCAT(a.region, a.id) = b.external_key",
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d533ec4fc02309ab",
+            "using_columns": []
+          }
+        ],
+        "projections": [
+          {
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 18
+              }
+            ],
+            "expression": "a.id",
+            "expression_kind": "direct_column",
+            "is_wildcard": false,
+            "output_name": "id",
+            "projection_ordinal": 1,
+            "resolution_basis": "scoped_ast",
+            "resolution_status": "resolved",
+            "source_column_usage_ids": [
+              "sql_column_usage_sdd-pilot_b3b1ae125d933488"
+            ],
+            "sql_projection_id": "sql_projection_sdd-pilot_b153d04ddca381a1"
+          }
+        ],
+        "query_context_schema_version": "sql-query-context/v1",
+        "query_id": "query_sdd-pilot_000007",
+        "repo_id": "sdd-pilot",
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "scope": {
+          "column_usage_count": 4,
+          "evidence_refs": [
+            {
+              "file": "sql-cases.sql",
+              "line_start": 18
+            }
+          ],
+          "file": "sql-cases.sql",
+          "line_start": 18,
+          "output_columns": [
+            "id"
+          ],
+          "output_contract_basis": "explicit_select_projections",
+          "output_contract_status": "complete",
+          "output_contract_wildcard_provenance": [],
+          "projection_count": 1,
+          "query_id": "query_sdd-pilot_000007",
+          "relation_count": 2,
+          "scope_kind": "statement",
+          "sql_select_scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9"
+        },
+        "scope_candidates": [],
+        "scope_id": "sql_select_scope_sdd-pilot_74a62e6a03f5c3d9",
+        "scope_relations": [
+          {
+            "alias": "a",
+            "definition_status": "not_applicable",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 18
+              }
+            ],
+            "logical_name": "customer",
+            "observed_fields": [
+              {
+                "name": "id",
+                "usage_roles": [
+                  "join",
+                  "projection"
+                ]
+              },
+              {
+                "name": "region",
+                "usage_roles": [
+                  "join"
+                ]
+              }
+            ],
+            "output_columns": [],
+            "output_contract_basis": "not_applicable",
+            "output_contract_status": "not_applicable",
+            "output_contract_wildcard_provenance": [],
+            "relation_kind": "physical",
+            "relation_name": "customer",
+            "source_scope_ids": [],
+            "sql_relation_id": "sql_relation_sdd-pilot_2197c50a41b7e3f6",
+            "template_name": "customer",
+            "usage_role": "from"
+          },
+          {
+            "alias": "b",
+            "definition_status": "not_applicable",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 18
+              }
+            ],
+            "logical_name": "profile",
+            "observed_fields": [
+              {
+                "name": "external_key",
+                "usage_roles": [
+                  "join"
+                ]
+              }
+            ],
+            "output_columns": [],
+            "output_contract_basis": "not_applicable",
+            "output_contract_status": "not_applicable",
+            "output_contract_wildcard_provenance": [],
+            "relation_kind": "physical",
+            "relation_name": "profile",
+            "source_scope_ids": [],
+            "sql_relation_id": "sql_relation_sdd-pilot_3b3e68e03c42a7b4",
+            "template_name": "profile",
+            "usage_role": "join"
+          }
+        ],
+        "selection_status": "selected",
+        "statement": {
+          "evidence_refs": [
+            {
+              "file": "sql-cases.sql",
+              "line_start": 18
+            }
+          ],
+          "file": "sql-cases.sql",
+          "line_end": 19,
+          "line_start": 18,
+          "query_id": "query_sdd-pilot_000007",
+          "sql_statement_id": "query_sdd-pilot_000007",
+          "statement_type": "select",
+          "unit_kind": "sql_file"
+        },
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "query_id": "query_sdd-pilot_000007",
+        "repo_id": "sdd-pilot",
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/query-context"
+    },
+    {
+      "body": {
+        "code": "request_validation_failed",
+        "details": {
+          "errors": [
+            {
+              "input": null,
+              "loc": [
+                "query",
+                "revision_id"
+              ],
+              "msg": "Field required",
+              "type": "missing"
+            }
+          ]
+        },
+        "message": "request payload or parameters are invalid",
+        "request_id": null,
+        "schema_version": "knowledge_api/v1"
+      },
+      "params": {},
+      "status": 422,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "code": "invalid_revision_binding",
+        "details": {},
+        "message": "consumer knowledge reads require an exact revision_id; resolve active explicitly before reading",
+        "request_id": null,
+        "schema_version": "knowledge_api/v1"
+      },
+      "params": {
+        "revision_id": "latest"
+      },
+      "status": 400,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "code": "revision_not_found",
+        "details": {},
+        "message": "requested system revision is unavailable",
+        "request_id": null,
+        "schema_version": "knowledge_api/v1"
+      },
+      "params": {
+        "revision_id": "missing"
+      },
+      "status": 404,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "build": {
+          "build_status": "complete",
+          "builder_version": "0.61.0a73",
+          "completed_at": "2026-09-12T16:59:58.684922",
+          "scope_id": "sdd-pilot"
+        },
+        "counts": {
+          "collection_relationship_count": 0,
+          "effective_field_count": 12,
+          "gap_count": 1,
+          "inheritance_declaration_count": 1,
+          "inherited_relationship_count": 0,
+          "relationship_count": 3,
+          "type_count": 6
+        },
+        "declared_model_query_schema_version": "code-declared-data-model-query/v2",
+        "declared_model_schema_version": "code-declared-data-model/v1",
+        "field_annotation_counts": [
+          {
+            "annotation_name": "Deprecated",
+            "count": 1
+          }
+        ],
+        "filters": {
+          "exclude_field_annotations": [],
+          "repo_id": null,
+          "type_annotations": []
+        },
+        "gap_counts": [
+          {
+            "count": 1,
+            "gap_code": "external_schema_reference_not_resolved",
+            "severity": "warning"
+          }
+        ],
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot",
+        "type_annotation_counts": []
+      },
+      "params": {
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "data-model/declared-summary"
+    },
+    {
+      "body": {
+        "declared_model_query_schema_version": "code-declared-data-model-query/v2",
+        "declared_model_schema_version": "code-declared-data-model/v1",
+        "filters": {
+          "search_scope": "all_declared_types",
+          "type_annotations": []
+        },
+        "items": [
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": false,
+              "incoming_examples": [],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 0,
+              "outgoing_relationship_count": 2
+            },
+            "documentation": {},
+            "field_count": 5,
+            "fqcn": "openapi:declared-openapi.json#/components/schemas/Customer",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "Customer",
+            "object_id": "code_declared_type_8ca7c14d3f384b24971f",
+            "package_name": "openapi:openapi",
+            "relationship_count": 2,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "openapi_schema_scanner",
+              "line_end": 1,
+              "line_start": 1,
+              "locator": "#/components/schemas/Customer",
+              "repository_relative_path": "declared-openapi.json"
+            },
+            "source_set": "main",
+            "type_kind": "object"
+          },
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": true,
+              "incoming_examples": [
+                {
+                  "declared_type_expression": "object",
+                  "field_occurrence_id": "code_declared_field_b62877ce3f838676e1e2",
+                  "provenance": {
+                    "basis": "resolved_effective_field_type_reference",
+                    "declaration_owner_type_occurrence_id": "code_declared_type_8ca7c14d3f384b24971f",
+                    "does_not_imply_business_association": true,
+                    "inherited_depth": 0,
+                    "is_inherited": false
+                  },
+                  "relationship_id": "code_declared_relationship_33ff7a09b09255d62df6",
+                  "relationship_kind": "declared_field_type_reference",
+                  "resolution_status": "resolved",
+                  "source_field": "metadata",
+                  "source_fqcn": "openapi:declared-openapi.json#/components/schemas/Customer",
+                  "source_name": "Customer",
+                  "source_object_id": "code_declared_type_8ca7c14d3f384b24971f",
+                  "source_ref": {
+                    "extractor": "openapi_schema_scanner",
+                    "line_end": 1,
+                    "line_start": 1,
+                    "locator": "#/components/schemas/Customer/properties/metadata",
+                    "repository_relative_path": "declared-openapi.json"
+                  }
+                }
+              ],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 1,
+              "outgoing_relationship_count": 0
+            },
+            "documentation": {},
+            "field_count": 1,
+            "fqcn": "openapi:declared-openapi.json#/components/schemas/Customer/properties/metadata",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "Customer.metadata",
+            "object_id": "code_declared_type_8fafb91d98cd808a12b0",
+            "package_name": "openapi:openapi",
+            "relationship_count": 0,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "openapi_schema_scanner",
+              "line_end": 1,
+              "line_start": 1,
+              "locator": "#/components/schemas/Customer/properties/metadata",
+              "repository_relative_path": "declared-openapi.json"
+            },
+            "source_set": "main",
+            "type_kind": "object"
+          },
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": true,
+              "incoming_examples": [
+                {
+                  "declared_type_expression": "Profile",
+                  "field_occurrence_id": "code_declared_field_46eb7cdafc3aef95d5a8",
+                  "provenance": {
+                    "basis": "resolved_effective_field_type_reference",
+                    "declaration_owner_type_occurrence_id": "code_declared_type_8ca7c14d3f384b24971f",
+                    "does_not_imply_business_association": true,
+                    "inherited_depth": 0,
+                    "is_inherited": false
+                  },
+                  "relationship_id": "code_declared_relationship_9742fb5ab413ece52836",
+                  "relationship_kind": "declared_field_type_reference",
+                  "resolution_status": "resolved",
+                  "source_field": "profile",
+                  "source_fqcn": "openapi:declared-openapi.json#/components/schemas/Customer",
+                  "source_name": "Customer",
+                  "source_object_id": "code_declared_type_8ca7c14d3f384b24971f",
+                  "source_ref": {
+                    "extractor": "openapi_schema_scanner",
+                    "line_end": 1,
+                    "line_start": 1,
+                    "locator": "#/components/schemas/Customer/properties/profile",
+                    "repository_relative_path": "declared-openapi.json"
+                  }
+                }
+              ],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 1,
+              "outgoing_relationship_count": 0
+            },
+            "documentation": {},
+            "field_count": 1,
+            "fqcn": "openapi:declared-openapi.json#/components/schemas/Profile",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "Profile",
+            "object_id": "code_declared_type_6444dbf3df33cb17e457",
+            "package_name": "openapi:openapi",
+            "relationship_count": 0,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "openapi_schema_scanner",
+              "line_end": 1,
+              "line_start": 1,
+              "locator": "#/components/schemas/Profile",
+              "repository_relative_path": "declared-openapi.json"
+            },
+            "source_set": "main",
+            "type_kind": "object"
+          },
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": false,
+              "incoming_examples": [],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 0,
+              "outgoing_relationship_count": 0
+            },
+            "documentation": {},
+            "field_count": 1,
+            "fqcn": "synthetic.fixture.BaseEntity",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "BaseEntity",
+            "object_id": "code_declared_type_6fe3be9cdd1b065a4e51",
+            "package_name": "synthetic.fixture",
+            "relationship_count": 0,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "java_tree_sitter",
+              "line_end": 5,
+              "line_start": 3,
+              "repository_relative_path": "Sample.java"
+            },
+            "source_set": "unknown",
+            "type_kind": "class"
+          },
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": false,
+              "incoming_examples": [],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 0,
+              "outgoing_relationship_count": 1
+            },
+            "documentation": {},
+            "field_count": 3,
+            "fqcn": "synthetic.fixture.Customer",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "Customer",
+            "object_id": "code_declared_type_1e37b524ab7cf008bfb7",
+            "package_name": "synthetic.fixture",
+            "relationship_count": 1,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "java_tree_sitter",
+              "line_end": 11,
+              "line_start": 7,
+              "repository_relative_path": "Sample.java"
+            },
+            "source_set": "unknown",
+            "type_kind": "class"
+          },
+          {
+            "annotations": [],
+            "binding_summary": {
+              "has_observed_incoming_binding": true,
+              "incoming_examples": [
+                {
+                  "declared_type_expression": "Profile",
+                  "field_occurrence_id": "code_declared_field_e597e611ef8b371271d7",
+                  "provenance": {
+                    "basis": "resolved_effective_field_type_reference",
+                    "declaration_owner_type_occurrence_id": "code_declared_type_1e37b524ab7cf008bfb7",
+                    "does_not_imply_business_association": true,
+                    "inherited_depth": 0,
+                    "is_inherited": false
+                  },
+                  "relationship_id": "code_declared_relationship_c6caf646774dd58af93b",
+                  "relationship_kind": "declared_field_type_reference",
+                  "resolution_status": "same_package",
+                  "source_field": "profile",
+                  "source_fqcn": "synthetic.fixture.Customer",
+                  "source_name": "Customer",
+                  "source_object_id": "code_declared_type_1e37b524ab7cf008bfb7",
+                  "source_ref": {
+                    "extractor": "java_tree_sitter",
+                    "line_end": 10,
+                    "line_start": 10,
+                    "repository_relative_path": "Sample.java"
+                  }
+                }
+              ],
+              "incoming_examples_truncated": false,
+              "incoming_relationship_count": 1,
+              "outgoing_relationship_count": 0
+            },
+            "documentation": {},
+            "field_count": 1,
+            "fqcn": "synthetic.fixture.Profile",
+            "match_evidence": [],
+            "match_evidence_truncated": false,
+            "name": "Profile",
+            "object_id": "code_declared_type_3082f2f51b32d13ac1b1",
+            "package_name": "synthetic.fixture",
+            "relationship_count": 0,
+            "repo_id": "sdd-pilot",
+            "retrieval_score": 0,
+            "score_basis": "unfiltered_listing",
+            "source_ref": {
+              "extractor": "java_tree_sitter",
+              "line_end": 15,
+              "line_start": 13,
+              "repository_relative_path": "Sample.java"
+            },
+            "source_set": "unknown",
+            "type_kind": "class"
+          }
+        ],
+        "page": {
+          "limit": 50,
+          "offset": 0,
+          "total": 6
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "data-model/declared-objects"
+    },
+    {
+      "body": {
+        "capabilities": [
+          "common.code-declared-data-model",
+          "common.code-declared-entities",
+          "common.code-declared-fields",
+          "common.code-declared-inheritance",
+          "common.code-declared-relationships",
+          "common.declared-model-candidates",
+          "common.declared-model-dataset",
+          "common.sql-analysis",
+          "common.sql-attribute-insertion-context",
+          "common.sql-field-calculation",
+          "common.sql-relation-fields",
+          "common.sql-relation-semantic-roles",
+          "common.sql-source-inventory",
+          "common.sql-source-inventory-export",
+          "common.sql-target-column-lineage",
+          "common.sql-target-resolution",
+          "common.sql-workflow-bindings",
+          "common.sql-workflow-context"
+        ],
+        "generated_from": {
+          "capabilities_fingerprint": "365f237521973b4e4e1ea29a9341a3db381c25818d2deb32a35597de17d27f45",
+          "consumer_policy_fingerprint": "6cc7274c4a6319e754df1d1954cf469457620b47a720d4329bba9ab5706c7238",
+          "retrieval_profile_fingerprint": "040bbb9e516582aab3a4c1249d381dc1130e5038b3e7844b2c9c5a39e4fd1a83",
+          "revision_id": "rev-08005fc81dcf2b53908d4a65",
+          "tool_catalog_fingerprint": "9f49776fcae14b48c150e2e43b3e141b9e0feb83fd4989587f66fa037c658063",
+          "tool_catalog_version": "13"
+        },
+        "integration_profile": {
+          "fingerprint": "af5eba105a6721bcfe6243fd94c462baf14c0845a0636f7a47788cdd4cd5b26b",
+          "profile_fingerprint": "040bbb9e516582aab3a4c1249d381dc1130e5038b3e7844b2c9c5a39e4fd1a83",
+          "profile_id": "sql-analysis/v1",
+          "profile_version": "2"
+        },
+        "knowledge_artifacts": [
+          {
+            "artifact_id": "knowledge_artifact_43e64144e20fcac927aa",
+            "capabilities": [
+              "common.sql-analysis",
+              "common.sql-attribute-insertion-context",
+              "common.sql-field-calculation",
+              "common.sql-relation-fields",
+              "common.sql-relation-semantic-roles",
+              "common.sql-source-inventory",
+              "common.sql-source-inventory-export",
+              "common.sql-target-column-lineage",
+              "common.sql-target-resolution",
+              "common.sql-workflow-bindings",
+              "common.sql-workflow-context"
+            ],
+            "content_fingerprint": "4f87977e0b079a0909c86a8ccacd2c050361a991c39063001877250f33900025",
+            "coverage": {},
+            "diagnostic_count": 0,
+            "model_kind": "sql-observed-data-usage",
+            "schema_version": "knowledge_layer_sql/v2",
+            "source_materialization_id": null
+          },
+          {
+            "artifact_id": "knowledge_artifact_e9853d23261813bd1ecc",
+            "capabilities": [
+              "common.code-declared-data-model",
+              "common.code-declared-entities",
+              "common.code-declared-fields",
+              "common.code-declared-inheritance",
+              "common.code-declared-relationships",
+              "common.declared-model-candidates",
+              "common.declared-model-dataset"
+            ],
+            "content_fingerprint": "ba06c6acc08947c8be5b6a4cca63772501bef2c41b90944317b298d7bb460565",
+            "coverage": {
+              "ambiguous_type_reference_count": 0,
+              "analysis_status": "partial",
+              "evidence_source_count": 2,
+              "inline_schema_declaration_count": 1,
+              "java_files_failed": 0,
+              "java_files_in_scope": 1,
+              "java_files_parsed": 1,
+              "java_files_with_parse_errors": 0,
+              "model_gap_count": 1,
+              "openapi_document_count": 1,
+              "repository_count": 1,
+              "repository_status_counts": {
+                "partial": 1
+              },
+              "schema_declaration_count": 3,
+              "schema_field_declaration_count": 11,
+              "schema_reference_count": 3,
+              "source_coverage_by_repository": {
+                "sdd-pilot": {
+                  "coverage_status": "partial",
+                  "evidence_sources": [
+                    {
+                      "artifact_kind": "java-type-structure-evidence",
+                      "coverage": {
+                        "ambiguous_type_reference_count": 0,
+                        "annotation_declaration_count": 1,
+                        "coverage_status": "complete",
+                        "enum_constant_declaration_count": 0,
+                        "field_declaration_count": 4,
+                        "inheritance_declaration_count": 1,
+                        "java_files_discovered": 1,
+                        "java_files_failed": 0,
+                        "java_files_in_scope": 1,
+                        "java_files_parsed": 1,
+                        "java_files_with_parse_errors": 0,
+                        "type_declaration_count": 3,
+                        "type_reference_count": 2,
+                        "unresolved_type_reference_count": 0,
+                        "unsupported_declaration_count": 0
+                      },
+                      "schema_version": "java-type-structure-evidence/v1"
+                    },
+                    {
+                      "artifact_kind": "schema-declaration-evidence",
+                      "coverage": {
+                        "candidate_structured_file_count": 1,
+                        "composition_observation_count": 0,
+                        "coverage_status": "partial",
+                        "field_declaration_count": 7,
+                        "formal_schema_document_count": 1,
+                        "inline_schema_declaration_count": 1,
+                        "json_schema_document_count": 0,
+                        "json_schema_document_parse_failed_count": 0,
+                        "openapi_document_count": 1,
+                        "openapi_document_parse_failed_count": 0,
+                        "proto_document_count": 0,
+                        "proto_document_parse_failed_count": 0,
+                        "provider_status": {
+                          "json_schema": "implemented",
+                          "openapi": "implemented",
+                          "proto": "implemented",
+                          "xsd": "implemented"
+                        },
+                        "schema_declaration_count": 3,
+                        "schema_reference_count": 3,
+                        "unresolved_schema_reference_count": 1,
+                        "xsd_document_count": 0,
+                        "xsd_document_parse_failed_count": 0
+                      },
+                      "schema_version": "schema-declaration-evidence/v1"
+                    }
+                  ]
+                }
+              },
+              "unresolved_schema_reference_count": 1,
+              "unresolved_type_reference_count": 0,
+              "unsupported_declaration_count": 0
+            },
+            "diagnostic_count": 0,
+            "model_kind": "code-declared-data-model",
+            "schema_version": "code-declared-data-model/v1",
+            "source_materialization_id": null
+          }
+        ],
+        "policy": {
+          "evidence_statuses": [
+            "observed",
+            "strongly_supported",
+            "probable",
+            "ambiguity",
+            "unresolved",
+            "gap"
+          ],
+          "grounding": "# Каноническая политика потребителя знаний\n\n## Граница доверия\n\n- Ты работаешь как потребитель над **закреплённой ревизией Knowledge API**.\n- Раздел `scope` текущего Integration Profile задаёт точные `system_id`/`revision_id`; `capabilities` и `tools` содержат только знания и операции, опубликованные для этой ревизии.\n- Отвечай на фактические вопросы только по результатам разрешённых инструментов Knowledge API текущего исследования.\n- LLM организует поиск и объясняет результат, но не является источником фактов.\n- Не обращайся к DuckDB, локальным файлам Knowledge Layer, Task, Suite, Core/Runner/KLC или исходникам, если они не представлены разрешённым публичным контрактом инструмента.\n- Не вызывай инструмент, отсутствующий в разделе `tools` текущего Integration Profile. Его отсутствие означает, что соответствующая capability не опубликована в закреплённой ревизии, а не что функциональность системы отсутствует в реальности.\n- Для технических утверждений сохраняй идентификаторы происхождения доказательств (`evidence`), реально присутствующие в результатах вызванных инструментов.\n- Перед категорическим выводом об отсутствии используй `get_analysis_coverage`, если этот инструмент доступен. Пустой каталог и `not_observed` не доказывают отсутствие функциональности.\n- Счётчики покрытия — диагностические количества наблюдений, а не процент точности.\n- Различай статусы `observed`/`confirmed`, `strongly_supported`, `probable`/`candidate`, `ambiguity`, `unresolved` и `gap`. Не повышай статус доказательности.\n- Частичный lineage не является полным процессом end-to-end.\n\n## Выбор инструментов\n\n- Сначала используй `scope`, `capabilities`, `knowledge_artifacts` и `generated_from` текущего Integration Profile, когда вопрос требует понять состав доступных знаний или причину отсутствия инструмента.\n- `get_knowledge_item` — универсальное точное чтение элемента AISL. Используй его, когда уже известны `artifact_id`, `item_kind` и `local_id` и нужно детерминированно проверить конкретный элемент знаний, evidence, issues или опубликованную correspondence. Он не заменяет поиск кандидатов.\n- В ответе `get_knowledge_item` состояния `unsupported` и `not_available` не означают отсутствие факта: первое означает отсутствие универсальной проекции для этого facet/product, второе — что типизированный product не публикует этот факт для данного item.\n- Кандидат, найденный через внешний semantic/vector retrieval, не является evidence. Если кандидат адресуем в AISL, проверь его точным чтением до фактического утверждения.\n- Для знаний effective-модели используй `search_data_objects`, затем `get_data_object` и при необходимости `get_data_object_relationship`, если эти инструменты присутствуют.\n- Для модели, объявленной в коде, используй `search_declared_data_objects`, затем `get_declared_data_object`, если они присутствуют. Это наблюдаемая/производная declared-структура с документацией, наследованием и происхождением доказательств исходника; она не доказывает storage JOIN или physical mapping.\n- Если guidance разрешает оба интерфейса чтения модели, выбирай только инструменты, присутствующие в текущем Integration Profile; отсутствие инструментов effective-модели не является основанием скрывать доступные declared-факты.\n- Для физической структуры используй доступные `search_physical_model_tables`, `get_physical_model_table`, `list_physical_model_relationships` и `list_physical_model_gaps`.\n- Для SQL используй только опубликованные SQL-инструменты. Сохраняй в ответе `probable`, `partial`, `ambiguous`, `unresolved` и gaps.\n- Все инструменты одного Integration Profile работают только с одной закреплённой prepared revision. Разные типы знаний внутри неё различаются capabilities/artifacts, а не отдельными revision bindings. Не пытайся передать или изменить `revision_id` в arguments.\n- Если API сообщает некорректные аргументы, исправь их по публичному контракту tool/API и повтори вызов; не меняй область ревизии.\n\n## Модель и физическое хранение\n\n- Эффективная логическая модель и физическая модель являются разными типизированными знаниями.\n- Не превращай совпадение названий в доказанное logical/physical mapping.\n- Факты physical model подтверждают структуру, но не назначают SQL-роли `read`/`write` и не заменяют evidence наблюдаемого SQL JOIN.\n- Для storage references различай logical identity, physical storage key, aliases, encoding inputs и join status.\n- Не придумывай separator, нормализацию alias, контейнерную семантику или SQL-функцию без явного evidence/guidance.\n- Не объявляй физический JOIN подтверждённым без соответствующего статуса в результате Knowledge API.\n\n## Пользовательский ответ\n\n- Формируй готовый самостоятельный ответ человеку на языке пользователя.\n- Начинай с прямого содержательного ответа, а не с описания инструментов или методологии.\n- Сначала показывай подтверждённые объекты, поля, связи, операции и маршруты; ограничения размещай после результата.\n- Сведения `probable`/`candidate`, `ambiguity`, `unresolved` и `gap` маркируй локально и не смешивай с подтверждёнными фактами.\n- Не перегружай текст внутренними runtime IDs, именами schemas и названиями инструментов, если пользователь не просит трассировку.\n- Если доказательств недостаточно, сначала сообщи подтверждённую часть, затем точно укажи, какого опубликованного knowledge/evidence не хватает.\n- Существенные gaps и ограничения собери отдельно; не создавай такой раздел без необходимости.\n- Не придумывай бизнес-смысл по одному имени объекта.\n\n## Диаграммы\n\n- Если пользователь явно просит схему, диаграмму, архитектуру, поток или карту связей, используй только связи из результатов инструментов текущего исследования.\n- Различай подтверждённые, вероятные и неразрешённые связи; `unresolved` не превращай в подтверждённое ребро.\n- Для зависимостей и процессов предпочитай `flowchart`, для последовательности — `sequenceDiagram`; `erDiagram` используй только для подтверждённых связей.\n- По умолчанию не более 25 узлов в одной схеме.\n\n## Проекции результатов для LLM\n\n- Результат инструмента, переданный LLM, может быть явной ограниченной проекцией исходного ответа Knowledge API. Считай `view.projection`, `view.truncated`, счётчики и `continuation_available` evidence о полноте извлечения.\n- Компактная проекция не доказывает, что опущенных деталей не существует. При `truncated=true` или доступном продолжении не делай выводов о полноте/отсутствии только по этой проекции.\n- Исходные результаты Knowledge API остаются источником происхождения доказательств вне контекста LLM; не запрашивай широкие списки с `include_fields=true` только ради реконструкции исходного payload. Предпочитай компактные карточки discovery, после которых выполняется точное чтение объекта.",
+          "rules": {
+            "facts_require_tool_results": true,
+            "no_relation_or_join_guessing": true,
+            "no_schema_guessing": true,
+            "preserve_confidence_and_basis": true,
+            "preserve_diagnostics_and_gaps": true
+          }
+        },
+        "retrieval_guidance": {
+          "content": "# Политика SQL-анализа v1\n\nТы работаешь только с опубликованным SQL knowledge закреплённой revision. Не читай исходники и не выполняй повторный SQL-анализ.\n\n1. Для общего каталога workspace начни с `get_workspace_sql_catalog`; для точного инвентаризации источников — `list_used_source_tables_and_fields`.\n2. Для наблюдаемого JOIN используй `list_sql_joins`; совместное встречание source fields не доказывает пару JOIN.\n3. Для конкретного query/column используй `get_sql_query_context` и `get_sql_column_usage_context`.\n4. Для lineage целевого поля используй `get_sql_target_column_lineage`; для сценария изменения/добавления — `get_sql_field_calculation`, `find_sql_target_candidates`, `get_sql_attribute_insertion_context`.\n5. Materialization и workflow/config context читай только соответствующими опубликованными tools. Placeholder resolution применяй только при `resolution_status=resolved`; иначе сохраняй literal placeholder.\n6. Сохраняй возвращённые `confirmed/probable/partial/ambiguous/unresolved` и diagnostics. Не генерируй новый JOIN, target mapping или бизнес-смысл.\n7. Пустой результат при неполной coverage не доказывает отсутствие использования SQL.",
+          "profile_id": "sql-analysis/v1",
+          "profile_version": "2"
+        },
+        "schema_version": "llm_integration_profile/v1",
+        "scope": {
+          "revision_binding": "pinned",
+          "revision_id": "rev-08005fc81dcf2b53908d4a65",
+          "system_id": "sdd-pilot"
+        },
+        "tools": [
+          {
+            "api_binding": {
+              "arguments": {
+                "business_entity_hints": {
+                  "location": "query",
+                  "name": "business_entity",
+                  "transform": "list"
+                },
+                "limit": {
+                  "location": "query",
+                  "name": "limit",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "source_column_hints": {
+                  "location": "query",
+                  "name": "source_column",
+                  "transform": "list"
+                },
+                "source_relation_hints": {
+                  "location": "query",
+                  "name": "source_relation",
+                  "transform": "list"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "find_sql_target_candidates_api_knowledge_v1_systems__system_id__sql_target_candidates_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/target-candidates",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "business_entity_hints": "array[string]",
+              "limit": "integer",
+              "repo_id": "string|null",
+              "source_column_hints": "array[string]",
+              "source_relation_hints": "array[string]"
+            },
+            "description": "Верни детерминированно ранжированные кандидаты SQL-цели по подсказкам source relation, source column и business entity. Инструмент не генерирует SQL.",
+            "name": "find_sql_target_candidates",
+            "required_capabilities": [
+              "common.sql-target-resolution"
+            ],
+            "warnings": [
+              "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "object_id": {
+                  "location": "path",
+                  "name": "object_id",
+                  "transform": "url_segment"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "data_model_object_context/v3"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_data_model_object_context_api_knowledge_v1_systems__system_id__data_model_object_context__object_id__get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/object-context/{object_id}",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "object_id": "string"
+            },
+            "description": "Верни один точный object-centric технический контекст модели данных для внешней LLM: declared object/fields/relationships плюс точные опубликованные logical-storage и model-storage semantics, если эти products есть в pinned revision. Отсутствующее storage knowledge явно представляется как `not_available`/`not_observed`. Инструмент не придумывает physical SQL JOIN и не повышает статус неоднозначного mapping.",
+            "name": "get_data_model_object_context",
+            "required_capabilities": [
+              "common.code-declared-data-model"
+            ],
+            "warnings": [
+              "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "exclude_field_annotations": {
+                  "location": "query",
+                  "name": "exclude_field_annotations",
+                  "transform": "csv"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "type_annotations": {
+                  "location": "query",
+                  "name": "type_annotations",
+                  "transform": "csv"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "summarize_declared_data_model_api_knowledge_v1_systems__system_id__data_model_declared_summary_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-summary",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "exclude_field_annotations": "array[string]",
+              "repo_id": "string|null",
+              "type_annotations": "array[string]"
+            },
+            "description": "Суммируй объявленную в коде модель закреплённой revision: raw/filtered counts, наблюдаемые частоты type/field annotations и явные model gaps. Exact annotation filters задают выбранную caller-ом evidence projection, а не бизнес-семантику, принадлежащую framework.",
+            "name": "get_declared_data_model_summary",
+            "required_capabilities": [
+              "common.code-declared-data-model"
+            ],
+            "warnings": [
+              "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "object_id": {
+                  "location": "path",
+                  "name": "object_id",
+                  "transform": "url_segment"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_declared_data_object_api_knowledge_v1_systems__system_id__data_model_declared_objects__object_id__get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects/{object_id}",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "object_id": "string"
+            },
+            "description": "Верни один точный объект модели, объявленной в коде: effective inherited fields, declared relationships, inheritance, source references и provenance. Declared relationships сами по себе не доказывают семантику storage JOIN.",
+            "name": "get_declared_data_object",
+            "required_capabilities": [
+              "common.code-declared-data-model"
+            ],
+            "warnings": [
+              "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "artifact_id": {
+                  "location": "path",
+                  "name": "artifact_id",
+                  "transform": "url_segment"
+                },
+                "item_kind": {
+                  "location": "path",
+                  "name": "item_kind",
+                  "transform": "url_segment"
+                },
+                "local_id": {
+                  "location": "path",
+                  "name": "local_id",
+                  "transform": "url_segment"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_aisl_knowledge_item_api_knowledge_v1_systems__system_id__knowledge_items__artifact_id___item_kind___local_id__get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/knowledge-items/{artifact_id}/{item_kind}/{local_id}",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "artifact_id": "string",
+              "item_kind": "string",
+              "local_id": "string"
+            },
+            "description": "Прочитай один точный опубликованный AISL knowledge item по `artifact_id`, `item_kind` и `local_id` в pinned revision. Используй это как детерминированную проверку после discovery кандидата. Ответ сохраняет typed payload, доступные evidence/issues/correspondence и явные состояния facets `available`/`not_available`/`unsupported`. Инструмент не выполняет semantic search, а `unsupported`/`not_available` никогда не доказывают отсутствие.",
+            "name": "get_knowledge_item",
+            "required_capabilities": [],
+            "warnings": [
+              "Это exact-read AISL item, а не semantic discovery. Состояния facet `unsupported` или `not_available` нельзя интерпретировать как evidence отсутствия исходного факта."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "max_results": {
+                  "location": "body",
+                  "name": "max_results",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "body",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "source_column_hints": {
+                  "location": "body",
+                  "name": "source_column_hints",
+                  "transform": "list"
+                },
+                "source_relation_hints": {
+                  "location": "body",
+                  "name": "source_relation_hints",
+                  "transform": "list"
+                },
+                "target_relation": {
+                  "location": "body",
+                  "name": "target_relation",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_body": {},
+              "method": "POST",
+              "operation_id": "resolve_sql_attribute_insertion_context_api_knowledge_v1_systems__system_id__sql_attribute_insertion_context_post",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/attribute-insertion-context",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "max_results": "integer",
+              "repo_id": "string|null",
+              "source_column_hints": "array[string]",
+              "source_relation_hints": "array[string]",
+              "target_relation": "string"
+            },
+            "description": "Верни лучший наблюдаемый SQL scope для добавления атрибута и все diagnostics по `partial`/`probable` propagation.",
+            "name": "get_sql_attribute_insertion_context",
+            "required_capabilities": [
+              "common.sql-attribute-insertion-context"
+            ],
+            "warnings": [
+              "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "sql_column_usage_id": {
+                  "location": "path",
+                  "name": "sql_column_usage_id",
+                  "transform": "url_segment"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_sql_column_usage_context_api_knowledge_v1_systems__system_id__sql_column_usages__sql_column_usage_id__get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/column-usages/{sql_column_usage_id}",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "sql_column_usage_id": "string"
+            },
+            "description": "Верни одно точное использование SQL column со statement, SELECT scope, видимыми relations, JOINs и projections.",
+            "name": "get_sql_column_usage_context",
+            "required_capabilities": [
+              "common.sql-analysis"
+            ],
+            "warnings": []
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "include_gaps": {
+                  "location": "query",
+                  "name": "include_gaps",
+                  "transform": "bool"
+                },
+                "max_gaps": {
+                  "location": "query",
+                  "name": "max_gaps",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "target_column": {
+                  "location": "query",
+                  "name": "target_column",
+                  "transform": "identity"
+                },
+                "target_relation": {
+                  "location": "query",
+                  "name": "target_relation",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "sql-field-calculation/v2"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_sql_field_calculation_api_knowledge_v1_systems__system_id__sql_field_calculation_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/field-calculation",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "include_gaps": "boolean",
+              "max_gaps": "integer",
+              "repo_id": "string|null",
+              "target_column": "string",
+              "target_relation": "string"
+            },
+            "description": "Верни наблюдаемое SQL expression, transformation paths и все terminal sources для одного target field. Предпочтительный origin не выводится.",
+            "name": "get_sql_field_calculation",
+            "required_capabilities": [
+              "common.sql-field-calculation"
+            ],
+            "warnings": [
+              "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "query_id": {
+                  "location": "query",
+                  "name": "query_id",
+                  "transform": "identity"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "scope_id": {
+                  "location": "query",
+                  "name": "scope_id",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "get_sql_query_context_api_knowledge_v1_systems__system_id__sql_query_context_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/query-context",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "query_id": "string",
+              "repo_id": "string",
+              "scope_id": "string|null"
+            },
+            "description": "Верни один точный контекст SQL query/select scope со statement, видимыми relations, JOINs и projections. Используй его для проверки явных propagation points перед предложением изменения.",
+            "name": "get_sql_query_context",
+            "required_capabilities": [
+              "common.sql-analysis"
+            ],
+            "warnings": [
+              "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "include_gaps": {
+                  "location": "query",
+                  "name": "include_gaps",
+                  "transform": "bool"
+                },
+                "limit": {
+                  "location": "query",
+                  "name": "limit",
+                  "transform": "bounded_int"
+                },
+                "lineage_status": {
+                  "location": "query",
+                  "name": "lineage_status",
+                  "transform": "identity"
+                },
+                "max_gaps": {
+                  "location": "query",
+                  "name": "max_gaps",
+                  "transform": "bounded_int"
+                },
+                "offset": {
+                  "location": "query",
+                  "name": "offset",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "target_column": {
+                  "location": "query",
+                  "name": "target_column",
+                  "transform": "identity"
+                },
+                "target_relation": {
+                  "location": "query",
+                  "name": "target_relation",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "sql-target-column-lineage/v2"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "list_sql_target_column_lineage_api_knowledge_v1_systems__system_id__sql_target_column_lineage_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/target-column-lineage",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "include_gaps": "boolean",
+              "limit": "integer",
+              "lineage_status": "string|null",
+              "max_gaps": "integer",
+              "offset": "integer",
+              "repo_id": "string|null",
+              "target_column": "string|null",
+              "target_relation": "string"
+            },
+            "description": "Верни уже опубликованный recursive SQL lineage для одной target relation или однозначно наблюдаемой logical workflow target. Если logical workflow target уникальна, но physical relation identity неоднозначна или unresolved, существующий workflow lineage возвращается с явным `target_resolution` без выбора физического кандидата. Сохраняются все terminal branches и scoped gaps; read layer не реконструирует lineage.",
+            "name": "get_sql_target_column_lineage",
+            "required_capabilities": [
+              "common.sql-target-column-lineage"
+            ],
+            "warnings": [
+              "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "limit": {
+                  "location": "query",
+                  "name": "limit",
+                  "transform": "bounded_int"
+                },
+                "offset": {
+                  "location": "query",
+                  "name": "offset",
+                  "transform": "bounded_int"
+                },
+                "physical_join_confirmed": {
+                  "location": "query",
+                  "name": "physical_join_confirmed",
+                  "transform": "bool"
+                },
+                "query_id": {
+                  "location": "query",
+                  "name": "query_id",
+                  "transform": "identity"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "resolution_status": {
+                  "location": "query",
+                  "name": "resolution_status",
+                  "transform": "identity"
+                },
+                "scope_id": {
+                  "location": "query",
+                  "name": "scope_id",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "list_sql_joins_api_knowledge_v1_systems__system_id__sql_joins_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/joins",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "limit": "integer",
+              "offset": "integer",
+              "physical_join_confirmed": "boolean|null",
+              "query_id": "string|null",
+              "repo_id": "string|null",
+              "resolution_status": "string|null",
+              "scope_id": "string|null"
+            },
+            "description": "Перечисли компактные уже наблюдаемые SQL JOIN edges из pinned revision, включая точные predicates, relation identities, `column_pairs`, resolution status и evidence refs. Используй этот bulk read для вопросов обо всех или многих JOIN-связях: он не загружает нерелевантные SELECT projections и не реконструирует joins из source inventory.",
+            "name": "list_sql_joins",
+            "required_capabilities": [
+              "common.sql-analysis"
+            ],
+            "warnings": [
+              "Возвращай только наблюдаемые факты `sql_join_edge`. Сохраняй `unresolved`/`ambiguous` `resolution_status` и не придумывай отсутствующие column pairs.",
+              "Если пользователь просит все JOIN, используй пагинацию до полного покрытия `page.total`; не считай частичную страницу полной."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "limit": {
+                  "location": "query",
+                  "name": "limit",
+                  "transform": "bounded_int"
+                },
+                "offset": {
+                  "location": "query",
+                  "name": "offset",
+                  "transform": "bounded_int"
+                },
+                "placeholder": {
+                  "location": "query",
+                  "name": "placeholder",
+                  "transform": "identity"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "resolution_status": {
+                  "location": "query",
+                  "name": "resolution_status",
+                  "transform": "identity"
+                },
+                "resolved_value": {
+                  "location": "query",
+                  "name": "resolved_value",
+                  "transform": "identity"
+                },
+                "sql_file": {
+                  "location": "query",
+                  "name": "sql_file",
+                  "transform": "identity"
+                },
+                "workflow_context_file": {
+                  "location": "query",
+                  "name": "workflow_context_file",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "list_sql_placeholder_binding_resolutions_api_knowledge_v1_systems__system_id__sql_placeholder_binding_resolutions_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/placeholder-binding-resolutions",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "limit": "integer",
+              "offset": "integer",
+              "placeholder": "string|null",
+              "repo_id": "string|null",
+              "resolution_status": "string|null",
+              "resolved_value": "string|null",
+              "sql_file": "string|null",
+              "workflow_context_file": "string|null"
+            },
+            "description": "Верни принадлежащие KLC и подтверждённые evidence разрешения SQL placeholders из pinned revision. Используй их только для замены точного placeholder token на конкретное значение при `resolution_status=resolved`; иначе сохраняй наблюдаемый SQL-идентификатор и состояния `unresolved`/`ambiguous`.",
+            "name": "list_sql_placeholder_binding_resolutions",
+            "required_capabilities": [
+              "common.sql-workflow-context"
+            ],
+            "warnings": [
+              "Инструмент не выводит значения environment. Concrete value можно использовать только когда pinned revision уже публикует `resolution_status=resolved` для того же SQL file/context и точного placeholder.",
+              "Не выбирай между ambiguous values и не разрешай CTE, alias или intermediate relation names как будто это configuration placeholders."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "max_evidence_per_role": {
+                  "location": "query",
+                  "name": "max_evidence_per_role",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "search": {
+                  "location": "query",
+                  "name": "search",
+                  "transform": "identity"
+                },
+                "usage_role": {
+                  "location": "query",
+                  "name": "usage_role",
+                  "transform": "identity"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {
+                "view": "business_sources"
+              },
+              "method": "GET",
+              "operation_id": "export_sql_source_inventory_api_knowledge_v1_systems__system_id__sql_source_inventory_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/sql/source-inventory",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "max_evidence_per_role": "integer",
+              "repo_id": "string|null",
+              "search": "string|null",
+              "usage_role": "string|null"
+            },
+            "description": "Верни каноническую инвентаризацию SQL-источников для внешних таблиц бизнес-источников: детерминированно разрешённые поля, роли использования, evidence refs и coverage. Инвентаризация доказывает наблюдаемое участие и помогает находить relations/fields, но не доказывает попарную связь столбцов JOIN или сам JOIN predicate. Для всех или многих точных наблюдаемых JOIN используй `list_sql_joins`; `get_sql_query_context` применяй только когда действительно нужен более широкий контекст query/scope.",
+            "name": "list_used_source_tables_and_fields",
+            "required_capabilities": [
+              "common.sql-source-inventory-export"
+            ],
+            "warnings": [
+              "Инвентаризация содержит только бизнес-источники, разрешённые evidence; unmapped fields не назначаются по inference.",
+              "`usage_role='join'` для поля доказывает наблюдаемое участие в JOIN, но не то, с каким другим полем оно связано. Для точных наблюдаемых JOIN predicates/`column_pairs` используй `list_sql_joins`; не выводи пары колонок из их совместного встречания в этой инвентаризации."
+            ]
+          },
+          {
+            "api_binding": {
+              "arguments": {
+                "include_fields": {
+                  "location": "query",
+                  "name": "include_fields",
+                  "transform": "bool"
+                },
+                "limit": {
+                  "location": "query",
+                  "name": "limit",
+                  "transform": "bounded_int"
+                },
+                "offset": {
+                  "location": "query",
+                  "name": "offset",
+                  "transform": "bounded_int"
+                },
+                "repo_id": {
+                  "location": "query",
+                  "name": "repo_id",
+                  "transform": "identity"
+                },
+                "search": {
+                  "location": "query",
+                  "name": "search",
+                  "transform": "identity"
+                },
+                "type_annotations": {
+                  "location": "query",
+                  "name": "type_annotations",
+                  "transform": "csv"
+                }
+              },
+              "binding_kind": "knowledge_api_http",
+              "expected_schema_versions": [
+                "knowledge_api/v1"
+              ],
+              "fixed_query": {},
+              "method": "GET",
+              "operation_id": "list_declared_data_objects_api_knowledge_v1_systems__system_id__data_model_declared_objects_get",
+              "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects",
+              "revision_binding": {
+                "location": "query",
+                "name": "revision_id",
+                "value_from": "scope.revision_id"
+              }
+            },
+            "arguments": {
+              "include_fields": "boolean",
+              "limit": "integer",
+              "offset": "integer",
+              "repo_id": "string|null",
+              "search": "string|null",
+              "type_annotations": "array[string]"
+            },
+            "description": "Перечисли или найди объекты, объявленные в коде pinned prepared revision, включая наблюдаемые annotations, documentation и унаследованные effective field occurrences. Аргумент `search` — лексический поиск: используй один короткий token или короткую phrase на вызов; синонимы/переводы отправляй отдельными вызовами. Результаты детерминированно ранжируются и могут содержать ограниченный `match_evidence`, показывающий, какой наблюдаемый type/field дал совпадение, а также `binding_summary` для наблюдаемых входящих/исходящих declared relationships. `retrieval_score` — metadata ранжирования, а не semantic confidence. Необязательные exact annotation filters выбирают заданную caller-ом evidence-проекцию; declared-code facts не доказывают storage mappings или physical JOIN semantics.",
+            "name": "search_declared_data_objects",
+            "required_capabilities": [
+              "common.code-declared-data-model"
+            ],
+            "warnings": [
+              "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+            ]
+          }
+        ]
+      },
+      "params": {
+        "profile_id": "sql-analysis/v1",
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "llm-integration-profile"
+    },
+    {
+      "body": {
+        "advisory_profiles": [
+          {
+            "profile_fingerprint": "2889faa6ca286b18b09cd946ea764e5748005a37648c5c81e240274aabd6d743",
+            "profile_id": "attribute-addition-plan/v1",
+            "profile_version": "17",
+            "relevant_resource_ids": [
+              "analysis-coverage",
+              "attribute-paths",
+              "data-model",
+              "physical-model",
+              "sql-analysis",
+              "storage-usage"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "6d3588d5e4730429174218bd85b6273d54a2eec56c6cafc12c59836fa02b00bc",
+            "profile_id": "data-model/v1",
+            "profile_version": "4",
+            "relevant_resource_ids": [
+              "analysis-coverage",
+              "data-model",
+              "physical-model",
+              "sql-analysis"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "f117ea585eac7b75f40d3e489def3baba907d3f97e23cd27ba74b875e3f57d80",
+            "profile_id": "foreign-data-persistence/v1",
+            "profile_version": "3",
+            "relevant_resource_ids": [
+              "foreign-data-persistence",
+              "storage-usage"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "c23f4fd54b1af81fdeb13ddbf4c81b45f46deec92a5b3e33e875e6c62af99728",
+            "profile_id": "reference-data/v1",
+            "profile_version": "3",
+            "relevant_resource_ids": [
+              "reference-data"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "040bbb9e516582aab3a4c1249d381dc1130e5038b3e7844b2c9c5a39e4fd1a83",
+            "profile_id": "sql-analysis/v1",
+            "profile_version": "2",
+            "relevant_resource_ids": [
+              "analysis-coverage",
+              "sql-analysis"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "4f775842d42fb6d3d96cff7bdfa6f119b4c75ae02f41e82be9dc87254a0e695b",
+            "profile_id": "storage-usage/v1",
+            "profile_version": "2",
+            "relevant_resource_ids": [
+              "storage-usage"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "e1421e41db5125cd107321fe2818a33246722c818c6481bba6c8217ae12e02a7",
+            "profile_id": "system-description/v1",
+            "profile_version": "3",
+            "relevant_resource_ids": [
+              "system-description"
+            ],
+            "semantics": "advisory_only"
+          },
+          {
+            "profile_fingerprint": "b03ee576aaa15cb522305f747ad4b0c9051711bbc538433b071212701a574252",
+            "profile_id": "system-interactions/v1",
+            "profile_version": "3",
+            "relevant_resource_ids": [
+              "system-interactions"
+            ],
+            "semantics": "advisory_only"
+          }
+        ],
+        "capabilities": [
+          "common.code-declared-data-model",
+          "common.code-declared-entities",
+          "common.code-declared-fields",
+          "common.code-declared-inheritance",
+          "common.code-declared-relationships",
+          "common.declared-model-candidates",
+          "common.declared-model-dataset",
+          "common.sql-analysis",
+          "common.sql-attribute-insertion-context",
+          "common.sql-field-calculation",
+          "common.sql-relation-fields",
+          "common.sql-relation-semantic-roles",
+          "common.sql-source-inventory",
+          "common.sql-source-inventory-export",
+          "common.sql-target-column-lineage",
+          "common.sql-target-resolution",
+          "common.sql-workflow-bindings",
+          "common.sql-workflow-context"
+        ],
+        "catalog_fingerprint": "2c4b8c93a59f1459bb98d9ec46b217f8f6fd7cce70ad8c7ae1e42b141510fb99",
+        "catalog_kind": "descriptive",
+        "conventions": {
+          "ambiguity_gaps": "preserve_and_propagate",
+          "confidence_basis": "preserve_published_values",
+          "cross_system_correspondence": "consumer_owned_not_aisl_fact",
+          "physical_storage": "not_part_of_public_contract",
+          "provenance": "preserve_published_references",
+          "relationships": "published_revision_edges_only",
+          "stable_identity": "use_declared_identifier_fields_only"
+        },
+        "execution_semantics": "none",
+        "generated_from": {
+          "advisory_profiles_fingerprint": "c452cf2460cb3237fa40e0baf560cb3fbf3bff8dfe763c3535172b65dcd83734",
+          "capabilities_fingerprint": "365f237521973b4e4e1ea29a9341a3db381c25818d2deb32a35597de17d27f45",
+          "knowledge_artifacts_fingerprint": "226d497b95b1373f8c57903ba074ff808837305c128ff4459ad577d15d303c8f",
+          "resource_descriptors_fingerprint": "7539ad8dafd7fa5e8260fb56c9e8dda6017d0eefac09c3a3220ae07934b68b60"
+        },
+        "knowledge_artifacts": [
+          {
+            "artifact_id": "knowledge_artifact_43e64144e20fcac927aa",
+            "capabilities": [
+              "common.sql-analysis",
+              "common.sql-attribute-insertion-context",
+              "common.sql-field-calculation",
+              "common.sql-relation-fields",
+              "common.sql-relation-semantic-roles",
+              "common.sql-source-inventory",
+              "common.sql-source-inventory-export",
+              "common.sql-target-column-lineage",
+              "common.sql-target-resolution",
+              "common.sql-workflow-bindings",
+              "common.sql-workflow-context"
+            ],
+            "content_fingerprint": "4f87977e0b079a0909c86a8ccacd2c050361a991c39063001877250f33900025",
+            "coverage_available": true,
+            "diagnostic_count": 0,
+            "exact_dependency_product_ids": [],
+            "model_kind": "sql-observed-data-usage",
+            "origin_kind": "derived",
+            "producer_contract_ref": "knowledge_layer/v1",
+            "producer_ref": "knowledge-layer-core",
+            "product_slot_id": "klc:sql-analysis",
+            "provenance_available": true,
+            "schema_version": "knowledge_layer_sql/v2"
+          },
+          {
+            "artifact_id": "knowledge_artifact_e9853d23261813bd1ecc",
+            "capabilities": [
+              "common.code-declared-data-model",
+              "common.code-declared-entities",
+              "common.code-declared-fields",
+              "common.code-declared-inheritance",
+              "common.code-declared-relationships",
+              "common.declared-model-candidates",
+              "common.declared-model-dataset"
+            ],
+            "content_fingerprint": "ba06c6acc08947c8be5b6a4cca63772501bef2c41b90944317b298d7bb460565",
+            "coverage_available": true,
+            "diagnostic_count": 0,
+            "exact_dependency_product_ids": [],
+            "model_kind": "code-declared-data-model",
+            "origin_kind": "derived",
+            "producer_contract_ref": "knowledge_layer/v1",
+            "producer_ref": "knowledge-layer-core",
+            "product_slot_id": "klc:code-declared-data-model",
+            "provenance_available": true,
+            "schema_version": "code-declared-data-model/v1"
+          }
+        ],
+        "resources": [
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-analysis-coverage",
+                "integration_tool": "get_analysis_coverage",
+                "operation_id": "analysis_coverage_api_knowledge_v1_systems__system_id__coverage_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "common.effective-data-model"
+              ]
+            },
+            "description": "Опубликованные coverage, basis counts, provenance и известные gaps для revision.",
+            "limitations": [
+              "Coverage ограничено опубликованными products и не является утверждением о глобальной полноте source.",
+              "Missing published capabilities: common.effective-data-model",
+              "No matching published artifact summary is present in the pinned revision."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "domains.analysis_gaps",
+                  "limitations"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "count_basis",
+                  "status"
+                ],
+                "provenance_fields": [
+                  "provenance"
+                ],
+                "record_kind": "analysis_coverage",
+                "relationship_fields": [],
+                "schema_version": "analysis_coverage/v1",
+                "stable_identifier_fields": [
+                  "revision_id",
+                  "system_id"
+                ]
+              }
+            ],
+            "resource_id": "analysis-coverage",
+            "resource_scope": "revision_local",
+            "title": "Покрытие анализа и известные ограничения"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "traverse",
+                "handle_id": "resolve-attribute-path",
+                "integration_tool": "resolve_attribute_path",
+                "operation_id": "resolve_attribute_paths_api_knowledge_v1_systems__system_id__attribute_paths_resolve_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "workspace.attribute-path-resolver"
+              ]
+            },
+            "description": "Revision-local пути по relationships, уже опубликованным AISL.",
+            "limitations": [
+              "Missing published capabilities: workspace.attribute-path-resolver",
+              "Resolver проходит только по опубликованным edges revision и не создаёт cross-system correspondence."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "result.gaps",
+                  "result.paths[].ambiguity"
+                ],
+                "confidence_basis_fields": [
+                  "result.paths[].basis",
+                  "result.paths[].confidence"
+                ],
+                "provenance_fields": [
+                  "result.paths[].evidence"
+                ],
+                "record_kind": "knowledge_attribute_path",
+                "relationship_fields": [
+                  "result.paths[].edges"
+                ],
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "stable_identifier_fields": [
+                  "result.paths[].path_id"
+                ]
+              }
+            ],
+            "resource_id": "attribute-paths",
+            "resource_scope": "revision_local",
+            "title": "Опубликованные пути атрибутов"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-data-model-object-context",
+                "integration_tool": "get_data_model_object_context",
+                "operation_id": "get_data_model_object_context_api_knowledge_v1_systems__system_id__data_model_object_context__object_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-data-object",
+                "integration_tool": "get_data_object",
+                "operation_id": "get_table_api_knowledge_v1_systems__system_id__data_model_tables__table_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "get-data-object-relationship",
+                "integration_tool": "get_data_object_relationship",
+                "operation_id": "get_relationship_api_knowledge_v1_systems__system_id__data_model_tables__table_id__relationships__relationship_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-declared-data-object",
+                "integration_tool": "get_declared_data_object",
+                "operation_id": "get_declared_data_object_api_knowledge_v1_systems__system_id__data_model_declared_objects__object_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "search-data-objects",
+                "integration_tool": "search_data_objects",
+                "operation_id": "list_tables_api_knowledge_v1_systems__system_id__data_model_tables_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "search-declared-data-objects",
+                "integration_tool": "search_declared_data_objects",
+                "operation_id": "list_declared_data_objects_api_knowledge_v1_systems__system_id__data_model_declared_objects_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "degraded",
+            "availability_basis": {
+              "artifact_ids": [
+                "knowledge_artifact_e9853d23261813bd1ecc"
+              ],
+              "matched_capabilities": [
+                "common.code-declared-data-model"
+              ],
+              "required_capabilities": [
+                "common.code-declared-data-model",
+                "common.effective-data-model"
+              ]
+            },
+            "description": "Опубликованные data objects, fields и revision-local relationships из effective и declared models.",
+            "limitations": [
+              "Availability становится degraded, если опубликована только effective или только declared model.",
+              "Missing published capabilities: common.effective-data-model",
+              "Relationships являются фактами AISL только когда уже опубликованы внутри pinned revision."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "binding_summary"
+                ],
+                "confidence_basis_fields": [
+                  "binding_summary"
+                ],
+                "provenance_fields": [
+                  "source_ref"
+                ],
+                "record_kind": "declared_data_object",
+                "relationship_fields": [
+                  "inheritance[].inheritance_occurrence_id",
+                  "relationships[].relationship_id"
+                ],
+                "schema_version": "code-declared-data-model-query/v2",
+                "stable_identifier_fields": [
+                  "object_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "relationship_candidate_count"
+                ],
+                "confidence_basis_fields": [
+                  "relationships[].join"
+                ],
+                "provenance_fields": [
+                  "fields[].storage_observations[].evidence_refs"
+                ],
+                "record_kind": "effective_data_object",
+                "relationship_fields": [
+                  "relationships[].relationship_id"
+                ],
+                "schema_version": "data_model_api/v4",
+                "stable_identifier_fields": [
+                  "object.id"
+                ]
+              }
+            ],
+            "resource_id": "data-model",
+            "resource_scope": "revision_local",
+            "title": "Effective-модель и модель, объявленная в коде"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-fdp-context",
+                "integration_tool": "get_fdp_context",
+                "operation_id": "get_foreign_data_persistence_guidance_api_knowledge_v1_systems__system_id__foreign_data_persistence_guidance_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-fdp-landscape",
+                "integration_tool": "get_fdp_landscape",
+                "operation_id": "query_foreign_data_persistence_api_knowledge_v1_systems__system_id__foreign_data_persistence_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-fdp-path",
+                "integration_tool": "get_fdp_path",
+                "operation_id": "query_foreign_data_persistence_api_knowledge_v1_systems__system_id__foreign_data_persistence_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "bulk",
+                "handle_id": "list-fdp-cases",
+                "integration_tool": "list_fdp_cases",
+                "operation_id": "query_foreign_data_persistence_api_knowledge_v1_systems__system_id__foreign_data_persistence_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "list-fdp-paths",
+                "integration_tool": "list_fdp_paths",
+                "operation_id": "query_foreign_data_persistence_api_knowledge_v1_systems__system_id__foreign_data_persistence_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "workspace.fdp-paths"
+              ]
+            },
+            "description": "Опубликованные paths, mechanical cases, storage summaries и evidence для cross-repository persistence внутри одной revision.",
+            "limitations": [
+              "Missing published capabilities: workspace.fdp-paths",
+              "No matching published artifact summary is present in the pinned revision.",
+              "Описания paths сохраняют unresolved steps и не выводят отсутствующие mappings внешних систем."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "gaps",
+                  "interpretation_policy"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "path_status"
+                ],
+                "provenance_fields": [
+                  "evidence"
+                ],
+                "record_kind": "foreign_data_persistence_path",
+                "relationship_fields": [
+                  "access_path_id",
+                  "source_path_id"
+                ],
+                "schema_version": "foreign-data-persistence-guidance/v1",
+                "stable_identifier_fields": [
+                  "path_id"
+                ]
+              }
+            ],
+            "resource_id": "foreign-data-persistence",
+            "resource_scope": "revision_local",
+            "title": "Пути сохранения данных из внешних источников"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-knowledge-item",
+                "integration_tool": "get_knowledge_item",
+                "operation_id": "get_aisl_knowledge_item_api_knowledge_v1_systems__system_id__knowledge_items__artifact_id___item_kind___local_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "available",
+            "availability_basis": {
+              "artifact_ids": [
+                "knowledge_artifact_43e64144e20fcac927aa",
+                "knowledge_artifact_e9853d23261813bd1ecc"
+              ],
+              "matched_capabilities": [],
+              "required_capabilities": []
+            },
+            "description": "Stable addressing product/item с evidence, source fragments, issues и опубликованными correspondences.",
+            "limitations": [
+              "Envelope не синтезирует records, которых нет в authoritative typed product."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "correspondences_state",
+                  "coverage_state",
+                  "issues",
+                  "issues_state"
+                ],
+                "confidence_basis_fields": [
+                  "evidence[].basis",
+                  "projection_basis"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "evidence_bindings",
+                  "source_fragments"
+                ],
+                "record_kind": "aisl_knowledge_item",
+                "relationship_fields": [
+                  "correspondences[].correspondence_id"
+                ],
+                "schema_version": "aisl-knowledge-item-read/v1",
+                "stable_identifier_fields": [
+                  "item_ref.item_kind",
+                  "item_ref.local_id",
+                  "item_ref.product_id"
+                ]
+              }
+            ],
+            "resource_id": "knowledge-items",
+            "resource_scope": "revision_local",
+            "title": "Универсальное точное чтение AISL item"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-physical-model-table",
+                "integration_tool": "get_physical_model_table",
+                "operation_id": "get_physical_model_table_api_knowledge_v1_systems__system_id__physical_model_tables__table_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "list-physical-model-gaps",
+                "integration_tool": "list_physical_model_gaps",
+                "operation_id": "list_physical_model_gaps_api_knowledge_v1_systems__system_id__physical_model_gaps_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-physical-model-relationships",
+                "integration_tool": "list_physical_model_relationships",
+                "operation_id": "list_physical_model_relationships_api_knowledge_v1_systems__system_id__physical_model_relationships_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "search-physical-model-tables",
+                "integration_tool": "search_physical_model_tables",
+                "operation_id": "list_physical_model_tables_api_knowledge_v1_systems__system_id__physical_model_tables_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "common.physical-model.gaps",
+                "common.physical-model.relationships",
+                "common.physical-model.tables"
+              ]
+            },
+            "description": "Опубликованные physical tables, columns, keys, relationships и gaps unresolved references.",
+            "limitations": [
+              "Availability становится degraded, если capability таблиц, relationships или gaps опубликована только частично.",
+              "Missing published capabilities: common.physical-model.gaps, common.physical-model.relationships, common.physical-model.tables",
+              "No matching published artifact summary is present in the pinned revision."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "gap_kind",
+                  "message",
+                  "unresolved_ref"
+                ],
+                "confidence_basis_fields": [],
+                "provenance_fields": [
+                  "source_file"
+                ],
+                "record_kind": "physical_model_gap",
+                "relationship_fields": [
+                  "physical_model_source_id"
+                ],
+                "schema_version": "physical-model-query/v1",
+                "stable_identifier_fields": [
+                  "physical_model_gap_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "resolution_status"
+                ],
+                "confidence_basis_fields": [
+                  "resolution_status"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "source_file"
+                ],
+                "record_kind": "physical_model_relationship",
+                "relationship_fields": [
+                  "child_table_id",
+                  "parent_key_id",
+                  "parent_table_id"
+                ],
+                "schema_version": "physical-model-query/v1",
+                "stable_identifier_fields": [
+                  "physical_model_relationship_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "unresolved_column_refs"
+                ],
+                "confidence_basis_fields": [
+                  "logical_identity"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "source_file"
+                ],
+                "record_kind": "physical_model_table",
+                "relationship_fields": [
+                  "relationships[].physical_model_relationship_id"
+                ],
+                "schema_version": "physical-model-query/v1",
+                "stable_identifier_fields": [
+                  "physical_model_table_id"
+                ]
+              }
+            ],
+            "resource_id": "physical-model",
+            "resource_scope": "revision_local",
+            "title": "Физическая модель данных"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-reference-data-context",
+                "integration_tool": "get_reference_data_context",
+                "operation_id": "get_reference_data_guidance_api_knowledge_v1_systems__system_id__reference_data_guidance_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-reference-data-gaps",
+                "integration_tool": "get_reference_data_gaps",
+                "operation_id": "query_reference_data_api_knowledge_v1_systems__system_id__reference_data_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "bulk",
+                "handle_id": "get-reference-data-landscape",
+                "integration_tool": "get_reference_data_landscape",
+                "operation_id": "query_reference_data_api_knowledge_v1_systems__system_id__reference_data_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-reference-data-object",
+                "integration_tool": "get_reference_data_object",
+                "operation_id": "query_reference_data_api_knowledge_v1_systems__system_id__reference_data_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "get-reference-usage-observations",
+                "integration_tool": "get_reference_usage_observations",
+                "operation_id": "query_reference_data_api_knowledge_v1_systems__system_id__reference_data_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "search-reference-data",
+                "integration_tool": "search_reference_data",
+                "operation_id": "query_reference_data_api_knowledge_v1_systems__system_id__reference_data_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "common.reference-data"
+              ]
+            },
+            "description": "Опубликованные local definitions, literal writes, usage observations, candidates и явные gaps.",
+            "limitations": [
+              "Candidate representations остаются опубликованными candidates, а не автоматически выбранным внешним стандартом.",
+              "Missing published capabilities: common.reference-data",
+              "No matching published artifact summary is present in the pinned revision."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "candidate_representations",
+                  "gaps"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "interpretation_policy"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "local_definition_evidence"
+                ],
+                "record_kind": "reference_data_object",
+                "relationship_fields": [
+                  "candidate_representations",
+                  "usage_observations"
+                ],
+                "schema_version": "reference-data-guidance/v1",
+                "stable_identifier_fields": [
+                  "reference_object_id"
+                ]
+              }
+            ],
+            "resource_id": "reference-data",
+            "resource_scope": "revision_local",
+            "title": "Наблюдения по НСИ и справочным данным"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "discover",
+                "handle_id": "find-sql-target-candidates",
+                "integration_tool": "find_sql_target_candidates",
+                "operation_id": "find_sql_target_candidates_api_knowledge_v1_systems__system_id__sql_target_candidates_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-sql-attribute-insertion-context",
+                "integration_tool": "get_sql_attribute_insertion_context",
+                "operation_id": "resolve_sql_attribute_insertion_context_api_knowledge_v1_systems__system_id__sql_attribute_insertion_context_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-sql-column-usage-context",
+                "integration_tool": "get_sql_column_usage_context",
+                "operation_id": "get_sql_column_usage_context_api_knowledge_v1_systems__system_id__sql_column_usages__sql_column_usage_id__get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-sql-field-calculation",
+                "integration_tool": "get_sql_field_calculation",
+                "operation_id": "get_sql_field_calculation_api_knowledge_v1_systems__system_id__sql_field_calculation_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-sql-query-context",
+                "integration_tool": "get_sql_query_context",
+                "operation_id": "get_sql_query_context_api_knowledge_v1_systems__system_id__sql_query_context_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "get-sql-target-column-lineage",
+                "integration_tool": "get_sql_target_column_lineage",
+                "operation_id": "list_sql_target_column_lineage_api_knowledge_v1_systems__system_id__sql_target_column_lineage_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "get-workspace-sql-catalog",
+                "integration_tool": "get_workspace_sql_catalog",
+                "operation_id": "get_workspace_sql_catalog_api_knowledge_v1_systems__system_id__sql_workspace_catalog_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "bulk",
+                "handle_id": "list-sql-joins",
+                "integration_tool": "list_sql_joins",
+                "operation_id": "list_sql_joins_api_knowledge_v1_systems__system_id__sql_joins_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-sql-relation-materializations",
+                "integration_tool": "list_sql_relation_materializations",
+                "operation_id": "list_sql_relation_materializations_api_knowledge_v1_systems__system_id__sql_relation_materializations_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "bulk",
+                "handle_id": "list-used-source-tables-and-fields",
+                "integration_tool": "list_used_source_tables_and_fields",
+                "operation_id": "export_sql_source_inventory_api_knowledge_v1_systems__system_id__sql_source_inventory_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "degraded",
+            "availability_basis": {
+              "artifact_ids": [
+                "knowledge_artifact_43e64144e20fcac927aa"
+              ],
+              "matched_capabilities": [
+                "common.sql-analysis",
+                "common.sql-attribute-insertion-context",
+                "common.sql-field-calculation",
+                "common.sql-source-inventory-export",
+                "common.sql-target-column-lineage",
+                "common.sql-target-resolution"
+              ],
+              "required_capabilities": [
+                "common.sql-analysis",
+                "common.sql-attribute-insertion-context",
+                "common.sql-field-calculation",
+                "common.sql-relation-materialization",
+                "common.sql-source-inventory-export",
+                "common.sql-target-column-lineage",
+                "common.sql-target-resolution",
+                "common.workspace-sql-catalog"
+              ]
+            },
+            "description": "SQL relations, source usage, calculations, lineage, query context и наблюдаемые SQL join edges, опубликованные в revision.",
+            "limitations": [
+              "Availability становится degraded, если опубликована только часть SQL products.",
+              "Missing published capabilities: common.sql-relation-materialization, common.workspace-sql-catalog",
+              "Наблюдаемый SQL join является AISL knowledge; связь между независимыми системами, созданная consumer-ом, им не является."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "diagnostics"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "resolution_status"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "file",
+                  "line_start"
+                ],
+                "record_kind": "observed_sql_join",
+                "relationship_fields": [
+                  "source_relation_id",
+                  "target_relation_id"
+                ],
+                "schema_version": "knowledge_layer_sql/v2",
+                "stable_identifier_fields": [
+                  "sql_join_edge_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "coverage",
+                  "diagnostics"
+                ],
+                "confidence_basis_fields": [
+                  "classification_basis",
+                  "resolution_status"
+                ],
+                "provenance_fields": [
+                  "evidence"
+                ],
+                "record_kind": "sql_relation",
+                "relationship_fields": [
+                  "query_ids"
+                ],
+                "schema_version": "knowledge_layer_sql/v2",
+                "stable_identifier_fields": [
+                  "relation_id"
+                ]
+              }
+            ],
+            "resource_id": "sql-analysis",
+            "resource_scope": "revision_local",
+            "title": "Наблюдаемый SQL-анализ"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "discover",
+                "handle_id": "list-observed-storage-accesses",
+                "integration_tool": "list_observed_storage_accesses",
+                "operation_id": "list_observed_storage_accesses_api_knowledge_v1_systems__system_id__storage_usage_accesses_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "list-observed-storage-gaps",
+                "integration_tool": "list_observed_storage_gaps",
+                "operation_id": "list_observed_storage_gaps_api_knowledge_v1_systems__system_id__storage_usage_gaps_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "common.storage-access-gaps",
+                "common.storage-read-write-inventory"
+              ]
+            },
+            "description": "Опубликованные storage reads/writes, target resolution и явные storage-usage gaps.",
+            "limitations": [
+              "Missing published capabilities: common.storage-access-gaps, common.storage-read-write-inventory",
+              "No matching published artifact summary is present in the pinned revision.",
+              "Unresolved storage targets сохраняются как gaps, а не угадываются."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "target_resolution_status"
+                ],
+                "confidence_basis_fields": [
+                  "target_resolution_level",
+                  "target_resolution_status"
+                ],
+                "provenance_fields": [
+                  "source_ref"
+                ],
+                "record_kind": "observed_storage_access",
+                "relationship_fields": [],
+                "schema_version": "observed-storage-usage-query/v1",
+                "stable_identifier_fields": [
+                  "storage_access_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "details",
+                  "gap_code",
+                  "message"
+                ],
+                "confidence_basis_fields": [
+                  "severity"
+                ],
+                "provenance_fields": [
+                  "source_refs"
+                ],
+                "record_kind": "observed_storage_gap",
+                "relationship_fields": [
+                  "owner_id",
+                  "owner_kind"
+                ],
+                "schema_version": "observed-storage-usage-query/v1",
+                "stable_identifier_fields": [
+                  "storage_usage_gap_id"
+                ]
+              }
+            ],
+            "resource_id": "storage-usage",
+            "resource_scope": "revision_local",
+            "title": "Наблюдаемое использование хранилищ"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-system-description-context",
+                "integration_tool": "get_system_description_context",
+                "operation_id": "get_system_description_guidance_api_knowledge_v1_systems__system_id__system_description_guidance_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-system-description-coverage",
+                "integration_tool": "get_system_description_coverage",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-system-description-gaps",
+                "integration_tool": "get_system_description_gaps",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "get-system-repository-composition",
+                "integration_tool": "get_system_repository_composition",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "bulk",
+                "handle_id": "get-system-representative-journeys",
+                "integration_tool": "get_system_representative_journeys",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "get-system-scope-overview",
+                "integration_tool": "get_system_scope_overview",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "get-system-technologies",
+                "integration_tool": "get_system_technologies",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "list-system-events",
+                "integration_tool": "list_system_events",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-system-integrations",
+                "integration_tool": "list_system_integrations",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "list-system-interfaces",
+                "integration_tool": "list_system_interfaces",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "list-system-storage-targets",
+                "integration_tool": "list_system_storage_targets",
+                "operation_id": "query_system_description_api_knowledge_v1_systems__system_id__system_description_query_post",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "common.system-description"
+              ]
+            },
+            "description": "Опубликованные scope, repository composition, technologies, interfaces, integrations, events, storage targets, journeys и gaps.",
+            "limitations": [
+              "Missing published capabilities: common.system-description",
+              "No matching published artifact summary is present in the pinned revision.",
+              "Описание сохраняет опубликованные gaps и не выводит недокументированные system boundaries."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "coverage",
+                  "gaps"
+                ],
+                "confidence_basis_fields": [
+                  "projection"
+                ],
+                "provenance_fields": [
+                  "evidence"
+                ],
+                "record_kind": "system_description_item",
+                "relationship_fields": [
+                  "composition",
+                  "observed_inventory.integrations"
+                ],
+                "schema_version": "system-description-guidance/v1",
+                "stable_identifier_fields": [
+                  "item_id",
+                  "item_kind",
+                  "scope.system_id"
+                ]
+              }
+            ],
+            "resource_id": "system-description",
+            "resource_scope": "revision_local",
+            "title": "Описание системы"
+          },
+          {
+            "access_handles": [
+              {
+                "access_kind": "read",
+                "handle_id": "get-system-interaction-context",
+                "integration_tool": "get_system_interaction_context",
+                "operation_id": "get_system_interaction_guidance_api_knowledge_v1_systems__system_id__interactions__interaction_id__guidance_get",
+                "pagination": false,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-interaction-boundaries",
+                "integration_tool": "list_interaction_boundaries",
+                "operation_id": "list_repository_interaction_boundaries_api_knowledge_v1_systems__system_id__interactions_boundaries_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "list-interaction-coverage",
+                "integration_tool": "list_interaction_coverage",
+                "operation_id": "list_repository_interaction_coverage_api_knowledge_v1_systems__system_id__interactions_coverage_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "read",
+                "handle_id": "list-interaction-diagnostics",
+                "integration_tool": "list_interaction_diagnostics",
+                "operation_id": "list_system_interaction_diagnostics_api_knowledge_v1_systems__system_id__interactions_diagnostics_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-interaction-execution-contexts",
+                "integration_tool": "list_interaction_execution_contexts",
+                "operation_id": "list_system_interaction_execution_contexts_api_knowledge_v1_systems__system_id__interactions_execution_contexts_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "traverse",
+                "handle_id": "list-interaction-field-contracts",
+                "integration_tool": "list_interaction_field_contracts",
+                "operation_id": "list_system_interaction_field_contracts_api_knowledge_v1_systems__system_id__interactions_field_contracts_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              },
+              {
+                "access_kind": "discover",
+                "handle_id": "list-system-interactions",
+                "integration_tool": "list_system_interactions",
+                "operation_id": "list_system_interactions_api_knowledge_v1_systems__system_id__interactions_get",
+                "pagination": true,
+                "revision_binding": "scope.revision_id"
+              }
+            ],
+            "availability": "unavailable",
+            "availability_basis": {
+              "artifact_ids": [],
+              "matched_capabilities": [],
+              "required_capabilities": [
+                "workspace.repository-interaction-boundaries",
+                "workspace.repository-interaction-coverage",
+                "workspace.system-interaction-field-contracts",
+                "workspace.system-interactions"
+              ]
+            },
+            "description": "Опубликованные interactions, repository boundaries, execution contexts, field contracts, diagnostics и coverage.",
+            "limitations": [
+              "Missing published capabilities: workspace.repository-interaction-boundaries, workspace.repository-interaction-coverage, workspace.system-interaction-field-contracts, workspace.system-interactions",
+              "No matching published artifact summary is present in the pinned revision.",
+              "Unresolved peers остаются unresolved; catalog не угадывает и не кластеризует системы."
+            ],
+            "record_contracts": [
+              {
+                "ambiguity_gap_fields": [
+                  "coverage",
+                  "diagnostics"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "match_status"
+                ],
+                "provenance_fields": [
+                  "evidence",
+                  "source_refs"
+                ],
+                "record_kind": "system_interaction",
+                "relationship_fields": [
+                  "boundary_interaction_ids_json"
+                ],
+                "schema_version": "system-interaction-query/v1",
+                "stable_identifier_fields": [
+                  "interaction_id"
+                ]
+              },
+              {
+                "ambiguity_gap_fields": [
+                  "diagnostics"
+                ],
+                "confidence_basis_fields": [
+                  "basis",
+                  "match_status"
+                ],
+                "provenance_fields": [
+                  "evidence"
+                ],
+                "record_kind": "system_interaction_field_contract",
+                "relationship_fields": [
+                  "boundary_interaction_id",
+                  "interaction_id"
+                ],
+                "schema_version": "workspace_system_interaction_field_contract/v2",
+                "stable_identifier_fields": [
+                  "field_contract_id"
+                ]
+              }
+            ],
+            "resource_id": "system-interactions",
+            "resource_scope": "revision_local",
+            "title": "Наблюдения по взаимодействиям систем"
+          }
+        ],
+        "schema_version": "aisl_public_knowledge_catalog/v1",
+        "scope": {
+          "revision_binding": "pinned",
+          "revision_id": "rev-08005fc81dcf2b53908d4a65",
+          "system_id": "sdd-pilot"
+        }
+      },
+      "params": {
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "public-knowledge-catalog"
+    },
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [
+              "b.enabled = 1"
+            ],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ad1bb7b067419197",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.id = b.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_e42e7e2d0ba39d77",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              },
+              {
+                "left_column": "region",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_e30dea80aa2e4278",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.region = b.region",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "region",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_f8a20407ffae4123",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 1
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "left",
+            "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 1,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9",
+              "sql_relation_sdd-pilot_785439073dbf1776"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.id = b.customer_id AND a.region = b.region AND b.enabled = 1",
+            "query_id": "query_sdd-pilot_000001",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_070ddadea9b3f148",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d6314cc9e018c77b",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ab0a5613993de08a",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": ">=",
+                "predicate": "a.event_time >= b.start_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "start_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_2bf6917d23f16cd5",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              },
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_39eda1d08c07c8e7",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": "<",
+                "predicate": "a.event_time < b.end_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "end_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_49f2db4e18748695",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 6
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a"
+            ],
+            "left_relation_names": [
+              "event"
+            ],
+            "line_start": 6,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+              "sql_relation_sdd-pilot_71129504161613ba"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.event_time >= b.start_time AND a.event_time < b.end_time",
+            "query_id": "query_sdd-pilot_000002",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+            "right_relation_kind": "physical",
+            "right_relation_name": "validity",
+            "scope_id": "sql_select_scope_sdd-pilot_7398ed9b50190493",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8a330be1ee531b40",
+            "temporal_or_range_predicates": [
+              "a.event_time >= b.start_time",
+              "a.event_time < b.end_time"
+            ],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": null,
+                "left_relation_candidate_ids": [],
+                "left_relation_candidate_names": [],
+                "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "USING (id)",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "id",
+                "right_column_usage_id": null,
+                "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "using",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 9
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 9,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0",
+              "sql_relation_sdd-pilot_02e64474a634987e"
+            ],
+            "physical_join_confirmed": true,
+            "query_id": "query_sdd-pilot_000003",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_9ce09fa2dd1714f9",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8f346fb694cd3bcd",
+            "temporal_or_range_predicates": [],
+            "using_columns": [
+              "id"
+            ]
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 0,
+          "total": 8
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 0,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [
+              "b.enabled = 1"
+            ],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ad1bb7b067419197",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.id = b.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_e42e7e2d0ba39d77",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              },
+              {
+                "left_column": "region",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_e30dea80aa2e4278",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.region = b.region",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "region",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_f8a20407ffae4123",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 1
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "left",
+            "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 1,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9",
+              "sql_relation_sdd-pilot_785439073dbf1776"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.id = b.customer_id AND a.region = b.region AND b.enabled = 1",
+            "query_id": "query_sdd-pilot_000001",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_070ddadea9b3f148",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d6314cc9e018c77b",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ab0a5613993de08a",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": ">=",
+                "predicate": "a.event_time >= b.start_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "start_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_2bf6917d23f16cd5",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              },
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_39eda1d08c07c8e7",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": "<",
+                "predicate": "a.event_time < b.end_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "end_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_49f2db4e18748695",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 6
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a"
+            ],
+            "left_relation_names": [
+              "event"
+            ],
+            "line_start": 6,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+              "sql_relation_sdd-pilot_71129504161613ba"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.event_time >= b.start_time AND a.event_time < b.end_time",
+            "query_id": "query_sdd-pilot_000002",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+            "right_relation_kind": "physical",
+            "right_relation_name": "validity",
+            "scope_id": "sql_select_scope_sdd-pilot_7398ed9b50190493",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8a330be1ee531b40",
+            "temporal_or_range_predicates": [
+              "a.event_time >= b.start_time",
+              "a.event_time < b.end_time"
+            ],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": null,
+                "left_relation_candidate_ids": [],
+                "left_relation_candidate_names": [],
+                "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "USING (id)",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "id",
+                "right_column_usage_id": null,
+                "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "using",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 9
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 9,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0",
+              "sql_relation_sdd-pilot_02e64474a634987e"
+            ],
+            "physical_join_confirmed": true,
+            "query_id": "query_sdd-pilot_000003",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_9ce09fa2dd1714f9",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8f346fb694cd3bcd",
+            "temporal_or_range_predicates": [],
+            "using_columns": [
+              "id"
+            ]
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 0,
+          "total": 8
+        },
+        "revision_id": "rev-dd1dfa4f26cb1d6259b4d222",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 0,
+        "revision_id": "rev-dd1dfa4f26cb1d6259b4d222"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    },
+    {
+      "body": {
+        "filters": {
+          "physical_join_confirmed": null,
+          "query_id": null,
+          "repo_id": null,
+          "resolution_status": null,
+          "scope_id": null
+        },
+        "items": [
+          {
+            "additional_predicates": [
+              "b.enabled = 1"
+            ],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ad1bb7b067419197",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.id = b.customer_id",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "customer_id",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_e42e7e2d0ba39d77",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              },
+              {
+                "left_column": "region",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_e30dea80aa2e4278",
+                "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "a.region = b.region",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "region",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_f8a20407ffae4123",
+                "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 1
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "left",
+            "left_relation_id": "sql_relation_sdd-pilot_a7944202f4b602a9",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 1,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_a7944202f4b602a9",
+              "sql_relation_sdd-pilot_785439073dbf1776"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.id = b.customer_id AND a.region = b.region AND b.enabled = 1",
+            "query_id": "query_sdd-pilot_000001",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_785439073dbf1776",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_070ddadea9b3f148",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_d6314cc9e018c77b",
+            "temporal_or_range_predicates": [],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_ab0a5613993de08a",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": ">=",
+                "predicate": "a.event_time >= b.start_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "start_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_2bf6917d23f16cd5",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              },
+              {
+                "left_column": "event_time",
+                "left_column_usage_id": "sql_column_usage_sdd-pilot_39eda1d08c07c8e7",
+                "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+                "left_relation_name": "event",
+                "operator": "<",
+                "predicate": "a.event_time < b.end_time",
+                "predicate_role": "range_or_temporal",
+                "resolution_status": "confirmed",
+                "right_column": "end_time",
+                "right_column_usage_id": "sql_column_usage_sdd-pilot_49f2db4e18748695",
+                "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+                "right_relation_name": "validity"
+              }
+            ],
+            "condition_kind": "on",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 6
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a"
+            ],
+            "left_relation_names": [
+              "event"
+            ],
+            "line_start": 6,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_c52eb05d4cd8536a",
+              "sql_relation_sdd-pilot_71129504161613ba"
+            ],
+            "physical_join_confirmed": true,
+            "predicate": "a.event_time >= b.start_time AND a.event_time < b.end_time",
+            "query_id": "query_sdd-pilot_000002",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_71129504161613ba",
+            "right_relation_kind": "physical",
+            "right_relation_name": "validity",
+            "scope_id": "sql_select_scope_sdd-pilot_7398ed9b50190493",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8a330be1ee531b40",
+            "temporal_or_range_predicates": [
+              "a.event_time >= b.start_time",
+              "a.event_time < b.end_time"
+            ],
+            "using_columns": []
+          },
+          {
+            "additional_predicates": [],
+            "column_pairs": [
+              {
+                "left_column": "id",
+                "left_column_usage_id": null,
+                "left_relation_candidate_ids": [],
+                "left_relation_candidate_names": [],
+                "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+                "left_relation_name": "customer",
+                "operator": "=",
+                "predicate": "USING (id)",
+                "predicate_role": "equality_key",
+                "resolution_status": "confirmed",
+                "right_column": "id",
+                "right_column_usage_id": null,
+                "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+                "right_relation_name": "profile"
+              }
+            ],
+            "condition_kind": "using",
+            "evidence_maturity_level": "confirmed",
+            "evidence_refs": [
+              {
+                "file": "sql-cases.sql",
+                "line_start": 9
+              }
+            ],
+            "expression_links": [],
+            "file": "sql-cases.sql",
+            "join_ordinal": 1,
+            "join_type": "inner",
+            "left_relation_id": "sql_relation_sdd-pilot_387612a34bbc2cf0",
+            "left_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0"
+            ],
+            "left_relation_names": [
+              "customer"
+            ],
+            "line_start": 9,
+            "participating_relation_ids": [
+              "sql_relation_sdd-pilot_387612a34bbc2cf0",
+              "sql_relation_sdd-pilot_02e64474a634987e"
+            ],
+            "physical_join_confirmed": true,
+            "query_id": "query_sdd-pilot_000003",
+            "repo_id": "sdd-pilot",
+            "resolution_reasons": [],
+            "resolution_status": "confirmed",
+            "right_relation_id": "sql_relation_sdd-pilot_02e64474a634987e",
+            "right_relation_kind": "physical",
+            "right_relation_name": "profile",
+            "scope_id": "sql_select_scope_sdd-pilot_9ce09fa2dd1714f9",
+            "sql_join_edge_id": "sql_join_edge_sdd-pilot_8f346fb694cd3bcd",
+            "temporal_or_range_predicates": [],
+            "using_columns": [
+              "id"
+            ]
+          }
+        ],
+        "join_query_schema_version": "sql-join-list/v1",
+        "page": {
+          "limit": 3,
+          "offset": 0,
+          "total": 8
+        },
+        "revision_id": "rev-08005fc81dcf2b53908d4a65",
+        "schema_version": "knowledge_api/v1",
+        "system_id": "sdd-pilot"
+      },
+      "params": {
+        "limit": 3,
+        "offset": 0,
+        "revision_id": "rev-08005fc81dcf2b53908d4a65"
+      },
+      "status": 200,
+      "suffix": "sql/joins"
+    }
+  ]
+}

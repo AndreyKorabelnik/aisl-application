@@ -1,0 +1,300 @@
+{
+  "artifact_id": "java_type_structure_166d5e82283748a925729ed7",
+  "artifact_kind": "java-type-structure-evidence",
+  "content_fingerprint": "166d5e82283748a925729ed7debe29d17f91f130996bb664960c0dfa2edc6349",
+  "contract_version": "core_evidence_artifact_contract/v1",
+  "coverage": {
+    "ambiguous_type_reference_count": 0,
+    "annotation_declaration_count": 1,
+    "coverage_status": "complete",
+    "enum_constant_declaration_count": 0,
+    "field_declaration_count": 4,
+    "inheritance_declaration_count": 1,
+    "java_files_discovered": 1,
+    "java_files_failed": 0,
+    "java_files_in_scope": 1,
+    "java_files_parsed": 1,
+    "java_files_with_parse_errors": 0,
+    "type_declaration_count": 3,
+    "type_reference_count": 2,
+    "unresolved_type_reference_count": 0,
+    "unsupported_declaration_count": 0
+  },
+  "diagnostics": [],
+  "parameters": {
+    "include_test_sources": true,
+    "language": "java",
+    "record_limit": null
+  },
+  "payload": {
+    "annotation_declarations": [
+      {
+        "annotation_id": "java_annotation_fd140bd32de68777ff88e4e1",
+        "annotation_name": "Deprecated",
+        "arguments_raw": null,
+        "candidate_annotation_types": [],
+        "resolution_status": "unresolved",
+        "resolved_annotation_type": null,
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 8,
+          "line_start": 8,
+          "repository_relative_path": "Sample.java"
+        },
+        "structured_arguments": [],
+        "target_id": "java_field_45e22693dd9ff4be035d86d2",
+        "target_kind": "field"
+      }
+    ],
+    "enum_constant_declarations": [],
+    "field_declarations": [
+      {
+        "declared_type_expression": "String",
+        "documentation": null,
+        "field_id": "java_field_45e22693dd9ff4be035d86d2",
+        "initializer_present": false,
+        "is_final": false,
+        "is_static": false,
+        "modifier_tokens": [
+          "private"
+        ],
+        "name": "nickname",
+        "normalized_type_expression": "String",
+        "owner_type_id": "java_type_07a801d4cdcfa113fe0b1759",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 9,
+          "line_start": 8,
+          "repository_relative_path": "Sample.java"
+        }
+      },
+      {
+        "declared_type_expression": "Profile",
+        "documentation": null,
+        "field_id": "java_field_c52702d7258ec5feb20be058",
+        "initializer_present": false,
+        "is_final": false,
+        "is_static": false,
+        "modifier_tokens": [
+          "private"
+        ],
+        "name": "profile",
+        "normalized_type_expression": "Profile",
+        "owner_type_id": "java_type_07a801d4cdcfa113fe0b1759",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 10,
+          "line_start": 10,
+          "repository_relative_path": "Sample.java"
+        }
+      },
+      {
+        "declared_type_expression": "String",
+        "documentation": null,
+        "field_id": "java_field_00e08c94ed757658bbf6469e",
+        "initializer_present": false,
+        "is_final": false,
+        "is_static": false,
+        "modifier_tokens": [
+          "protected"
+        ],
+        "name": "id",
+        "normalized_type_expression": "String",
+        "owner_type_id": "java_type_2a7a01b3d08411436c25e8a6",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 4,
+          "line_start": 4,
+          "repository_relative_path": "Sample.java"
+        }
+      },
+      {
+        "declared_type_expression": "String",
+        "documentation": null,
+        "field_id": "java_field_de46ed7545ef0fe6d118e0e6",
+        "initializer_present": false,
+        "is_final": false,
+        "is_static": false,
+        "modifier_tokens": [
+          "private"
+        ],
+        "name": "name",
+        "normalized_type_expression": "String",
+        "owner_type_id": "java_type_8c8005e778407ca5646427c2",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 14,
+          "line_start": 14,
+          "repository_relative_path": "Sample.java"
+        }
+      }
+    ],
+    "inheritance_declarations": [
+      {
+        "candidate_fqcns": [
+          "synthetic.fixture.BaseEntity"
+        ],
+        "candidate_supertype_ids": [
+          "java_type_2a7a01b3d08411436c25e8a6"
+        ],
+        "declared_supertype_expression": "BaseEntity",
+        "inheritance_id": "java_inheritance_75bfe984f94aaa2cab5abba3",
+        "relation_kind": "extends",
+        "resolution_status": "same_package",
+        "resolved_fqcn": "synthetic.fixture.BaseEntity",
+        "resolved_supertype_id": "java_type_2a7a01b3d08411436c25e8a6",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 11,
+          "line_start": 7,
+          "repository_relative_path": "Sample.java"
+        },
+        "subtype_id": "java_type_07a801d4cdcfa113fe0b1759",
+        "type_arguments": []
+      }
+    ],
+    "source_units": [
+      {
+        "bytes": 243,
+        "content_sha256": "875b7e031b23b57b8a2488eb497890058eb1f483cbfb417ff729a7d9cf88f70c",
+        "imports": [],
+        "language": "java",
+        "package_name": "synthetic.fixture",
+        "parse_error_count": 0,
+        "parse_status": "success",
+        "repository_relative_path": "Sample.java",
+        "source_set": "unknown",
+        "source_unit_id": "java_source_unit_937a2ab2e32f5e137bcffdf7"
+      }
+    ],
+    "type_declarations": [
+      {
+        "documentation": null,
+        "enclosing_type_id": null,
+        "fully_qualified_name": "synthetic.fixture.BaseEntity",
+        "modifier_tokens": [],
+        "package_name": "synthetic.fixture",
+        "simple_name": "BaseEntity",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 5,
+          "line_start": 3,
+          "repository_relative_path": "Sample.java"
+        },
+        "source_set": "unknown",
+        "source_unit_id": "java_source_unit_937a2ab2e32f5e137bcffdf7",
+        "type_id": "java_type_2a7a01b3d08411436c25e8a6",
+        "type_kind": "class",
+        "type_parameters": []
+      },
+      {
+        "documentation": null,
+        "enclosing_type_id": null,
+        "fully_qualified_name": "synthetic.fixture.Customer",
+        "modifier_tokens": [
+          "final"
+        ],
+        "package_name": "synthetic.fixture",
+        "simple_name": "Customer",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 11,
+          "line_start": 7,
+          "repository_relative_path": "Sample.java"
+        },
+        "source_set": "unknown",
+        "source_unit_id": "java_source_unit_937a2ab2e32f5e137bcffdf7",
+        "type_id": "java_type_07a801d4cdcfa113fe0b1759",
+        "type_kind": "class",
+        "type_parameters": []
+      },
+      {
+        "documentation": null,
+        "enclosing_type_id": null,
+        "fully_qualified_name": "synthetic.fixture.Profile",
+        "modifier_tokens": [
+          "final"
+        ],
+        "package_name": "synthetic.fixture",
+        "simple_name": "Profile",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 15,
+          "line_start": 13,
+          "repository_relative_path": "Sample.java"
+        },
+        "source_set": "unknown",
+        "source_unit_id": "java_source_unit_937a2ab2e32f5e137bcffdf7",
+        "type_id": "java_type_8c8005e778407ca5646427c2",
+        "type_kind": "class",
+        "type_parameters": []
+      }
+    ],
+    "type_reference_observations": [
+      {
+        "candidate_fqcns": [
+          "synthetic.fixture.Profile"
+        ],
+        "candidate_type_ids": [
+          "java_type_8c8005e778407ca5646427c2"
+        ],
+        "declared_type_expression": "Profile",
+        "owner_id": "java_field_c52702d7258ec5feb20be058",
+        "owner_kind": "field",
+        "reference_role": "field_type",
+        "referenced_type_token": "Profile",
+        "resolution_status": "same_package",
+        "resolved_fqcn": "synthetic.fixture.Profile",
+        "resolved_type_id": "java_type_8c8005e778407ca5646427c2",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 10,
+          "line_start": 10,
+          "repository_relative_path": "Sample.java"
+        },
+        "type_reference_id": "java_type_ref_844386846055ef02adadf114"
+      },
+      {
+        "candidate_fqcns": [
+          "synthetic.fixture.BaseEntity"
+        ],
+        "candidate_type_ids": [
+          "java_type_2a7a01b3d08411436c25e8a6"
+        ],
+        "declared_type_expression": "BaseEntity",
+        "owner_id": "java_type_07a801d4cdcfa113fe0b1759",
+        "owner_kind": "type",
+        "reference_role": "extends_type",
+        "referenced_type_token": "BaseEntity",
+        "resolution_status": "same_package",
+        "resolved_fqcn": "synthetic.fixture.BaseEntity",
+        "resolved_type_id": "java_type_2a7a01b3d08411436c25e8a6",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 11,
+          "line_start": 7,
+          "repository_relative_path": "Sample.java"
+        },
+        "type_reference_id": "java_type_ref_64c8491269cd42b09861b20e"
+      }
+    ]
+  },
+  "producer": {
+    "analyzer_id": "java-type-structure-analyzer",
+    "analyzer_version": "0.44.23a77",
+    "component": "code-analyzer-core"
+  },
+  "provenance": {
+    "execution_runtime": "core_evidence_runtime/v1",
+    "parser_provider": "tree_sitter",
+    "semantic_routing": "explicit_analyzer_identity"
+  },
+  "schema_version": "java-type-structure-evidence/v1",
+  "source_snapshot": {
+    "file_count": 1,
+    "fingerprint": "9f01e28a90c4681922955cd4e5cb2c963c90661ec688ed676fe777938fff83a6",
+    "revision": null,
+    "scope": "java_source_files",
+    "source_id": "sdd-pilot"
+  }
+}

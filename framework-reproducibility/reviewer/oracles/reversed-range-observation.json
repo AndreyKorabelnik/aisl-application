@@ -1,0 +1,67 @@
+{
+  "actual": [
+    {
+      "additional_predicates": [],
+      "column_pairs": [
+        {
+          "left_column": "event_time",
+          "left_column_usage_id": "sql_column_usage_sdd-reversed_0c233f2b1823153c",
+          "left_relation_id": "sql_relation_sdd-reversed_44e486dcaf7ea737",
+          "left_relation_name": "event",
+          "operator": ">",
+          "predicate": "b.start_time > a.event_time",
+          "predicate_role": "range_or_temporal",
+          "resolution_status": "confirmed",
+          "right_column": "start_time",
+          "right_column_usage_id": "sql_column_usage_sdd-reversed_4f7a4e2a064d04a6",
+          "right_relation_id": "sql_relation_sdd-reversed_f8c43a5d642c1085",
+          "right_relation_name": "validity"
+        }
+      ],
+      "condition_kind": "on",
+      "evidence": [
+        {
+          "extractor": "sql_profile_scoped_ast",
+          "line_start": 1,
+          "relative_file": "reversed-range.sql",
+          "scope_id": "sql_select_scope_sdd-reversed_d021742be9e34032"
+        }
+      ],
+      "evidence_maturity_level": "confirmed",
+      "expression_links": [],
+      "fact_type": "sql_join_edge",
+      "file": "reversed-range.sql",
+      "join_ordinal": 1,
+      "join_type": "inner",
+      "left_relation_id": "sql_relation_sdd-reversed_44e486dcaf7ea737",
+      "left_relation_ids": [
+        "sql_relation_sdd-reversed_44e486dcaf7ea737"
+      ],
+      "left_relation_names": [
+        "event"
+      ],
+      "line_start": 1,
+      "participating_relation_ids": [
+        "sql_relation_sdd-reversed_44e486dcaf7ea737",
+        "sql_relation_sdd-reversed_f8c43a5d642c1085"
+      ],
+      "physical_join_confirmed": true,
+      "predicate": "b.start_time > a.event_time",
+      "query_id": "query_sdd-reversed_000001",
+      "repo_id": "sdd-reversed",
+      "resolution_reasons": [],
+      "resolution_status": "confirmed",
+      "right_relation_id": "sql_relation_sdd-reversed_f8c43a5d642c1085",
+      "right_relation_kind": "physical",
+      "right_relation_name": "validity",
+      "scope_id": "sql_select_scope_sdd-reversed_d021742be9e34032",
+      "sql_join_edge_id": "sql_join_edge_sdd-reversed_ae5a1e8649d4f6a8",
+      "temporal_or_range_predicates": [
+        "b.start_time > a.event_time"
+      ],
+      "using_columns": []
+    }
+  ],
+  "input": "SELECT a.id FROM event a JOIN validity b ON b.start_time > a.event_time;\n",
+  "status": "OBSERVATION_REQUIRES_CONTRACT_DECISION"
+}

@@ -1,0 +1,15 @@
+{
+  "framework_modified": false,
+  "model_policy": "latest publicly available DeepSeek at first scored run; pin exact served model for the experiment",
+  "rules": {
+    "drive_file_id": "1WjK8qsEaIJDjcwTn62HJndAliEYGUj6i",
+    "version": "1.10"
+  },
+  "scored_run_status": "NOT_RUN_SPEC_INCOMPLETE",
+  "selected_model_id": null,
+  "source_bytes": 2596556,
+  "source_checkpoint": "F4.95",
+  "source_drive_file_id": "1xwrSdDAHaIimizq1mdy40-ufmC_i7EE5",
+  "source_manifest_verified": 828,
+  "source_sha256": "fb3b7134194eddb9d6ac25b184ef046516b368b1aec513c2a29d61a397cd88f3"
+}

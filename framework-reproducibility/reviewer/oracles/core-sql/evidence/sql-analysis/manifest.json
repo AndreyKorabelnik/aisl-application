@@ -1,0 +1,202 @@
+{
+  "artifact": "sql_analysis",
+  "contract_version": "1.0",
+  "schema_version": "sql-analysis/v1",
+  "created_at": "2026-09-12T16:59:57.617268+00:00",
+  "analysis_status": "partial",
+  "repository": {
+    "repo_id": "sdd-synthetic",
+    "system_name": "Synthetic SDD",
+    "project_code": "SDD"
+  },
+  "producer": {
+    "name": "code-analyzer-core",
+    "version": "0.44.23a77",
+    "sql_profile_version": "1.9"
+  },
+  "facts": [
+    {
+      "fact_type": "sql_statement",
+      "id_field": "sql_statement_id",
+      "path": "facts/sql_statement.jsonl",
+      "record_count": 8,
+      "sha256": "963dd381498def3f605936a90443c2b3cebab971ccea44bdc3f835cd76eac82c",
+      "byte_size": 9904
+    },
+    {
+      "fact_type": "sql_script_statement",
+      "id_field": "sql_script_statement_id",
+      "path": "facts/sql_script_statement.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_script_call",
+      "id_field": "sql_script_call_id",
+      "path": "facts/sql_script_call.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_script_binding",
+      "id_field": "sql_script_binding_id",
+      "path": "facts/sql_script_binding.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_script_embedded_sql",
+      "id_field": "sql_script_embedded_sql_id",
+      "path": "facts/sql_script_embedded_sql.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_script_invocation",
+      "id_field": "sql_script_invocation_id",
+      "path": "facts/sql_script_invocation.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_semantic_placeholder",
+      "id_field": "sql_semantic_placeholder_id",
+      "path": "facts/sql_semantic_placeholder.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_workflow_binding",
+      "id_field": "sql_workflow_binding_id",
+      "path": "facts/sql_workflow_binding.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    },
+    {
+      "fact_type": "sql_select_scope",
+      "id_field": "sql_select_scope_id",
+      "path": "facts/sql_select_scope.jsonl",
+      "record_count": 9,
+      "sha256": "1c5e57e1e50f7a92293a6456ea615c8ae30c0cdc8e8916e361a3985425d50f38",
+      "byte_size": 7329
+    },
+    {
+      "fact_type": "sql_relation",
+      "id_field": "sql_relation_id",
+      "path": "facts/sql_relation.jsonl",
+      "record_count": 17,
+      "sha256": "ebe3e75d3baa6373846ec6f5bc21950a3a00d9fcb9f2671c79bb2af9722dfe4f",
+      "byte_size": 16340
+    },
+    {
+      "fact_type": "sql_column_usage",
+      "id_field": "sql_column_usage_id",
+      "path": "facts/sql_column_usage.jsonl",
+      "record_count": 29,
+      "sha256": "44cb6dba0e5fc7e521b8d5f72889a0d140b77c9e58467ae274b9187d9b4ada6e",
+      "byte_size": 26182
+    },
+    {
+      "fact_type": "sql_projection",
+      "id_field": "sql_projection_id",
+      "path": "facts/sql_projection.jsonl",
+      "record_count": 11,
+      "sha256": "39b88e415d08c6216378646a15f1a62bcf98a23d55377849653d450afa6831ae",
+      "byte_size": 8193
+    },
+    {
+      "fact_type": "sql_write_target",
+      "id_field": "sql_write_target_id",
+      "path": "facts/sql_write_target.jsonl",
+      "record_count": 1,
+      "sha256": "703117d2bcdd2f3dbcd66bee27cefb89862125422fc281f0c796f80af9a2d947",
+      "byte_size": 1243
+    },
+    {
+      "fact_type": "sql_target_projection_binding",
+      "id_field": "sql_target_projection_binding_id",
+      "path": "facts/sql_target_projection_binding.jsonl",
+      "record_count": 2,
+      "sha256": "9c6b878c5407abfb4421b556b0d8f766322f58cdcdd7acf9b2e5de2c0b612172",
+      "byte_size": 1808
+    },
+    {
+      "fact_type": "sql_join_edge",
+      "id_field": "sql_join_edge_id",
+      "path": "facts/sql_join_edge.jsonl",
+      "record_count": 8,
+      "sha256": "45bbfdd4a26c48c6528052e5bc6025e7ecfd4370b149144a32e1df47997dc237",
+      "byte_size": 14680
+    },
+    {
+      "fact_type": "sql_direct_column_lineage",
+      "id_field": "sql_direct_column_lineage_id",
+      "path": "facts/sql_direct_column_lineage.jsonl",
+      "record_count": 2,
+      "sha256": "6628e008f3b69ffcb196709ea406be6bc0bdaa76a26c7134437fa1dbe9e03895",
+      "byte_size": 2795
+    },
+    {
+      "fact_type": "sql_recursive_column_lineage",
+      "id_field": "sql_recursive_column_lineage_id",
+      "path": "facts/sql_recursive_column_lineage.jsonl",
+      "record_count": 2,
+      "sha256": "0ac3b131dcd9b4d61bfafde8d5766b6b6c533e6e934e2dc66e918e1e30fb3361",
+      "byte_size": 3393
+    },
+    {
+      "fact_type": "sql_object_dependency",
+      "id_field": "sql_object_dependency_id",
+      "path": "facts/sql_object_dependency.jsonl",
+      "record_count": 2,
+      "sha256": "a07d22cdc449d33a16b6d0f79ba0381b5cf158b77bef9e73fa25a4eaf335cc4f",
+      "byte_size": 1291
+    },
+    {
+      "fact_type": "sql_scoped_lineage_gap",
+      "id_field": "sql_scoped_lineage_gap_id",
+      "path": "facts/sql_scoped_lineage_gap.jsonl",
+      "record_count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0
+    }
+  ],
+  "coverage": {
+    "path": "coverage.json",
+    "sha256": "89b0492da0fe8ac090aff2f8edd83fc9a78dc38f7dc2f918105c1c8cd758f06f",
+    "byte_size": 2810
+  },
+  "content_fingerprint": "4467427217c7f2a04ffb274129c6d0d3fb7d1b22a3575f4f6ecfe9b9eb8186a7",
+  "evidence_path_policy": "repository_relative_only",
+  "serialization": {
+    "format": "jsonl",
+    "encoding": "utf-8",
+    "canonical_json": "sorted_keys_compact_one_record_per_line",
+    "record_order": "deterministic_by_fact_id"
+  },
+  "compaction_policy": {
+    "kept": [
+      "typed identities",
+      "resolution statuses",
+      "expressions",
+      "repository-relative evidence"
+    ],
+    "omitted": [
+      "repeated generic maturity dimensions",
+      "global policy strings",
+      "machine-local paths"
+    ]
+  },
+  "excluded_noncanonical_outputs": [
+    "aggregate SQL summaries",
+    "navigation samples",
+    "full diagnostic query payloads"
+  ]
+}

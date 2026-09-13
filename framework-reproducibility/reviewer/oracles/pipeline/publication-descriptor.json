@@ -1,0 +1,192 @@
+{
+  "base_revision_id": null,
+  "producer": {
+    "producer_contract_ref": "sdd-neutral-publisher/v1",
+    "producer_ref": "sdd-neutral-publisher/1"
+  },
+  "products": [
+    {
+      "artifact_id": "knowledge_artifact_e9853d23261813bd1ecc",
+      "capabilities": [
+        "common.code-declared-data-model",
+        "common.code-declared-entities",
+        "common.code-declared-fields",
+        "common.code-declared-inheritance",
+        "common.code-declared-relationships",
+        "common.declared-model-candidates",
+        "common.declared-model-dataset"
+      ],
+      "content_fingerprint": "ba06c6acc08947c8be5b6a4cca63772501bef2c41b90944317b298d7bb460565",
+      "coverage": {
+        "ambiguous_type_reference_count": 0,
+        "analysis_status": "partial",
+        "evidence_source_count": 2,
+        "inline_schema_declaration_count": 1,
+        "java_files_failed": 0,
+        "java_files_in_scope": 1,
+        "java_files_parsed": 1,
+        "java_files_with_parse_errors": 0,
+        "model_gap_count": 1,
+        "openapi_document_count": 1,
+        "repository_count": 1,
+        "repository_status_counts": {
+          "partial": 1
+        },
+        "schema_declaration_count": 3,
+        "schema_field_declaration_count": 11,
+        "schema_reference_count": 3,
+        "source_coverage_by_repository": {
+          "sdd-pilot": {
+            "coverage_status": "partial",
+            "evidence_sources": [
+              {
+                "artifact_kind": "java-type-structure-evidence",
+                "coverage": {
+                  "ambiguous_type_reference_count": 0,
+                  "annotation_declaration_count": 1,
+                  "coverage_status": "complete",
+                  "enum_constant_declaration_count": 0,
+                  "field_declaration_count": 4,
+                  "inheritance_declaration_count": 1,
+                  "java_files_discovered": 1,
+                  "java_files_failed": 0,
+                  "java_files_in_scope": 1,
+                  "java_files_parsed": 1,
+                  "java_files_with_parse_errors": 0,
+                  "type_declaration_count": 3,
+                  "type_reference_count": 2,
+                  "unresolved_type_reference_count": 0,
+                  "unsupported_declaration_count": 0
+                },
+                "schema_version": "java-type-structure-evidence/v1"
+              },
+              {
+                "artifact_kind": "schema-declaration-evidence",
+                "coverage": {
+                  "candidate_structured_file_count": 1,
+                  "composition_observation_count": 0,
+                  "coverage_status": "partial",
+                  "field_declaration_count": 7,
+                  "formal_schema_document_count": 1,
+                  "inline_schema_declaration_count": 1,
+                  "json_schema_document_count": 0,
+                  "json_schema_document_parse_failed_count": 0,
+                  "openapi_document_count": 1,
+                  "openapi_document_parse_failed_count": 0,
+                  "proto_document_count": 0,
+                  "proto_document_parse_failed_count": 0,
+                  "provider_status": {
+                    "json_schema": "implemented",
+                    "openapi": "implemented",
+                    "proto": "implemented",
+                    "xsd": "implemented"
+                  },
+                  "schema_declaration_count": 3,
+                  "schema_reference_count": 3,
+                  "unresolved_schema_reference_count": 1,
+                  "xsd_document_count": 0,
+                  "xsd_document_parse_failed_count": 0
+                },
+                "schema_version": "schema-declaration-evidence/v1"
+              }
+            ]
+          }
+        },
+        "unresolved_schema_reference_count": 1,
+        "unresolved_type_reference_count": 0,
+        "unsupported_declaration_count": 0
+      },
+      "diagnostics": [],
+      "exact_dependency_product_ids": [],
+      "model_kind": "code-declared-data-model",
+      "origin_kind": "derived",
+      "physical_artifacts": [
+        {
+          "byte_size": 9973760,
+          "filename": "knowledge-layer.duckdb",
+          "media_type": "application/vnd.duckdb",
+          "member_path": "payload/products/001-knowledge_artifact_e9853d23261813bd1ecc/001-database-knowledge-layer.duckdb",
+          "role": "database",
+          "schema_version": "code-declared-data-model/v1",
+          "sha256": "f574210930d0379dbd75a05350bbe570145cf262eac7f70a9da4d015b61fcae0"
+        },
+        {
+          "byte_size": 7619,
+          "filename": "knowledge-layer-manifest.json",
+          "media_type": "application/json",
+          "member_path": "payload/products/001-knowledge_artifact_e9853d23261813bd1ecc/002-manifest-knowledge-layer-manifest.json",
+          "role": "manifest",
+          "schema_version": "knowledge_layer/v1",
+          "sha256": "6d846d245278bc2efbbc67d21df2e100a0268e25e0a1591fbe0197af7a43c4b9"
+        }
+      ],
+      "producer_contract_ref": "knowledge_layer/v1",
+      "producer_operation_ref": "code-declared-data-model",
+      "producer_ref": "knowledge-layer-core",
+      "product_slot_id": "klc:code-declared-data-model",
+      "provenance": {},
+      "schema_version": "code-declared-data-model/v1",
+      "upstream_dependencies": []
+    },
+    {
+      "artifact_id": "knowledge_artifact_43e64144e20fcac927aa",
+      "capabilities": [
+        "common.sql-analysis",
+        "common.sql-attribute-insertion-context",
+        "common.sql-field-calculation",
+        "common.sql-relation-fields",
+        "common.sql-relation-semantic-roles",
+        "common.sql-source-inventory",
+        "common.sql-source-inventory-export",
+        "common.sql-target-column-lineage",
+        "common.sql-target-resolution",
+        "common.sql-workflow-bindings",
+        "common.sql-workflow-context"
+      ],
+      "content_fingerprint": "4f87977e0b079a0909c86a8ccacd2c050361a991c39063001877250f33900025",
+      "coverage": {},
+      "diagnostics": [],
+      "exact_dependency_product_ids": [],
+      "model_kind": "sql-observed-data-usage",
+      "origin_kind": "derived",
+      "physical_artifacts": [
+        {
+          "byte_size": 13643776,
+          "filename": "knowledge-layer.duckdb",
+          "media_type": "application/vnd.duckdb",
+          "member_path": "payload/products/002-knowledge_artifact_43e64144e20fcac927aa/001-database-knowledge-layer.duckdb",
+          "role": "database",
+          "schema_version": "knowledge_layer_sql/v2",
+          "sha256": "12b6efb770d98cb66e9a3403120d4fabba29ecc100c690bb14da601451a9f0e3"
+        },
+        {
+          "byte_size": 6328,
+          "filename": "knowledge-layer-manifest.json",
+          "media_type": "application/json",
+          "member_path": "payload/products/002-knowledge_artifact_43e64144e20fcac927aa/002-manifest-knowledge-layer-manifest.json",
+          "role": "manifest",
+          "schema_version": "knowledge_layer/v1",
+          "sha256": "5e97d9b5cc5b30f7255f686eb12f80eb68725f5ffb5b001f88cd4bda42745212"
+        }
+      ],
+      "producer_contract_ref": "knowledge_layer/v1",
+      "producer_operation_ref": "sql-analysis",
+      "producer_ref": "knowledge-layer-core",
+      "product_slot_id": "klc:sql-analysis",
+      "provenance": {},
+      "schema_version": "knowledge_layer_sql/v2",
+      "upstream_dependencies": []
+    }
+  ],
+  "publication_defaults": {
+    "activate": true,
+    "labels": [],
+    "metadata": {}
+  },
+  "publication_fingerprint": "872ec1d5233e99b7d7c31d9329c8af6b9c692debe1e72e6f30fcff8be102b010",
+  "schema_version": "aisl_publication_descriptor/v1",
+  "system": {
+    "display_name": "Synthetic pilot",
+    "system_id": "sdd-pilot"
+  }
+}

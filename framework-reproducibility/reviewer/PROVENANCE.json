@@ -1,0 +1,441 @@
+{
+  "baseline_sha256": "fb3b7134194eddb9d6ac25b184ef046516b368b1aec513c2a29d61a397cd88f3",
+  "exports": [
+    {
+      "export": "learner/public-contracts/aisl_public_knowledge_catalog_v1.schema.json",
+      "sha256": "29b1e55649e8efffaa70540236b6486d2243e72b320489f691b5ed4b7d2727aa",
+      "source_paths": [
+        "packages/knowledge-integration/knowledge_integration/schemas/aisl_public_knowledge_catalog_v1.schema.json"
+      ],
+      "transformation": "byte-for-byte public schema copy"
+    },
+    {
+      "export": "learner/public-contracts/knowledge-layer-build-request-v1.schema.json",
+      "sha256": "d74596719c1cf5e261739bdcb3654ed0646cdfe40faa069153503d04de9c5692",
+      "source_paths": [
+        "packages/knowledge-layer-core/schemas/knowledge-layer-build-request-v1.schema.json"
+      ],
+      "transformation": "byte-for-byte public schema copy"
+    },
+    {
+      "export": "learner/public-contracts/knowledge-layer-manifest-v1.schema.json",
+      "sha256": "38af9d1028c4534962e92209c3092ee6232eaaf484d6769d9964d90e3a6ec022",
+      "source_paths": [
+        "packages/knowledge-layer-core/schemas/knowledge-layer-manifest-v1.schema.json"
+      ],
+      "transformation": "byte-for-byte public schema copy"
+    },
+    {
+      "export": "learner/public-contracts/knowledge.selected.openapi.json",
+      "sha256": "c52334d77325faa2a0094ee7b27c35cdffcbc8b7477178f6cbf846080d2ac154",
+      "source_paths": [
+        "packages/knowledge-api/schemas/knowledge-v1.openapi.json"
+      ],
+      "transformation": "selected operations with transitive local component reference closure"
+    },
+    {
+      "export": "learner/public-contracts/llm_integration_profile_v1.schema.json",
+      "sha256": "d712b12b5e1eee4fd510515d11f6af1a04dfb2d560fb6acccb02d438e5367a1e",
+      "source_paths": [
+        "packages/knowledge-integration/knowledge_integration/schemas/llm_integration_profile_v1.schema.json"
+      ],
+      "transformation": "byte-for-byte public schema copy"
+    },
+    {
+      "export": "learner/public-contracts/sql.fact-fields.json",
+      "sha256": "bd7ba7e0f20ed757447ce21d971de49b7da899b6c290a09f8997ec0913f972d9",
+      "source_paths": [
+        "packages/knowledge-layer-core/knowledge_layer_core/sql_analysis_schema.py"
+      ],
+      "transformation": "Python AST projection of SqlFactSchema declarative arguments; not nested schema"
+    },
+    {
+      "export": "learner/public-contracts/tools.selected.json",
+      "sha256": "c707b4686db2258db7de84b7e7cda7706d4650fc1a8b13852769f4b096f1622d",
+      "source_paths": [
+        "integration-content/README.md",
+        "integration-content/consumer-policy.md",
+        "integration-content/manifest.json",
+        "integration-content/profiles/attribute-addition-plan.md",
+        "integration-content/profiles/data-model.md",
+        "integration-content/profiles/foreign-data-persistence.md",
+        "integration-content/profiles/reference-data.md",
+        "integration-content/profiles/sql-analysis.md",
+        "integration-content/profiles/storage-usage.md",
+        "integration-content/profiles/system-description.md",
+        "integration-content/profiles/system-interactions.md",
+        "integration-content/report-templates/data-model.md",
+        "integration-content/report-templates/declared-data-model.md",
+        "integration-content/report-templates/foreign-data-persistence.md",
+        "integration-content/report-templates/observed-storage-usage.md",
+        "integration-content/report-templates/reference-data.md",
+        "integration-content/report-templates/sql-change-analysis.md",
+        "integration-content/report-templates/sql-source-inventory.md",
+        "integration-content/report-templates/system-description.md",
+        "integration-content/report-templates/system-interactions.md",
+        "integration-content/report-templates/workspace-sql-catalog.md",
+        "integration-content/resources.json",
+        "integration-content/tools.json",
+        "packages/knowledge-integration/knowledge_integration/__init__.py",
+        "packages/knowledge-integration/knowledge_integration/_generated_knowledge_api_operations.py",
+        "packages/knowledge-integration/knowledge_integration/api_bindings.py",
+        "packages/knowledge-integration/knowledge_integration/content_store.py",
+        "packages/knowledge-integration/knowledge_integration/generator.py",
+        "packages/knowledge-integration/knowledge_integration/models.py",
+        "packages/knowledge-integration/knowledge_integration/policy.py",
+        "packages/knowledge-integration/knowledge_integration/profile_registry.py",
+        "packages/knowledge-integration/knowledge_integration/public_catalog.py",
+        "packages/knowledge-integration/knowledge_integration/renderers.py",
+        "packages/knowledge-integration/knowledge_integration/report_templates.py",
+        "packages/knowledge-integration/knowledge_integration/resource_registry.py",
+        "packages/knowledge-integration/knowledge_integration/result_views.py",
+        "packages/knowledge-integration/knowledge_integration/schemas/aisl_public_knowledge_catalog_v1.schema.json",
+        "packages/knowledge-integration/knowledge_integration/schemas/llm_integration_profile_v1.schema.json",
+        "packages/knowledge-integration/knowledge_integration/tool_catalog.py"
+      ],
+      "transformation": "10 selected exact outputs of canonical_tool_definitions"
+    }
+  ],
+  "sources": [
+    {
+      "bytes": 2809,
+      "sha256": "ed2e602bf6a457ef7ae64898918d2776c4916f5f7eac6d7d00f41d04e1b851d4",
+      "source_path": "SOURCE_TO_DELIVERY_MAP.json"
+    },
+    {
+      "bytes": 460,
+      "sha256": "54ad3cc6f9b67d7152df2425b3aea02efcb05ca8327cd295fba0e2fe726928e1",
+      "source_path": "consumer/aisl-consumer-suite/apps/aisl-agent-runtime/pyproject.toml"
+    },
+    {
+      "bytes": 542,
+      "sha256": "46de8fa8f8c137d50816095e30892e7b654b538b5be4e2e81efedf266c9c800c",
+      "source_path": "consumer/aisl-consumer-suite/apps/aisl-ui-runtime/pyproject.toml"
+    },
+    {
+      "bytes": 624,
+      "sha256": "b25e0f7f7de71e13042b340192e26c9706f78a6d3866c807b9a4a8584ea92577",
+      "source_path": "consumer/aisl-consumer-suite/apps/aisl-workbench/package.json"
+    },
+    {
+      "bytes": 806,
+      "sha256": "692d2c6754171d242d86813cea243ba1eaaafc37d287bd8a0aedd1f813a396b8",
+      "source_path": "consumer/aisl-consumer-suite/packages/aisl-sdk-typescript/package.json"
+    },
+    {
+      "bytes": 425,
+      "sha256": "555bebb531828c7471bf8c7eed025f94b09eafd8f8afff635b344fce6376e3d6",
+      "source_path": "consumer/aisl-consumer-suite/packages/aisl-sdk/pyproject.toml"
+    },
+    {
+      "bytes": 462,
+      "sha256": "8d41d712b70ea78f003942cc9121538d6bc02a4b8aedd2d96579b60a190ad624",
+      "source_path": "consumer/aisl-consumer-suite/tools/aisl-cli/pyproject.toml"
+    },
+    {
+      "bytes": 1089,
+      "sha256": "10d375c578f788839cb4f3e4eef8cab6c6df435603c254837755c1dc474bc1db",
+      "source_path": "extensions/plp-data-model-extension/pyproject.toml"
+    },
+    {
+      "bytes": 907,
+      "sha256": "50726355499f4caa343fbffc9ec8fdbc20fcbe4178385d6337259bb69bcdb4af",
+      "source_path": "extensions/sber-sql-dm-helper-extension/pyproject.toml"
+    },
+    {
+      "bytes": 886,
+      "sha256": "5ee247dbdb4f50ec5d88dda1cc5540427931a36dc05b46cf0c6ebee909bd651e",
+      "source_path": "extensions/tsa-change-vector-extension/pyproject.toml"
+    },
+    {
+      "bytes": 1154,
+      "sha256": "be60128d2db121bebc2e616e2b8292e5756a166df6d651f67aa2d72851158630",
+      "source_path": "integration-content/README.md"
+    },
+    {
+      "bytes": 10792,
+      "sha256": "193ccf1c70343f8ad97eeb47b16126bc7b6d46a42a66921e31584895900fc500",
+      "source_path": "integration-content/consumer-policy.md"
+    },
+    {
+      "bytes": 3891,
+      "sha256": "3940504f9b1deb9a44256606ec1f2da8f9434af3d4f68051f7577b86978d28b5",
+      "source_path": "integration-content/manifest.json"
+    },
+    {
+      "bytes": 29681,
+      "sha256": "70981ee70b5434d276d6cd4206eebb4e6b57c1d3d3a7931bbd75efccba1434ca",
+      "source_path": "integration-content/profiles/attribute-addition-plan.md"
+    },
+    {
+      "bytes": 10441,
+      "sha256": "0407910ccbdc8442c6dd7d126c3bde7ab76817b3aeeff207e739347864af967b",
+      "source_path": "integration-content/profiles/data-model.md"
+    },
+    {
+      "bytes": 5897,
+      "sha256": "d29cb5d88f9ce40206dfb59a839a21d083a7af10978714f0db14b994d627f15e",
+      "source_path": "integration-content/profiles/foreign-data-persistence.md"
+    },
+    {
+      "bytes": 5704,
+      "sha256": "3600bae9963dce052169eb4e52e562ce6feb461168aeb861e25210cb3839d45e",
+      "source_path": "integration-content/profiles/reference-data.md"
+    },
+    {
+      "bytes": 1651,
+      "sha256": "686fd784640575cd6bf53a15bf5c48e850685793ac5b70ea1bfcb9f5d09e165f",
+      "source_path": "integration-content/profiles/sql-analysis.md"
+    },
+    {
+      "bytes": 1082,
+      "sha256": "45d31677431f199a4be878205fadc96c960db7cd32cd4486a002d1c81e7f9358",
+      "source_path": "integration-content/profiles/storage-usage.md"
+    },
+    {
+      "bytes": 4693,
+      "sha256": "d80e5b95107eb2511e63cf3182e93bf41df6ce6d9e3431c77c7c5f22555c4c84",
+      "source_path": "integration-content/profiles/system-description.md"
+    },
+    {
+      "bytes": 2818,
+      "sha256": "16d239212e8c4b1d9c073458d245882e068f2b0cb3749b2892c0898f6b416ea5",
+      "source_path": "integration-content/profiles/system-interactions.md"
+    },
+    {
+      "bytes": 4053,
+      "sha256": "d4cca913af4ab18d5fa8e883a864f3214722b5894ff60beb53449ea1b2d965c1",
+      "source_path": "integration-content/report-templates/data-model.md"
+    },
+    {
+      "bytes": 3370,
+      "sha256": "af50fc36a29f0ac2dee2a62bd483e9305a3f8b06a8d54d040c7b2df8852c7b26",
+      "source_path": "integration-content/report-templates/declared-data-model.md"
+    },
+    {
+      "bytes": 3631,
+      "sha256": "43b46352ae6f7b591cc17a7649845e36ae434e05d2c55afd31027334d2469d42",
+      "source_path": "integration-content/report-templates/foreign-data-persistence.md"
+    },
+    {
+      "bytes": 2958,
+      "sha256": "c05c474b50aa7cae399a19c9c15a871d7557a562e92fb827b7785be92cdcfc8c",
+      "source_path": "integration-content/report-templates/observed-storage-usage.md"
+    },
+    {
+      "bytes": 3760,
+      "sha256": "8b69b8a1893f7644c5294d9b0cc7512ffca1612c2a1912da120ea005f54c8c7c",
+      "source_path": "integration-content/report-templates/reference-data.md"
+    },
+    {
+      "bytes": 3082,
+      "sha256": "dcce020d3ab2399475127ccda164ea361cef1d814f82fec79681bcd4364af143",
+      "source_path": "integration-content/report-templates/sql-change-analysis.md"
+    },
+    {
+      "bytes": 3391,
+      "sha256": "6c80f2008c69e0b9b80aeae9c198ff6f57b3f112429e4f8be4546527974fe200",
+      "source_path": "integration-content/report-templates/sql-source-inventory.md"
+    },
+    {
+      "bytes": 3921,
+      "sha256": "787b2ae8c5de3b1442fd703dea9b8a5c29951e490acb1f9cc42be1396cf46e10",
+      "source_path": "integration-content/report-templates/system-description.md"
+    },
+    {
+      "bytes": 3476,
+      "sha256": "9a8a93c98e2ef391d0cc5f88bc0c46698726335681429a2a1a52d43df72407c4",
+      "source_path": "integration-content/report-templates/system-interactions.md"
+    },
+    {
+      "bytes": 2901,
+      "sha256": "c0b1d3312ca1bfb7ae33e36c541307008ae1d902a31cb9b3739b01b330f25d4d",
+      "source_path": "integration-content/report-templates/workspace-sql-catalog.md"
+    },
+    {
+      "bytes": 5237,
+      "sha256": "afc666a9d8c1b878b8269be1b2b6fa21bc0217485aaa0880689193c0b357ca22",
+      "source_path": "integration-content/resources.json"
+    },
+    {
+      "bytes": 39366,
+      "sha256": "619f150e701760296339d7c0f281f5cbe54e62542b1b4080e292b207e0f4947e",
+      "source_path": "integration-content/tools.json"
+    },
+    {
+      "bytes": 498,
+      "sha256": "8252a32e8e03e92bbef500b4cdc7201de70765c7251e2af724cc884ec1ca079b",
+      "source_path": "packages/aisl-publication/pyproject.toml"
+    },
+    {
+      "bytes": 880,
+      "sha256": "caa19364a54c790174faa338141e607774906ae24f518adf54ded1446981cb05",
+      "source_path": "packages/code-analyzer-core/pyproject.toml"
+    },
+    {
+      "bytes": 832,
+      "sha256": "caaa1bf1e52794d0869678981af79f471a58ae8734d93bd25c12bd483c172a1b",
+      "source_path": "packages/knowledge-api/pyproject.toml"
+    },
+    {
+      "bytes": 673010,
+      "sha256": "b5c183929f12403ae7d512d8a9cd3de81e97c3c7d4dab039ee0eea1b9290755b",
+      "source_path": "packages/knowledge-api/schemas/knowledge-v1.openapi.json"
+    },
+    {
+      "bytes": 929,
+      "sha256": "ae4aaf7296347a0cf5c57c4dff6e5eba61882569977acbd7d1f9d390cfa9258b",
+      "source_path": "packages/knowledge-control-plane/pyproject.toml"
+    },
+    {
+      "bytes": 67247,
+      "sha256": "32b287fc563927aeea2ab3cb040e8e8f827b50e4ff4165a8be8eda7522025f15",
+      "source_path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/core-analysis-catalog.json"
+    },
+    {
+      "bytes": 96443,
+      "sha256": "c4cb63da32ca42d3614f98e62ebfef14ea702d3eba9d55d7693fd83139d2d3df",
+      "source_path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/core-evidence-contract-catalog.json"
+    },
+    {
+      "bytes": 100610,
+      "sha256": "ce1c198bc47f5b075c67726fb3b3972a2aa79b545b4b8f4dabe5aad573ed20bc",
+      "source_path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/knowledge-catalog.json"
+    },
+    {
+      "bytes": 86527,
+      "sha256": "5d60919d7b175245d64b149892070c62f761e95ac576272ef125a437a6c978c3",
+      "source_path": "packages/knowledge-control-plane/src/knowledge_control_plane/resources/runtime_contracts/knowledge-materialization-catalog.json"
+    },
+    {
+      "bytes": 2573,
+      "sha256": "786b9a0b034bbde9a6eeb156aefb1ff9a154e404d7d0d9f21f0a2d4a6f9a386e",
+      "source_path": "packages/knowledge-integration/knowledge_integration/__init__.py"
+    },
+    {
+      "bytes": 13245,
+      "sha256": "766372a7f1c269f978b104b9b67d317d9146a7da6e17b37d53f047017911e628",
+      "source_path": "packages/knowledge-integration/knowledge_integration/_generated_knowledge_api_operations.py"
+    },
+    {
+      "bytes": 16416,
+      "sha256": "a632ea671fd254f9d6a6e2703dbeecc482772229c6f2dac200786074a0c2f307",
+      "source_path": "packages/knowledge-integration/knowledge_integration/api_bindings.py"
+    },
+    {
+      "bytes": 9638,
+      "sha256": "1ed3b8f7da4839fc17e5293867e7c4b828d4ca7470ecdb7b32f5b1e772ba9fbe",
+      "source_path": "packages/knowledge-integration/knowledge_integration/content_store.py"
+    },
+    {
+      "bytes": 5349,
+      "sha256": "d9d21f23b6faa6ef9bd7428ccdd2924e11cd982cbddfae450992fe5203aa1f45",
+      "source_path": "packages/knowledge-integration/knowledge_integration/generator.py"
+    },
+    {
+      "bytes": 1168,
+      "sha256": "f751620dca497e935017f8fc782f1a777ef5582753b1f1974dd947ae021ef7a2",
+      "source_path": "packages/knowledge-integration/knowledge_integration/models.py"
+    },
+    {
+      "bytes": 319,
+      "sha256": "24ee8e298b97b64675a7076ee65e03c76ff131473c13c9e47721c1d00cb7f0b0",
+      "source_path": "packages/knowledge-integration/knowledge_integration/policy.py"
+    },
+    {
+      "bytes": 2207,
+      "sha256": "7dd81eb3141605cd82d7f2b5ec3adc3f52b6f3faffda976b7a5a07ed50a9c3b1",
+      "source_path": "packages/knowledge-integration/knowledge_integration/profile_registry.py"
+    },
+    {
+      "bytes": 21965,
+      "sha256": "578e6842d82048bd52d5fdca4827fe7b9c152d6604310f1cecd59273d2f8e753",
+      "source_path": "packages/knowledge-integration/knowledge_integration/public_catalog.py"
+    },
+    {
+      "bytes": 3555,
+      "sha256": "6f900cc57df00e609a597fda0e776bb01673f9561f69e494bd768d03186f7fc8",
+      "source_path": "packages/knowledge-integration/knowledge_integration/renderers.py"
+    },
+    {
+      "bytes": 2273,
+      "sha256": "784bc9a2582a88e8eb563cd86d4219ceb77ac350d2c03a8012d430db278734a1",
+      "source_path": "packages/knowledge-integration/knowledge_integration/report_templates.py"
+    },
+    {
+      "bytes": 38803,
+      "sha256": "b3744b33844115a3afa0d3c05551fad650f0001f416e8cf9e6e54d9582fc5b5a",
+      "source_path": "packages/knowledge-integration/knowledge_integration/resource_registry.py"
+    },
+    {
+      "bytes": 27480,
+      "sha256": "39a79e4d2b365e5c2d1ec7e29b71e8ab83f0ac7eaf310616efc263fa627049ce",
+      "source_path": "packages/knowledge-integration/knowledge_integration/result_views.py"
+    },
+    {
+      "bytes": 10610,
+      "sha256": "29b1e55649e8efffaa70540236b6486d2243e72b320489f691b5ed4b7d2727aa",
+      "source_path": "packages/knowledge-integration/knowledge_integration/schemas/aisl_public_knowledge_catalog_v1.schema.json"
+    },
+    {
+      "bytes": 2483,
+      "sha256": "d712b12b5e1eee4fd510515d11f6af1a04dfb2d560fb6acccb02d438e5367a1e",
+      "source_path": "packages/knowledge-integration/knowledge_integration/schemas/llm_integration_profile_v1.schema.json"
+    },
+    {
+      "bytes": 22695,
+      "sha256": "81f11d29456b4ec1ec137faa34973a741fa03371206b1a148f303cc1df77bedc",
+      "source_path": "packages/knowledge-integration/knowledge_integration/tool_catalog.py"
+    },
+    {
+      "bytes": 556,
+      "sha256": "0b495976d07520ffa0c47459ccd7686f71ee7f810a5b926fec18bea104a78dc8",
+      "source_path": "packages/knowledge-integration/pyproject.toml"
+    },
+    {
+      "bytes": 22741,
+      "sha256": "6720d0c1b7fb3cdd6732d6bf243e943b6fbaf9813cb55209a4638e6332cd587b",
+      "source_path": "packages/knowledge-layer-core/knowledge_layer_core/sql_analysis_schema.py"
+    },
+    {
+      "bytes": 769,
+      "sha256": "a82d1f2481c215cfd2951353d690354e9e9d1aacc943bd5afd681e080f7a8040",
+      "source_path": "packages/knowledge-layer-core/pyproject.toml"
+    },
+    {
+      "bytes": 1483,
+      "sha256": "d74596719c1cf5e261739bdcb3654ed0646cdfe40faa069153503d04de9c5692",
+      "source_path": "packages/knowledge-layer-core/schemas/knowledge-layer-build-request-v1.schema.json"
+    },
+    {
+      "bytes": 4208,
+      "sha256": "38af9d1028c4534962e92209c3092ee6232eaaf484d6769d9964d90e3a6ec022",
+      "source_path": "packages/knowledge-layer-core/schemas/knowledge-layer-manifest-v1.schema.json"
+    },
+    {
+      "bytes": 465,
+      "sha256": "7bbff580a03ea5c9a02004f2eb4d5fdc0d06c3571e90470a0ae9477eb5a8174b",
+      "source_path": "packages/prepared-knowledge-runtime/pyproject.toml"
+    },
+    {
+      "bytes": 671,
+      "sha256": "2fbebfd2c746472e9b59abe56ca720636c042a0dbabc2418275e0b965fc0972b",
+      "source_path": "packages/source-syntax-primitives/pyproject.toml"
+    },
+    {
+      "bytes": 710,
+      "sha256": "2844113b3ad65c6e600c8aea5816e5fee44ecdee8a7128521013cb3d8e121922",
+      "source_path": "packages/static-analysis-runner/pyproject.toml"
+    },
+    {
+      "bytes": 740,
+      "sha256": "95a87f5b1b547311a9e6efbed6ca4ed6d44aaca86b3aee7105baf897c73dfb6c",
+      "source_path": "packages/technology-extension-runtime/pyproject.toml"
+    },
+    {
+      "bytes": 24798,
+      "sha256": "41cda0aeb09ed549bf90fa46059d5dba89ca722bc0fda12de3999c727cdadcdf",
+      "source_path": "tools/capability_trace.py"
+    }
+  ]
+}

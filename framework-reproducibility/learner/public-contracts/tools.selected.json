@@ -1,0 +1,526 @@
+{
+  "get_data_model_object_context": {
+    "api_binding": {
+      "arguments": {
+        "object_id": {
+          "location": "path",
+          "name": "object_id",
+          "transform": "url_segment"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "data_model_object_context/v3"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "get_data_model_object_context_api_knowledge_v1_systems__system_id__data_model_object_context__object_id__get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/object-context/{object_id}",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "object_id": "string"
+    },
+    "description": "Верни один точный object-centric технический контекст модели данных для внешней LLM: declared object/fields/relationships плюс точные опубликованные logical-storage и model-storage semantics, если эти products есть в pinned revision. Отсутствующее storage knowledge явно представляется как `not_available`/`not_observed`. Инструмент не придумывает physical SQL JOIN и не повышает статус неоднозначного mapping.",
+    "required_capabilities": [
+      "common.code-declared-data-model"
+    ],
+    "warnings": [
+      "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+    ]
+  },
+  "get_declared_data_model_summary": {
+    "api_binding": {
+      "arguments": {
+        "exclude_field_annotations": {
+          "location": "query",
+          "name": "exclude_field_annotations",
+          "transform": "csv"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "type_annotations": {
+          "location": "query",
+          "name": "type_annotations",
+          "transform": "csv"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "summarize_declared_data_model_api_knowledge_v1_systems__system_id__data_model_declared_summary_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-summary",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "exclude_field_annotations": "array[string]",
+      "repo_id": "string|null",
+      "type_annotations": "array[string]"
+    },
+    "description": "Суммируй объявленную в коде модель закреплённой revision: raw/filtered counts, наблюдаемые частоты type/field annotations и явные model gaps. Exact annotation filters задают выбранную caller-ом evidence projection, а не бизнес-семантику, принадлежащую framework.",
+    "required_capabilities": [
+      "common.code-declared-data-model"
+    ],
+    "warnings": [
+      "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+    ]
+  },
+  "get_declared_data_object": {
+    "api_binding": {
+      "arguments": {
+        "object_id": {
+          "location": "path",
+          "name": "object_id",
+          "transform": "url_segment"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "get_declared_data_object_api_knowledge_v1_systems__system_id__data_model_declared_objects__object_id__get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects/{object_id}",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "object_id": "string"
+    },
+    "description": "Верни один точный объект модели, объявленной в коде: effective inherited fields, declared relationships, inheritance, source references и provenance. Declared relationships сами по себе не доказывают семантику storage JOIN.",
+    "required_capabilities": [
+      "common.code-declared-data-model"
+    ],
+    "warnings": [
+      "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+    ]
+  },
+  "get_knowledge_item": {
+    "api_binding": {
+      "arguments": {
+        "artifact_id": {
+          "location": "path",
+          "name": "artifact_id",
+          "transform": "url_segment"
+        },
+        "item_kind": {
+          "location": "path",
+          "name": "item_kind",
+          "transform": "url_segment"
+        },
+        "local_id": {
+          "location": "path",
+          "name": "local_id",
+          "transform": "url_segment"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "get_aisl_knowledge_item_api_knowledge_v1_systems__system_id__knowledge_items__artifact_id___item_kind___local_id__get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/knowledge-items/{artifact_id}/{item_kind}/{local_id}",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "artifact_id": "string",
+      "item_kind": "string",
+      "local_id": "string"
+    },
+    "description": "Прочитай один точный опубликованный AISL knowledge item по `artifact_id`, `item_kind` и `local_id` в pinned revision. Используй это как детерминированную проверку после discovery кандидата. Ответ сохраняет typed payload, доступные evidence/issues/correspondence и явные состояния facets `available`/`not_available`/`unsupported`. Инструмент не выполняет semantic search, а `unsupported`/`not_available` никогда не доказывают отсутствие.",
+    "required_capabilities": [],
+    "warnings": [
+      "Это exact-read AISL item, а не semantic discovery. Состояния facet `unsupported` или `not_available` нельзя интерпретировать как evidence отсутствия исходного факта."
+    ]
+  },
+  "get_sql_column_usage_context": {
+    "api_binding": {
+      "arguments": {
+        "sql_column_usage_id": {
+          "location": "path",
+          "name": "sql_column_usage_id",
+          "transform": "url_segment"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "get_sql_column_usage_context_api_knowledge_v1_systems__system_id__sql_column_usages__sql_column_usage_id__get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/sql/column-usages/{sql_column_usage_id}",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "sql_column_usage_id": "string"
+    },
+    "description": "Верни одно точное использование SQL column со statement, SELECT scope, видимыми relations, JOINs и projections.",
+    "required_capabilities": [
+      "common.sql-analysis"
+    ],
+    "warnings": []
+  },
+  "get_sql_query_context": {
+    "api_binding": {
+      "arguments": {
+        "query_id": {
+          "location": "query",
+          "name": "query_id",
+          "transform": "identity"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "scope_id": {
+          "location": "query",
+          "name": "scope_id",
+          "transform": "identity"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "get_sql_query_context_api_knowledge_v1_systems__system_id__sql_query_context_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/sql/query-context",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "query_id": "string",
+      "repo_id": "string",
+      "scope_id": "string|null"
+    },
+    "description": "Верни один точный контекст SQL query/select scope со statement, видимыми relations, JOINs и projections. Используй его для проверки явных propagation points перед предложением изменения.",
+    "required_capabilities": [
+      "common.sql-analysis"
+    ],
+    "warnings": [
+      "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+    ]
+  },
+  "get_sql_target_column_lineage": {
+    "api_binding": {
+      "arguments": {
+        "include_gaps": {
+          "location": "query",
+          "name": "include_gaps",
+          "transform": "bool"
+        },
+        "limit": {
+          "location": "query",
+          "name": "limit",
+          "transform": "bounded_int"
+        },
+        "lineage_status": {
+          "location": "query",
+          "name": "lineage_status",
+          "transform": "identity"
+        },
+        "max_gaps": {
+          "location": "query",
+          "name": "max_gaps",
+          "transform": "bounded_int"
+        },
+        "offset": {
+          "location": "query",
+          "name": "offset",
+          "transform": "bounded_int"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "target_column": {
+          "location": "query",
+          "name": "target_column",
+          "transform": "identity"
+        },
+        "target_relation": {
+          "location": "query",
+          "name": "target_relation",
+          "transform": "identity"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "sql-target-column-lineage/v2"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "list_sql_target_column_lineage_api_knowledge_v1_systems__system_id__sql_target_column_lineage_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/sql/target-column-lineage",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "include_gaps": "boolean",
+      "limit": "integer",
+      "lineage_status": "string|null",
+      "max_gaps": "integer",
+      "offset": "integer",
+      "repo_id": "string|null",
+      "target_column": "string|null",
+      "target_relation": "string"
+    },
+    "description": "Верни уже опубликованный recursive SQL lineage для одной target relation или однозначно наблюдаемой logical workflow target. Если logical workflow target уникальна, но physical relation identity неоднозначна или unresolved, существующий workflow lineage возвращается с явным `target_resolution` без выбора физического кандидата. Сохраняются все terminal branches и scoped gaps; read layer не реконструирует lineage.",
+    "required_capabilities": [
+      "common.sql-target-column-lineage"
+    ],
+    "warnings": [
+      "Сохраняй возвращённые статусы SQL-результатов `probable`, `partial`, `ambiguous` и `unresolved` без повышения доказательности."
+    ]
+  },
+  "list_sql_joins": {
+    "api_binding": {
+      "arguments": {
+        "limit": {
+          "location": "query",
+          "name": "limit",
+          "transform": "bounded_int"
+        },
+        "offset": {
+          "location": "query",
+          "name": "offset",
+          "transform": "bounded_int"
+        },
+        "physical_join_confirmed": {
+          "location": "query",
+          "name": "physical_join_confirmed",
+          "transform": "bool"
+        },
+        "query_id": {
+          "location": "query",
+          "name": "query_id",
+          "transform": "identity"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "resolution_status": {
+          "location": "query",
+          "name": "resolution_status",
+          "transform": "identity"
+        },
+        "scope_id": {
+          "location": "query",
+          "name": "scope_id",
+          "transform": "identity"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "list_sql_joins_api_knowledge_v1_systems__system_id__sql_joins_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/sql/joins",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "limit": "integer",
+      "offset": "integer",
+      "physical_join_confirmed": "boolean|null",
+      "query_id": "string|null",
+      "repo_id": "string|null",
+      "resolution_status": "string|null",
+      "scope_id": "string|null"
+    },
+    "description": "Перечисли компактные уже наблюдаемые SQL JOIN edges из pinned revision, включая точные predicates, relation identities, `column_pairs`, resolution status и evidence refs. Используй этот bulk read для вопросов обо всех или многих JOIN-связях: он не загружает нерелевантные SELECT projections и не реконструирует joins из source inventory.",
+    "required_capabilities": [
+      "common.sql-analysis"
+    ],
+    "warnings": [
+      "Возвращай только наблюдаемые факты `sql_join_edge`. Сохраняй `unresolved`/`ambiguous` `resolution_status` и не придумывай отсутствующие column pairs.",
+      "Если пользователь просит все JOIN, используй пагинацию до полного покрытия `page.total`; не считай частичную страницу полной."
+    ]
+  },
+  "list_sql_placeholder_binding_resolutions": {
+    "api_binding": {
+      "arguments": {
+        "limit": {
+          "location": "query",
+          "name": "limit",
+          "transform": "bounded_int"
+        },
+        "offset": {
+          "location": "query",
+          "name": "offset",
+          "transform": "bounded_int"
+        },
+        "placeholder": {
+          "location": "query",
+          "name": "placeholder",
+          "transform": "identity"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "resolution_status": {
+          "location": "query",
+          "name": "resolution_status",
+          "transform": "identity"
+        },
+        "resolved_value": {
+          "location": "query",
+          "name": "resolved_value",
+          "transform": "identity"
+        },
+        "sql_file": {
+          "location": "query",
+          "name": "sql_file",
+          "transform": "identity"
+        },
+        "workflow_context_file": {
+          "location": "query",
+          "name": "workflow_context_file",
+          "transform": "identity"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "list_sql_placeholder_binding_resolutions_api_knowledge_v1_systems__system_id__sql_placeholder_binding_resolutions_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/sql/placeholder-binding-resolutions",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "limit": "integer",
+      "offset": "integer",
+      "placeholder": "string|null",
+      "repo_id": "string|null",
+      "resolution_status": "string|null",
+      "resolved_value": "string|null",
+      "sql_file": "string|null",
+      "workflow_context_file": "string|null"
+    },
+    "description": "Верни принадлежащие KLC и подтверждённые evidence разрешения SQL placeholders из pinned revision. Используй их только для замены точного placeholder token на конкретное значение при `resolution_status=resolved`; иначе сохраняй наблюдаемый SQL-идентификатор и состояния `unresolved`/`ambiguous`.",
+    "required_capabilities": [
+      "common.sql-workflow-context"
+    ],
+    "warnings": [
+      "Инструмент не выводит значения environment. Concrete value можно использовать только когда pinned revision уже публикует `resolution_status=resolved` для того же SQL file/context и точного placeholder.",
+      "Не выбирай между ambiguous values и не разрешай CTE, alias или intermediate relation names как будто это configuration placeholders."
+    ]
+  },
+  "search_declared_data_objects": {
+    "api_binding": {
+      "arguments": {
+        "include_fields": {
+          "location": "query",
+          "name": "include_fields",
+          "transform": "bool"
+        },
+        "limit": {
+          "location": "query",
+          "name": "limit",
+          "transform": "bounded_int"
+        },
+        "offset": {
+          "location": "query",
+          "name": "offset",
+          "transform": "bounded_int"
+        },
+        "repo_id": {
+          "location": "query",
+          "name": "repo_id",
+          "transform": "identity"
+        },
+        "search": {
+          "location": "query",
+          "name": "search",
+          "transform": "identity"
+        },
+        "type_annotations": {
+          "location": "query",
+          "name": "type_annotations",
+          "transform": "csv"
+        }
+      },
+      "binding_kind": "knowledge_api_http",
+      "expected_schema_versions": [
+        "knowledge_api/v1"
+      ],
+      "fixed_query": {},
+      "method": "GET",
+      "operation_id": "list_declared_data_objects_api_knowledge_v1_systems__system_id__data_model_declared_objects_get",
+      "path_template": "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects",
+      "revision_binding": {
+        "location": "query",
+        "name": "revision_id",
+        "value_from": "scope.revision_id"
+      }
+    },
+    "arguments": {
+      "include_fields": "boolean",
+      "limit": "integer",
+      "offset": "integer",
+      "repo_id": "string|null",
+      "search": "string|null",
+      "type_annotations": "array[string]"
+    },
+    "description": "Перечисли или найди объекты, объявленные в коде pinned prepared revision, включая наблюдаемые annotations, documentation и унаследованные effective field occurrences. Аргумент `search` — лексический поиск: используй один короткий token или короткую phrase на вызов; синонимы/переводы отправляй отдельными вызовами. Результаты детерминированно ранжируются и могут содержать ограниченный `match_evidence`, показывающий, какой наблюдаемый type/field дал совпадение, а также `binding_summary` для наблюдаемых входящих/исходящих declared relationships. `retrieval_score` — metadata ранжирования, а не semantic confidence. Необязательные exact annotation filters выбирают заданную caller-ом evidence-проекцию; declared-code facts не доказывают storage mappings или physical JOIN semantics.",
+    "required_capabilities": [
+      "common.code-declared-data-model"
+    ],
+    "warnings": [
+      "Объявленные в коде связи и поля являются фактами declared-модели; сами по себе они не доказывают семантику storage JOIN или физические mappings."
+    ]
+  }
+}

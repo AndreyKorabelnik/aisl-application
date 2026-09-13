@@ -1,0 +1,47 @@
+{
+  "plan_fingerprint": "058bf7b67f8d71622725c8a55155a7addacb9aedf20185e7e4114b237c2540b3",
+  "profile": {
+    "profile_id": "sdd-pilot",
+    "scope": {
+      "kind": "repository",
+      "scope_id": "sdd-pilot"
+    }
+  },
+  "resolved_selection": {
+    "resolved_knowledge_ids": [
+      "code-declared-data-model",
+      "sql-source-inventory"
+    ]
+  },
+  "schema_version": "knowledge_resolution_plan/v2",
+  "technical_plan": {
+    "evidence_requirements": [
+      {
+        "artifact_kind": "java-type-structure-evidence",
+        "parameters": {},
+        "producer_kind": "core",
+        "schema_version": "java-type-structure-evidence/v1"
+      },
+      {
+        "artifact_kind": "schema-declaration-evidence",
+        "parameters": {},
+        "producer_kind": "core",
+        "schema_version": "schema-declaration-evidence/v1"
+      },
+      {
+        "artifact_kind": "sql-analysis",
+        "parameters": {},
+        "producer_kind": "core",
+        "schema_version": "sql-analysis/v1"
+      }
+    ],
+    "materializations": [
+      {
+        "materialization_id": "code-declared-data-model"
+      },
+      {
+        "materialization_id": "sql-analysis"
+      }
+    ]
+  }
+}

@@ -1,0 +1,7047 @@
+{
+  "components": {
+    "schemas": {
+      "AislCorrespondenceEndpoint": {
+        "additionalProperties": false,
+        "properties": {
+          "item_kind": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Item Kind",
+            "type": "string"
+          },
+          "local_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Local Id",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "scope_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Scope Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope_id",
+          "revision_id",
+          "product_id",
+          "item_kind",
+          "local_id"
+        ],
+        "title": "AislCorrespondenceEndpoint",
+        "type": "object"
+      },
+      "AislCrossProductCorrespondence": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Basis",
+            "type": "string"
+          },
+          "candidate_target_refs": {
+            "items": {
+              "$ref": "#/components/schemas/AislCorrespondenceEndpoint"
+            },
+            "title": "Candidate Target Refs",
+            "type": "array"
+          },
+          "correspondence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Correspondence Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "relation_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relation Kind",
+            "type": "string"
+          },
+          "resolution_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Resolution Status",
+            "type": "string"
+          },
+          "source_ref": {
+            "$ref": "#/components/schemas/AislCorrespondenceEndpoint"
+          },
+          "target_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AislCorrespondenceEndpoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "correspondence_id",
+          "relation_kind",
+          "source_ref",
+          "resolution_status",
+          "basis"
+        ],
+        "title": "AislCrossProductCorrespondence",
+        "type": "object"
+      },
+      "AislEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Basis",
+            "type": "string"
+          },
+          "evidence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "evidence_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Evidence Kind",
+            "type": "string"
+          },
+          "source_fragment_ids": {
+            "items": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Source Fragment Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "evidence_kind",
+          "basis"
+        ],
+        "title": "AislEvidence",
+        "type": "object"
+      },
+      "AislEvidenceBinding": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Basis",
+            "type": "string"
+          },
+          "binding_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Binding Id",
+            "type": "string"
+          },
+          "evidence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "role": {
+            "default": "direct_observation",
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding_id",
+          "evidence_id",
+          "basis"
+        ],
+        "title": "AislEvidenceBinding",
+        "type": "object"
+      },
+      "AislKnowledgeIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Basis",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "issue_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Issue Id",
+            "type": "string"
+          },
+          "kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "issue_id",
+          "kind",
+          "message",
+          "basis"
+        ],
+        "title": "AislKnowledgeIssue",
+        "type": "object"
+      },
+      "AislKnowledgeItemReadResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "correspondences": {
+            "items": {
+              "$ref": "#/components/schemas/AislCrossProductCorrespondence"
+            },
+            "title": "Correspondences",
+            "type": "array"
+          },
+          "correspondences_state": {
+            "$ref": "#/components/schemas/AislReadFacetState"
+          },
+          "coverage_state": {
+            "$ref": "#/components/schemas/AislReadFacetState"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/AislEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "evidence_bindings": {
+            "items": {
+              "$ref": "#/components/schemas/AislEvidenceBinding"
+            },
+            "title": "Evidence Bindings",
+            "type": "array"
+          },
+          "evidence_state": {
+            "$ref": "#/components/schemas/AislReadFacetState"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/AislKnowledgeIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "issues_state": {
+            "$ref": "#/components/schemas/AislReadFacetState"
+          },
+          "item": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          },
+          "item_ref": {
+            "$ref": "#/components/schemas/AislKnowledgeItemRef"
+          },
+          "product": {
+            "$ref": "#/components/schemas/PublishedKnowledgeArtifact"
+          },
+          "projection_basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Projection Basis",
+            "type": "string"
+          },
+          "projection_status": {
+            "$ref": "#/components/schemas/AislReadFacetAvailability"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "aisl-knowledge-item-read/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_fragments": {
+            "items": {
+              "$ref": "#/components/schemas/AislSourceFragment"
+            },
+            "title": "Source Fragments",
+            "type": "array"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "product",
+          "item_ref",
+          "projection_status",
+          "projection_basis",
+          "evidence_state",
+          "coverage_state",
+          "issues_state",
+          "correspondences_state"
+        ],
+        "title": "AislKnowledgeItemReadResponse",
+        "type": "object"
+      },
+      "AislKnowledgeItemRef": {
+        "additionalProperties": false,
+        "properties": {
+          "item_kind": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Item Kind",
+            "type": "string"
+          },
+          "local_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Local Id",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Product Id",
+            "type": "string"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "scope_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Scope Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope_id",
+          "revision_id",
+          "product_id",
+          "item_kind",
+          "local_id"
+        ],
+        "title": "AislKnowledgeItemRef",
+        "type": "object"
+      },
+      "AislProductUpstreamDependency": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "content_fingerprint": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Content Fingerprint",
+            "type": "string"
+          },
+          "kind": {
+            "const": "aisl_product",
+            "default": "aisl_product",
+            "title": "Kind",
+            "type": "string"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "artifact_id",
+          "content_fingerprint"
+        ],
+        "title": "AislProductUpstreamDependency",
+        "type": "object"
+      },
+      "AislReadFacetAvailability": {
+        "enum": [
+          "available",
+          "not_available",
+          "unsupported"
+        ],
+        "title": "AislReadFacetAvailability",
+        "type": "string"
+      },
+      "AislReadFacetState": {
+        "additionalProperties": false,
+        "properties": {
+          "availability": {
+            "$ref": "#/components/schemas/AislReadFacetAvailability"
+          },
+          "basis": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "availability",
+          "basis"
+        ],
+        "title": "AislReadFacetState",
+        "type": "object"
+      },
+      "AislSourceFragment": {
+        "additionalProperties": false,
+        "properties": {
+          "content_identity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content Identity"
+          },
+          "extractor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extractor"
+          },
+          "fragment_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Fragment Id",
+            "type": "string"
+          },
+          "fragment_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Fragment Kind",
+            "type": "string"
+          },
+          "line_end": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line End"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "locator": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Locator",
+            "type": "string"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "source_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fragment_id",
+          "source_id",
+          "fragment_kind",
+          "locator"
+        ],
+        "title": "AislSourceFragment",
+        "type": "object"
+      },
+      "ApiError": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ApiError",
+        "type": "object"
+      },
+      "DataModelObjectContextResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "fields": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "gaps": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "object": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Object",
+            "type": "object"
+          },
+          "relationships": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "data_model_object_context/v3",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "storage_context": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Storage Context",
+            "type": "object"
+          },
+          "storage_identities": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Storage Identities",
+            "type": "array"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "object"
+        ],
+        "title": "DataModelObjectContextResponse",
+        "type": "object"
+      },
+      "DeclaredDataBindingExample": {
+        "additionalProperties": false,
+        "properties": {
+          "declared_type_expression": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Declared Type Expression",
+            "type": "string"
+          },
+          "field_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Field Occurrence Id",
+            "type": "string"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Provenance",
+            "type": "object"
+          },
+          "relationship_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "relationship_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relationship Kind",
+            "type": "string"
+          },
+          "resolution_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Resolution Status",
+            "type": "string"
+          },
+          "source_field": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Field",
+            "type": "string"
+          },
+          "source_fqcn": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Fqcn",
+            "type": "string"
+          },
+          "source_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Name",
+            "type": "string"
+          },
+          "source_object_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Object Id",
+            "type": "string"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "source_object_id",
+          "source_fqcn",
+          "source_name",
+          "field_occurrence_id",
+          "source_field",
+          "declared_type_expression",
+          "relationship_kind",
+          "resolution_status"
+        ],
+        "title": "DeclaredDataBindingExample",
+        "type": "object"
+      },
+      "DeclaredDataBindingSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "has_observed_incoming_binding": {
+            "title": "Has Observed Incoming Binding",
+            "type": "boolean"
+          },
+          "incoming_examples": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataBindingExample"
+            },
+            "title": "Incoming Examples",
+            "type": "array"
+          },
+          "incoming_examples_truncated": {
+            "default": false,
+            "title": "Incoming Examples Truncated",
+            "type": "boolean"
+          },
+          "incoming_relationship_count": {
+            "minimum": 0.0,
+            "title": "Incoming Relationship Count",
+            "type": "integer"
+          },
+          "outgoing_relationship_count": {
+            "minimum": 0.0,
+            "title": "Outgoing Relationship Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "incoming_relationship_count",
+          "outgoing_relationship_count",
+          "has_observed_incoming_binding"
+        ],
+        "title": "DeclaredDataBindingSummary",
+        "type": "object"
+      },
+      "DeclaredDataField": {
+        "additionalProperties": false,
+        "properties": {
+          "annotations": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Annotations",
+            "type": "array"
+          },
+          "declared_type_expression": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Declared Type Expression",
+            "type": "string"
+          },
+          "declaring_type_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Declaring Type Occurrence Id",
+            "type": "string"
+          },
+          "derivation_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Derivation Kind",
+            "type": "string"
+          },
+          "documentation": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Documentation",
+            "type": "object"
+          },
+          "effective_field_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Effective Field Occurrence Id",
+            "type": "string"
+          },
+          "field_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Field Occurrence Id",
+            "type": "string"
+          },
+          "inherited_depth": {
+            "minimum": 0.0,
+            "title": "Inherited Depth",
+            "type": "integer"
+          },
+          "is_final": {
+            "title": "Is Final",
+            "type": "boolean"
+          },
+          "is_inherited": {
+            "title": "Is Inherited",
+            "type": "boolean"
+          },
+          "is_static": {
+            "title": "Is Static",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "normalized_type_expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Normalized Type Expression"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Provenance",
+            "type": "object"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          }
+        },
+        "required": [
+          "effective_field_occurrence_id",
+          "field_occurrence_id",
+          "declaring_type_occurrence_id",
+          "name",
+          "inherited_depth",
+          "is_inherited",
+          "derivation_kind",
+          "declared_type_expression",
+          "is_static",
+          "is_final"
+        ],
+        "title": "DeclaredDataField",
+        "type": "object"
+      },
+      "DeclaredDataInheritance": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_fqcns": {
+            "items": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Candidate Fqcns",
+            "type": "array"
+          },
+          "declared_supertype_expression": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Declared Supertype Expression",
+            "type": "string"
+          },
+          "inheritance_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Inheritance Occurrence Id",
+            "type": "string"
+          },
+          "relation_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relation Kind",
+            "type": "string"
+          },
+          "resolution_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Resolution Status",
+            "type": "string"
+          },
+          "resolved_fqcn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved Fqcn"
+          },
+          "resolved_supertype_occurrence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved Supertype Occurrence Id"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          }
+        },
+        "required": [
+          "inheritance_occurrence_id",
+          "relation_kind",
+          "declared_supertype_expression",
+          "resolution_status"
+        ],
+        "title": "DeclaredDataInheritance",
+        "type": "object"
+      },
+      "DeclaredDataMatchEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "declared_type_expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared Type Expression"
+          },
+          "documentation": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Documentation",
+            "type": "object"
+          },
+          "effective_field_occurrence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Field Occurrence Id"
+          },
+          "evidence_role": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Evidence Role",
+            "type": "string"
+          },
+          "field_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Name"
+          },
+          "field_occurrence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Occurrence Id"
+          },
+          "inherited_depth": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Inherited Depth",
+            "type": "integer"
+          },
+          "is_inherited": {
+            "default": false,
+            "title": "Is Inherited",
+            "type": "boolean"
+          },
+          "match_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Match Kind",
+            "type": "string"
+          },
+          "score": {
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "integer"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          },
+          "target_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Target Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_kind",
+          "match_kind",
+          "score",
+          "evidence_role"
+        ],
+        "title": "DeclaredDataMatchEvidence",
+        "type": "object"
+      },
+      "DeclaredDataModelSummaryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "build": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Build",
+            "type": "object"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "declared_model_query_schema_version": {
+            "default": "code-declared-data-model-query/v2",
+            "title": "Declared Model Query Schema Version",
+            "type": "string"
+          },
+          "declared_model_schema_version": {
+            "default": "code-declared-data-model/v1",
+            "title": "Declared Model Schema Version",
+            "type": "string"
+          },
+          "field_annotation_counts": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Field Annotation Counts",
+            "type": "array"
+          },
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "gap_counts": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Gap Counts",
+            "type": "array"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          },
+          "type_annotation_counts": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Type Annotation Counts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id"
+        ],
+        "title": "DeclaredDataModelSummaryResponse",
+        "type": "object"
+      },
+      "DeclaredDataObjectDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "annotations": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Annotations",
+            "type": "array"
+          },
+          "binding_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclaredDataBindingSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "documentation": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Documentation",
+            "type": "object"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "fqcn": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Fqcn",
+            "type": "string"
+          },
+          "inheritance": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataInheritance"
+            },
+            "title": "Inheritance",
+            "type": "array"
+          },
+          "modifier_tokens": {
+            "items": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Modifier Tokens",
+            "type": "array"
+          },
+          "name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "object_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Object Id",
+            "type": "string"
+          },
+          "package_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package Name"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataRelationship"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "repo_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Repo Id",
+            "type": "string"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          },
+          "source_set": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Set"
+          },
+          "type_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Type Kind",
+            "type": "string"
+          },
+          "type_parameters": {
+            "items": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Type Parameters",
+            "type": "array"
+          }
+        },
+        "required": [
+          "object_id",
+          "repo_id",
+          "fqcn",
+          "name",
+          "type_kind"
+        ],
+        "title": "DeclaredDataObjectDetail",
+        "type": "object"
+      },
+      "DeclaredDataObjectDetailResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "declared_model_query_schema_version": {
+            "default": "code-declared-data-model-query/v2",
+            "title": "Declared Model Query Schema Version",
+            "type": "string"
+          },
+          "declared_model_schema_version": {
+            "default": "code-declared-data-model/v1",
+            "title": "Declared Model Schema Version",
+            "type": "string"
+          },
+          "object": {
+            "$ref": "#/components/schemas/DeclaredDataObjectDetail"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "object"
+        ],
+        "title": "DeclaredDataObjectDetailResponse",
+        "type": "object"
+      },
+      "DeclaredDataObjectListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "declared_model_query_schema_version": {
+            "default": "code-declared-data-model-query/v2",
+            "title": "Declared Model Query Schema Version",
+            "type": "string"
+          },
+          "declared_model_schema_version": {
+            "default": "code-declared-data-model/v1",
+            "title": "Declared Model Schema Version",
+            "type": "string"
+          },
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataObjectSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "page"
+        ],
+        "title": "DeclaredDataObjectListResponse",
+        "type": "object"
+      },
+      "DeclaredDataObjectSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "annotations": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Annotations",
+            "type": "array"
+          },
+          "binding_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclaredDataBindingSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "documentation": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Documentation",
+            "type": "object"
+          },
+          "field_count": {
+            "minimum": 0.0,
+            "title": "Field Count",
+            "type": "integer"
+          },
+          "fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DeclaredDataField"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fields"
+          },
+          "fqcn": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Fqcn",
+            "type": "string"
+          },
+          "match_evidence": {
+            "items": {
+              "$ref": "#/components/schemas/DeclaredDataMatchEvidence"
+            },
+            "title": "Match Evidence",
+            "type": "array"
+          },
+          "match_evidence_truncated": {
+            "default": false,
+            "title": "Match Evidence Truncated",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "object_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Object Id",
+            "type": "string"
+          },
+          "package_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package Name"
+          },
+          "relationship_count": {
+            "minimum": 0.0,
+            "title": "Relationship Count",
+            "type": "integer"
+          },
+          "repo_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Repo Id",
+            "type": "string"
+          },
+          "retrieval_score": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Retrieval Score",
+            "type": "integer"
+          },
+          "score_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Basis"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          },
+          "source_set": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Set"
+          },
+          "type_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Type Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "object_id",
+          "repo_id",
+          "fqcn",
+          "name",
+          "type_kind",
+          "field_count",
+          "relationship_count"
+        ],
+        "title": "DeclaredDataObjectSummary",
+        "type": "object"
+      },
+      "DeclaredDataRelationship": {
+        "additionalProperties": false,
+        "properties": {
+          "cardinality_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardinality Basis"
+          },
+          "cardinality_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cardinality Hint"
+          },
+          "declared_type_expression": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Declared Type Expression",
+            "type": "string"
+          },
+          "field_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Field Occurrence Id",
+            "type": "string"
+          },
+          "inherited_depth": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Inherited Depth",
+            "type": "integer"
+          },
+          "is_inherited": {
+            "default": false,
+            "title": "Is Inherited",
+            "type": "boolean"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Provenance",
+            "type": "object"
+          },
+          "relationship_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "relationship_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relationship Kind",
+            "type": "string"
+          },
+          "resolution_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Resolution Status",
+            "type": "string"
+          },
+          "source_field": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Source Field",
+            "type": "string"
+          },
+          "source_field_annotations": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Source Field Annotations",
+            "type": "array"
+          },
+          "source_ref": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Source Ref",
+            "type": "object"
+          },
+          "target_fqcn": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Target Fqcn",
+            "type": "string"
+          },
+          "target_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Target Name",
+            "type": "string"
+          },
+          "target_type_occurrence_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Target Type Occurrence Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "field_occurrence_id",
+          "source_field",
+          "declared_type_expression",
+          "target_type_occurrence_id",
+          "target_fqcn",
+          "target_name",
+          "relationship_kind",
+          "resolution_status"
+        ],
+        "title": "DeclaredDataRelationship",
+        "type": "object"
+      },
+      "ExternalArtifactUpstreamDependency": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "external_artifact",
+            "default": "external_artifact",
+            "title": "Kind",
+            "type": "string"
+          },
+          "media_type": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Media Type",
+            "type": "string"
+          },
+          "schema_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema Version"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "uri": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "sha256",
+          "media_type"
+        ],
+        "title": "ExternalArtifactUpstreamDependency",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "service": {
+            "default": "knowledge-api",
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "HealthStatus": {
+        "enum": [
+          "ok",
+          "degraded"
+        ],
+        "title": "HealthStatus",
+        "type": "string"
+      },
+      "JsonValue": {},
+      "PageMeta": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 50,
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total"
+        ],
+        "title": "PageMeta",
+        "type": "object"
+      },
+      "ProductOriginKind": {
+        "enum": [
+          "observed",
+          "derived"
+        ],
+        "title": "ProductOriginKind",
+        "type": "string"
+      },
+      "ProductPhysicalArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "byte_size": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Byte Size"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "media_type": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Media Type",
+            "type": "string"
+          },
+          "role": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Role",
+            "type": "string"
+          },
+          "schema_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema Version"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "uri": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "sha256",
+          "media_type",
+          "role"
+        ],
+        "title": "ProductPhysicalArtifact",
+        "type": "object"
+      },
+      "PublicationSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "producer_contract_ref": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Producer Contract Ref",
+            "type": "string"
+          },
+          "producer_ref": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Producer Ref",
+            "type": "string"
+          },
+          "publication_fingerprint": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Publication Fingerprint",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "aisl_publication_descriptor/v1",
+            "default": "aisl_publication_descriptor/v1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "producer_ref",
+          "producer_contract_ref",
+          "publication_fingerprint"
+        ],
+        "title": "PublicationSummary",
+        "type": "object"
+      },
+      "PublishedArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "byte_size": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Byte Size"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filename"
+          },
+          "media_type": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Media Type",
+            "type": "string"
+          },
+          "schema_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema Version"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "uri": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "sha256",
+          "media_type"
+        ],
+        "title": "PublishedArtifact",
+        "type": "object"
+      },
+      "PublishedKnowledgeArtifact": {
+        "additionalProperties": false,
+        "description": "One producer-neutral typed KnowledgeProduct in an immutable AISL revision.",
+        "properties": {
+          "artifact_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "capabilities": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "content_fingerprint": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Content Fingerprint",
+            "type": "string"
+          },
+          "coverage": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Coverage",
+            "type": "object"
+          },
+          "diagnostics": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Diagnostics",
+            "type": "array"
+          },
+          "exact_dependency_product_ids": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Exact Dependency Product Ids",
+            "type": "array"
+          },
+          "model_kind": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Model Kind",
+            "type": "string"
+          },
+          "origin_kind": {
+            "$ref": "#/components/schemas/ProductOriginKind"
+          },
+          "physical_artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ProductPhysicalArtifact"
+            },
+            "minItems": 1,
+            "title": "Physical Artifacts",
+            "type": "array"
+          },
+          "producer_contract_ref": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Producer Contract Ref",
+            "type": "string"
+          },
+          "producer_operation_ref": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Producer Operation Ref"
+          },
+          "producer_ref": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Producer Ref",
+            "type": "string"
+          },
+          "product_slot_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Product Slot Id",
+            "type": "string"
+          },
+          "provenance": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Provenance",
+            "type": "object"
+          },
+          "schema_version": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "upstream_dependencies": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "aisl_product": "#/components/schemas/AislProductUpstreamDependency",
+                  "external_artifact": "#/components/schemas/ExternalArtifactUpstreamDependency"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AislProductUpstreamDependency"
+                },
+                {
+                  "$ref": "#/components/schemas/ExternalArtifactUpstreamDependency"
+                }
+              ]
+            },
+            "title": "Upstream Dependencies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "artifact_id",
+          "model_kind",
+          "schema_version",
+          "product_slot_id",
+          "origin_kind",
+          "producer_ref",
+          "producer_contract_ref",
+          "content_fingerprint",
+          "physical_artifacts"
+        ],
+        "title": "PublishedKnowledgeArtifact",
+        "type": "object"
+      },
+      "RevisionCapabilitiesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "capabilities": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "capabilities"
+        ],
+        "title": "RevisionCapabilitiesResponse",
+        "type": "object"
+      },
+      "RevisionCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "activate": {
+            "default": true,
+            "title": "Activate",
+            "type": "boolean"
+          },
+          "base_revision_id": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Revision Id"
+          },
+          "knowledge_artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/PublishedKnowledgeArtifact"
+            },
+            "minItems": 1,
+            "title": "Knowledge Artifacts",
+            "type": "array"
+          },
+          "labels": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/PublicationSummary"
+          },
+          "publication_descriptor": {
+            "$ref": "#/components/schemas/PublishedArtifact"
+          }
+        },
+        "required": [
+          "publication",
+          "publication_descriptor",
+          "knowledge_artifacts"
+        ],
+        "title": "RevisionCreateRequest",
+        "type": "object"
+      },
+      "RevisionCreateResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "$ref": "#/components/schemas/SystemRevision"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "revision"
+        ],
+        "title": "RevisionCreateResponse",
+        "type": "object"
+      },
+      "RevisionListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SystemRevision"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "items",
+          "page"
+        ],
+        "title": "RevisionListResponse",
+        "type": "object"
+      },
+      "RevisionState": {
+        "enum": [
+          "active",
+          "superseded",
+          "inactive"
+        ],
+        "title": "RevisionState",
+        "type": "string"
+      },
+      "SqlColumnUsageContextCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "joins": {
+            "minimum": 0.0,
+            "title": "Joins",
+            "type": "integer"
+          },
+          "projections": {
+            "minimum": 0.0,
+            "title": "Projections",
+            "type": "integer"
+          },
+          "scope_relations": {
+            "minimum": 0.0,
+            "title": "Scope Relations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "scope_relations",
+          "joins",
+          "projections"
+        ],
+        "title": "SqlColumnUsageContextCounts",
+        "type": "object"
+      },
+      "SqlColumnUsageContextResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "counts": {
+            "$ref": "#/components/schemas/SqlColumnUsageContextCounts"
+          },
+          "joins": {
+            "items": {
+              "$ref": "#/components/schemas/SqlJoinContext"
+            },
+            "title": "Joins",
+            "type": "array"
+          },
+          "projections": {
+            "items": {
+              "$ref": "#/components/schemas/SqlProjectionContext"
+            },
+            "title": "Projections",
+            "type": "array"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SqlSelectScopeContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope_relations": {
+            "items": {
+              "$ref": "#/components/schemas/SqlScopeRelationContext"
+            },
+            "title": "Scope Relations",
+            "type": "array"
+          },
+          "statement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SqlStatementContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/SqlColumnUsageContextUsage"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "usage",
+          "counts"
+        ],
+        "title": "SqlColumnUsageContextResponse",
+        "type": "object"
+      },
+      "SqlColumnUsageContextUsage": {
+        "additionalProperties": false,
+        "properties": {
+          "column_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Column Name",
+            "type": "string"
+          },
+          "column_ordinal": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Column Ordinal"
+          },
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "file": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "File",
+            "type": "string"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "query_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "relation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relation Id"
+          },
+          "relation_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relation Kind"
+          },
+          "relation_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relation Name"
+          },
+          "repo_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Repo Id",
+            "type": "string"
+          },
+          "resolution_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Basis"
+          },
+          "resolution_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Resolution Status",
+            "type": "string"
+          },
+          "scope_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Scope Id",
+            "type": "string"
+          },
+          "sql_column_usage_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Column Usage Id",
+            "type": "string"
+          },
+          "table_or_alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Table Or Alias"
+          },
+          "usage_role": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Usage Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql_column_usage_id",
+          "repo_id",
+          "query_id",
+          "scope_id",
+          "file",
+          "column_name",
+          "usage_role",
+          "resolution_status"
+        ],
+        "title": "SqlColumnUsageContextUsage",
+        "type": "object"
+      },
+      "SqlEvidenceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Id"
+          },
+          "file": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "File",
+            "type": "string"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "query_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query Id"
+          },
+          "scope_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Id"
+          },
+          "usage_role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage Role"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "SqlEvidenceRef",
+        "type": "object"
+      },
+      "SqlJoinContext": {
+        "additionalProperties": false,
+        "properties": {
+          "column_pairs": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Column Pairs",
+            "type": "array"
+          },
+          "condition_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Kind"
+          },
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "join_ordinal": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join Ordinal"
+          },
+          "join_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join Type"
+          },
+          "left_relation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Left Relation Id"
+          },
+          "left_relation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Left Relation Ids",
+            "type": "array"
+          },
+          "left_relation_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Left Relation Names",
+            "type": "array"
+          },
+          "participating_relation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Participating Relation Ids",
+            "type": "array"
+          },
+          "physical_join_confirmed": {
+            "default": false,
+            "title": "Physical Join Confirmed",
+            "type": "boolean"
+          },
+          "predicate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicate"
+          },
+          "resolution_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Status"
+          },
+          "right_relation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Id"
+          },
+          "right_relation_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Kind"
+          },
+          "right_relation_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Name"
+          },
+          "sql_join_edge_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Join Edge Id",
+            "type": "string"
+          },
+          "using_columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Using Columns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sql_join_edge_id"
+        ],
+        "title": "SqlJoinContext",
+        "type": "object"
+      },
+      "SqlJoinListItem": {
+        "additionalProperties": false,
+        "properties": {
+          "additional_predicates": {
+            "items": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Additional Predicates",
+            "type": "array"
+          },
+          "column_pairs": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Column Pairs",
+            "type": "array"
+          },
+          "condition_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Kind"
+          },
+          "evidence_maturity_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Maturity Level"
+          },
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "expression_links": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Expression Links",
+            "type": "array"
+          },
+          "file": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "File",
+            "type": "string"
+          },
+          "join_ordinal": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join Ordinal"
+          },
+          "join_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Join Type"
+          },
+          "left_relation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Left Relation Id"
+          },
+          "left_relation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Left Relation Ids",
+            "type": "array"
+          },
+          "left_relation_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Left Relation Names",
+            "type": "array"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "participating_relation_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Participating Relation Ids",
+            "type": "array"
+          },
+          "physical_join_confirmed": {
+            "default": false,
+            "title": "Physical Join Confirmed",
+            "type": "boolean"
+          },
+          "predicate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicate"
+          },
+          "query_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "repo_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Repo Id",
+            "type": "string"
+          },
+          "resolution_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Resolution Reasons",
+            "type": "array"
+          },
+          "resolution_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Status"
+          },
+          "right_relation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Id"
+          },
+          "right_relation_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Kind"
+          },
+          "right_relation_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Right Relation Name"
+          },
+          "scope_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Scope Id",
+            "type": "string"
+          },
+          "sql_join_edge_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Join Edge Id",
+            "type": "string"
+          },
+          "temporal_or_range_predicates": {
+            "items": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Temporal Or Range Predicates",
+            "type": "array"
+          },
+          "using_columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Using Columns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sql_join_edge_id",
+          "repo_id",
+          "query_id",
+          "scope_id",
+          "file"
+        ],
+        "title": "SqlJoinListItem",
+        "type": "object"
+      },
+      "SqlJoinListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SqlJoinListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "join_query_schema_version": {
+            "default": "sql-join-list/v1",
+            "title": "Join Query Schema Version",
+            "type": "string"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "page"
+        ],
+        "title": "SqlJoinListResponse",
+        "type": "object"
+      },
+      "SqlPlaceholderBindingResolutionListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "binding_resolution_schema_version": {
+            "default": "sql-placeholder-binding-resolution/v1",
+            "title": "Binding Resolution Schema Version",
+            "type": "string"
+          },
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "summary": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Summary",
+            "type": "object"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "page"
+        ],
+        "title": "SqlPlaceholderBindingResolutionListResponse",
+        "type": "object"
+      },
+      "SqlProjectionContext": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "expression": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expression"
+          },
+          "expression_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expression Kind"
+          },
+          "is_wildcard": {
+            "default": false,
+            "title": "Is Wildcard",
+            "type": "boolean"
+          },
+          "output_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Name"
+          },
+          "projection_ordinal": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Projection Ordinal"
+          },
+          "resolution_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Basis"
+          },
+          "resolution_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Status"
+          },
+          "source_column_usage_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Column Usage Ids",
+            "type": "array"
+          },
+          "sql_projection_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Projection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql_projection_id"
+        ],
+        "title": "SqlProjectionContext",
+        "type": "object"
+      },
+      "SqlQueryContextCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "child_scopes": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Child Scopes",
+            "type": "integer"
+          },
+          "joins": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Joins",
+            "type": "integer"
+          },
+          "projections": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Projections",
+            "type": "integer"
+          },
+          "scope_relations": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Scope Relations",
+            "type": "integer"
+          }
+        },
+        "title": "SqlQueryContextCounts",
+        "type": "object"
+      },
+      "SqlQueryContextResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "child_scopes": {
+            "items": {
+              "$ref": "#/components/schemas/SqlSelectScopeContext"
+            },
+            "title": "Child Scopes",
+            "type": "array"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/SqlQueryContextCounts"
+          },
+          "diagnostics": {
+            "items": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Diagnostics",
+            "type": "array"
+          },
+          "joins": {
+            "items": {
+              "$ref": "#/components/schemas/SqlJoinContext"
+            },
+            "title": "Joins",
+            "type": "array"
+          },
+          "projections": {
+            "items": {
+              "$ref": "#/components/schemas/SqlProjectionContext"
+            },
+            "title": "Projections",
+            "type": "array"
+          },
+          "query_context_schema_version": {
+            "default": "sql-query-context/v1",
+            "title": "Query Context Schema Version",
+            "type": "string"
+          },
+          "query_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "repo_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Repo Id",
+            "type": "string"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SqlSelectScopeContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/SqlSelectScopeContext"
+            },
+            "title": "Scope Candidates",
+            "type": "array"
+          },
+          "scope_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Id"
+          },
+          "scope_relations": {
+            "items": {
+              "$ref": "#/components/schemas/SqlScopeRelationContext"
+            },
+            "title": "Scope Relations",
+            "type": "array"
+          },
+          "selection_status": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Selection Status",
+            "type": "string"
+          },
+          "statement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SqlStatementContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "repo_id",
+          "query_id",
+          "selection_status"
+        ],
+        "title": "SqlQueryContextResponse",
+        "type": "object"
+      },
+      "SqlScopeRelationContext": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alias"
+          },
+          "definition_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Definition Status"
+          },
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "logical_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logical Name"
+          },
+          "observed_fields": {
+            "items": {
+              "$ref": "#/components/schemas/SqlScopeRelationObservedField"
+            },
+            "title": "Observed Fields",
+            "type": "array"
+          },
+          "output_columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Output Columns",
+            "type": "array"
+          },
+          "output_contract_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Contract Basis"
+          },
+          "output_contract_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Contract Status"
+          },
+          "output_contract_wildcard_provenance": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Output Contract Wildcard Provenance",
+            "type": "array"
+          },
+          "relation_kind": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relation Kind",
+            "type": "string"
+          },
+          "relation_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Relation Name",
+            "type": "string"
+          },
+          "source_scope_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Scope Ids",
+            "type": "array"
+          },
+          "sql_relation_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Relation Id",
+            "type": "string"
+          },
+          "template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Name"
+          },
+          "usage_role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usage Role"
+          }
+        },
+        "required": [
+          "sql_relation_id",
+          "relation_kind",
+          "relation_name"
+        ],
+        "title": "SqlScopeRelationContext",
+        "type": "object"
+      },
+      "SqlScopeRelationObservedField": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "usage_roles": {
+            "items": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Usage Roles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "SqlScopeRelationObservedField",
+        "type": "object"
+      },
+      "SqlSelectScopeContext": {
+        "additionalProperties": false,
+        "properties": {
+          "column_usage_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Column Usage Count",
+            "type": "integer"
+          },
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "file": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "File",
+            "type": "string"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "output_columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Output Columns",
+            "type": "array"
+          },
+          "output_contract_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Contract Basis"
+          },
+          "output_contract_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Contract Status"
+          },
+          "output_contract_wildcard_provenance": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Output Contract Wildcard Provenance",
+            "type": "array"
+          },
+          "parent_scope_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Scope Id"
+          },
+          "projection_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Projection Count",
+            "type": "integer"
+          },
+          "query_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "relation_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Relation Count",
+            "type": "integer"
+          },
+          "scope_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Kind"
+          },
+          "scope_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Name"
+          },
+          "sql_select_scope_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Select Scope Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sql_select_scope_id",
+          "query_id",
+          "file"
+        ],
+        "title": "SqlSelectScopeContext",
+        "type": "object"
+      },
+      "SqlStatementContext": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_refs": {
+            "items": {
+              "$ref": "#/components/schemas/SqlEvidenceRef"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "file": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "File",
+            "type": "string"
+          },
+          "line_end": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line End"
+          },
+          "line_start": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Start"
+          },
+          "operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operation"
+          },
+          "query_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "sql_statement_id": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Sql Statement Id",
+            "type": "string"
+          },
+          "statement_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statement Type"
+          },
+          "target_relation_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Relation Name"
+          },
+          "unit_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Kind"
+          }
+        },
+        "required": [
+          "sql_statement_id",
+          "query_id",
+          "file"
+        ],
+        "title": "SqlStatementContext",
+        "type": "object"
+      },
+      "SqlTargetColumnLineageResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "gap_count": {
+            "minimum": 0.0,
+            "title": "Gap Count",
+            "type": "integer"
+          },
+          "gaps": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "gaps_by_kind": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Gaps By Kind",
+            "type": "object"
+          },
+          "gaps_truncated": {
+            "default": false,
+            "title": "Gaps Truncated",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "lineage_schema_version": {
+            "default": "sql-target-column-lineage/v2",
+            "title": "Lineage Schema Version",
+            "type": "string"
+          },
+          "lineage_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lineage Status"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "repo_id": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repo Id"
+          },
+          "requested_target_relation_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Requested Target Relation Name",
+            "type": "string"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "summary": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Summary",
+            "type": "object"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          },
+          "target_column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Column"
+          },
+          "target_relation_name": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Relation Name"
+          },
+          "target_resolution": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Target Resolution",
+            "type": "object"
+          },
+          "workflow_target_logical_name": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Target Logical Name"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "requested_target_relation_name",
+          "page",
+          "gap_count"
+        ],
+        "title": "SqlTargetColumnLineageResponse",
+        "type": "object"
+      },
+      "SystemCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "display_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "display_name"
+        ],
+        "title": "SystemCreateRequest",
+        "type": "object"
+      },
+      "SystemDetails": {
+        "additionalProperties": false,
+        "properties": {
+          "active_revision_id": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Revision Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "display_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "revision_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Revision Count",
+            "type": "integer"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "display_name",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SystemDetails",
+        "type": "object"
+      },
+      "SystemListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SystemSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMeta"
+          },
+          "schema_version": {
+            "default": "knowledge_api/v1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "page"
+        ],
+        "title": "SystemListResponse",
+        "type": "object"
+      },
+      "SystemRevision": {
+        "additionalProperties": false,
+        "properties": {
+          "base_revision_id": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Revision Id"
+          },
+          "capabilities": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "knowledge_artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/PublishedKnowledgeArtifact"
+            },
+            "title": "Knowledge Artifacts",
+            "type": "array"
+          },
+          "labels": {
+            "items": {
+              "maxLength": 240,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "ordinal": {
+            "minimum": 1.0,
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/PublicationSummary"
+          },
+          "publication_descriptor": {
+            "$ref": "#/components/schemas/PublishedArtifact"
+          },
+          "revision_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/RevisionState"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "revision_id",
+          "ordinal",
+          "state",
+          "created_at",
+          "publication",
+          "publication_descriptor",
+          "knowledge_artifacts"
+        ],
+        "title": "SystemRevision",
+        "type": "object"
+      },
+      "SystemSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "active_revision_id": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Revision Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "display_name": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "revision_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Revision Count",
+            "type": "integer"
+          },
+          "system_id": {
+            "maxLength": 240,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "title": "System Id",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system_id",
+          "display_name",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SystemSummary",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Canonical producer-neutral HTTP API for publishing and consuming versioned knowledge artifacts. It contains no orchestration jobs, UI state, arbitrary SQL, or LLM execution endpoints.",
+    "title": "Knowledge API",
+    "version": "0.40.9a12"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/knowledge/v1/health": {
+      "get": {
+        "operationId": "health_api_knowledge_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "service"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems": {
+      "get": {
+        "operationId": "list_systems_api_knowledge_v1_systems_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Systems",
+        "tags": [
+          "systems"
+        ]
+      },
+      "post": {
+        "operationId": "create_system_api_knowledge_v1_systems_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Create System",
+        "tags": [
+          "systems"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/capabilities": {
+      "get": {
+        "operationId": "revision_capabilities_api_knowledge_v1_systems__system_id__capabilities_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionCapabilitiesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Revision Capabilities",
+        "tags": [
+          "knowledge-artifacts"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects": {
+      "get": {
+        "operationId": "list_declared_data_objects_api_knowledge_v1_systems__system_id__data_model_declared_objects_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Repo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type_annotations",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Annotations"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_fields",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Fields",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeclaredDataObjectListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Declared Data Objects",
+        "tags": [
+          "data-model"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/data-model/declared-objects/{object_id}": {
+      "get": {
+        "operationId": "get_declared_data_object_api_knowledge_v1_systems__system_id__data_model_declared_objects__object_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "title": "Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeclaredDataObjectDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Declared Data Object",
+        "tags": [
+          "data-model"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/data-model/declared-summary": {
+      "get": {
+        "operationId": "summarize_declared_data_model_api_knowledge_v1_systems__system_id__data_model_declared_summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Repo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type_annotations",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type Annotations"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exclude_field_annotations",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exclude Field Annotations"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeclaredDataModelSummaryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Summarize Declared Data Model",
+        "tags": [
+          "data-model"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/data-model/object-context/{object_id}": {
+      "get": {
+        "operationId": "get_data_model_object_context_api_knowledge_v1_systems__system_id__data_model_object_context__object_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "title": "Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataModelObjectContextResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Data Model Object Context",
+        "tags": [
+          "data-model"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/knowledge-items/{artifact_id}/{item_kind}/{local_id}": {
+      "get": {
+        "operationId": "get_aisl_knowledge_item_api_knowledge_v1_systems__system_id__knowledge_items__artifact_id___item_kind___local_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "artifact_id",
+            "required": true,
+            "schema": {
+              "title": "Artifact Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_kind",
+            "required": true,
+            "schema": {
+              "title": "Item Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "local_id",
+            "required": true,
+            "schema": {
+              "title": "Local Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AislKnowledgeItemReadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Aisl Knowledge Item",
+        "tags": [
+          "aisl"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/llm-integration-profile": {
+      "get": {
+        "operationId": "get_llm_integration_profile_api_knowledge_v1_systems__system_id__llm_integration_profile_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "title": "Profile Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Llm Integration Profile",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/public-knowledge-catalog": {
+      "get": {
+        "operationId": "get_public_knowledge_catalog_api_knowledge_v1_systems__system_id__public_knowledge_catalog_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Public Knowledge Catalog",
+        "tags": [
+          "integration"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/revisions": {
+      "get": {
+        "operationId": "list_revisions_api_knowledge_v1_systems__system_id__revisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Revisions",
+        "tags": [
+          "revisions"
+        ]
+      },
+      "post": {
+        "operationId": "publish_revision_api_knowledge_v1_systems__system_id__revisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionCreateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Publish Revision",
+        "tags": [
+          "revisions"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/revisions/{revision_id}": {
+      "get": {
+        "operationId": "get_revision_api_knowledge_v1_systems__system_id__revisions__revision_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemRevision"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Revision",
+        "tags": [
+          "revisions"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/sql/column-usages/{sql_column_usage_id}": {
+      "get": {
+        "operationId": "get_sql_column_usage_context_api_knowledge_v1_systems__system_id__sql_column_usages__sql_column_usage_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "sql_column_usage_id",
+            "required": true,
+            "schema": {
+              "title": "Sql Column Usage Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlColumnUsageContextResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Sql Column Usage Context",
+        "tags": [
+          "sql"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/sql/joins": {
+      "get": {
+        "operationId": "list_sql_joins_api_knowledge_v1_systems__system_id__sql_joins_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Repo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "query_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scope Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resolution_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resolution Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "physical_join_confirmed",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Physical Join Confirmed"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlJoinListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Sql Joins",
+        "tags": [
+          "sql"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/sql/placeholder-binding-resolutions": {
+      "get": {
+        "operationId": "list_sql_placeholder_binding_resolutions_api_knowledge_v1_systems__system_id__sql_placeholder_binding_resolutions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Repo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sql_file",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sql File"
+            }
+          },
+          {
+            "in": "query",
+            "name": "workflow_context_file",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Workflow Context File"
+            }
+          },
+          {
+            "in": "query",
+            "name": "placeholder",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Placeholder"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resolved_value",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resolved Value"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resolution_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resolution Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlPlaceholderBindingResolutionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Sql Placeholder Binding Resolutions",
+        "tags": [
+          "sql"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/sql/query-context": {
+      "get": {
+        "operationId": "get_sql_query_context_api_knowledge_v1_systems__system_id__sql_query_context_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": true,
+            "schema": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "title": "Repo Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "query_id",
+            "required": true,
+            "schema": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "title": "Query Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scope Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlQueryContextResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "Get Sql Query Context",
+        "tags": [
+          "sql"
+        ]
+      }
+    },
+    "/api/knowledge/v1/systems/{system_id}/sql/target-column-lineage": {
+      "get": {
+        "operationId": "list_sql_target_column_lineage_api_knowledge_v1_systems__system_id__sql_target_column_lineage_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "system_id",
+            "required": true,
+            "schema": {
+              "title": "System Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "target_relation",
+            "required": true,
+            "schema": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "title": "Target Relation",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "target_column",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Column"
+            }
+          },
+          {
+            "in": "query",
+            "name": "repo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Repo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lineage_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lineage Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_gaps",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Gaps",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_gaps",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Max Gaps",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SqlTargetColumnLineageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Invalid request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Resource or publication conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Published or returned artifact is too large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Payload validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Internal knowledge service error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "description": "Knowledge artifact or backing service unavailable"
+          }
+        },
+        "summary": "List Sql Target Column Lineage",
+        "tags": [
+          "sql"
+        ]
+      }
+    }
+  }
+}

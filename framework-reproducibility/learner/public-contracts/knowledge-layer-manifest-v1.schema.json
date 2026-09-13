@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge-layer-manifest-v1.schema.json",
+  "title": "Knowledge Layer Manifest v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "producer",
+    "producer_version",
+    "scope_id",
+    "scope_type",
+    "repository_count",
+    "repository_ids",
+    "modes",
+    "build_id",
+    "build_status",
+    "database_path",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "knowledge_layer/v1"
+    },
+    "artifact_id": {
+      "const": "knowledge_layer"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deterministic": {
+      "const": true
+    },
+    "llm_generated": {
+      "const": false
+    },
+    "scope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_type": {
+      "enum": [
+        "repository",
+        "workspace"
+      ]
+    },
+    "repository_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "repository_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "data-model",
+          "sql",
+          "observed-storage-usage",
+          "model-storage-semantics",
+          "system-description",
+          "reference-data",
+          "system-interactions",
+          "repository-value-flow",
+          "persistence-lineage"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "build_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "build_status": {
+      "enum": [
+        "pending",
+        "complete",
+        "failed"
+      ]
+    },
+    "database_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "materialized_marts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "source_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "complete",
+            "failed"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "build_status"
+        ],
+        "properties": {
+          "build_status": {
+            "const": "complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "complete"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "repository_count"
+        ],
+        "properties": {
+          "repository_count": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope_type": {
+            "const": "repository"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "repository_count"
+        ],
+        "properties": {
+          "repository_count": {
+            "minimum": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope_type": {
+            "const": "workspace"
+          }
+        }
+      }
+    }
+  ]
+}

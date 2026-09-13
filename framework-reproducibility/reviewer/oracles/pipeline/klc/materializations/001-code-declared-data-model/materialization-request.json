@@ -1,0 +1,41 @@
+{
+  "inputs": {
+    "evidence_artifacts": [
+      {
+        "artifact_id": "java_type_structure_166d5e82283748a925729ed7",
+        "artifact_kind": "java-type-structure-evidence",
+        "content_fingerprint": "166d5e82283748a925729ed7debe29d17f91f130996bb664960c0dfa2edc6349",
+        "registration_manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+        "repo_id": "sdd-pilot",
+        "schema_version": "java-type-structure-evidence/v1",
+        "status": "completed"
+      },
+      {
+        "artifact_id": "schema-declaration-evidence_5d057e864d2c8ea2e71ac5d5",
+        "artifact_kind": "schema-declaration-evidence",
+        "content_fingerprint": "0f5ce86c2262ba41d00fcf24f3e8ce6c86b33cf3662b6634d73ee8bfeac3a9f1",
+        "registration_manifest_path": "/tmp/sdd-pipeline-fqxywemq/runner/repository_analysis_run_manifest.json",
+        "repo_id": "sdd-pilot",
+        "schema_version": "schema-declaration-evidence/v1",
+        "status": "partial"
+      }
+    ],
+    "knowledge_artifacts": []
+  },
+  "installed_extension_set": {
+    "extension_set_fingerprint": "05df32b11810cc2be34b632269aa820a95dd4c32b8bd8489c25905da2a7e0561",
+    "extensions": [],
+    "policy_fingerprint": "2e923902f1b7047f9121c4ca2f9ba38ec676a2bdf47d3920c8783d8738a3ab84",
+    "schema_version": "installed_extension_set/v1",
+    "spi_version": "technology-extension-spi/v1"
+  },
+  "materialization_id": "code-declared-data-model",
+  "orchestration": {
+    "materialization_catalog_fingerprint": "62848868906c8d25c792cdab59cfbdd021c8eb1e1da30935aca8d503cdc0e512",
+    "resolution_plan_fingerprint": "058bf7b67f8d71622725c8a55155a7addacb9aedf20185e7e4114b237c2540b3",
+    "runner_version": "0.10.54"
+  },
+  "parameters": {},
+  "schema_version": "knowledge_materialization_request/v2",
+  "scope_id": "sdd-pilot"
+}
