@@ -86,6 +86,20 @@ def validate(root=ROOT):
         check(pipeline["status"] == "PASS", "latest pipeline probe is incomplete or failed")
         check(all(c["status"] == "PASS" for c in pipeline["checks"]), "failed pipeline assertion")
         check(pipeline["check_count"] == len(pipeline["checks"]), "pipeline count drift")
+    current = documents.get("reviewer/current-reference/REBASE_REVIEW.json")
+    production = documents.get("reviewer/current-reference/PRODUCTION_PROBES.json")
+    if current:
+        check(current["to"] == "F4.103" and current["source_manifest_entries"] == 799, "current reference drift")
+        check(current["framework_modified"] is False, "reference mutated")
+        check(current["change_count"] == len(current["changes"]), "drift count mismatch")
+        coverage = documents["reviewer/current-reference/SEMANTIC_COVERAGE.json"]
+        check(coverage["status"] == "pass", "semantic coverage owner failed")
+        check(production is not None, "missing current production evidence")
+        check(production["status"] == "PASS" and production["reference_commit"] == current["commit"], "production reference mismatch")
+        check(production["source_zip_sha256"] == current["source_sha256"], "production archive mismatch")
+        check(production["check_count"] == len(production["checks"]) and
+              all(c["status"] == "PASS" for c in production["checks"]), "incomplete production evidence")
+        check(production["framework_source_unchanged"] and not production["scored_run"], "invalid production boundary")
     return {"status": "PASS", "kind": "side_project_structural_checks_only", "json_files": len(documents),
             "local_refs_resolved": refs, "selected_tools": len(selected), "selected_api_paths": len(spec["paths"]),
             "profile_fixture_checks": profile_count, "scored_readiness": False,
@@ -93,7 +107,9 @@ def validate(root=ROOT):
             "reference_pipeline": {"status": pipeline["status"], "boundary": pipeline["execution_boundary"],
                                    "checks": pipeline["check_count"], "schema_validation": pipeline["schema_validation"]} if pipeline else None,
             "pipeline_acceptance": "diagnostic_reference_only" if pipeline else "not_run",
-            "kcp_full_journey": "not_run", "deepseek": "not_run"}
+            "kcp_full_journey": "core_only_source_mode_cli_tcp" if production else "not_run",
+            "current_production_checks": production["check_count"] if production else 0,
+            "learner_full_rebase": "pending", "deepseek": "not_run"}
 
 
 if __name__ == "__main__":

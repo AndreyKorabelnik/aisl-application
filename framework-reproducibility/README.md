@@ -1,6 +1,29 @@
 # Воспроизводимость Framework по SDD — side project
 
-Checkpoint: **SP-SDD-0.3**, 2026-09-12. Статус: **declared contracts + diagnostic pipeline oracle / draft, NOT READY FOR SCORED RECONSTRUCTION**.
+Текущее приращение: **SP-SDD-0.4**, 2026-09-14. Статус: **F4.103 rebase review + production journey / draft, NOT READY FOR SCORED RECONSTRUCTION**.
+
+Начать с `reviewer/CURRENT_REFERENCE.md` и `learner/spec/PRODUCTION_JOURNEY.md`.
+Новый read-only reference — F4.103. Штатный integrity owner: 799/799 exact;
+semantic coverage: 14 selectable Knowledge IDs / 24 publishable types, PASS.
+`reviewer/current-reference/` содержит новый drift audit и текущий production report.
+Полное обновление learner contracts ещё требуется. Ниже данные и команды F4.95
+сохраняют исходную provenance; старые PASS не переименованы в F4.103.
+
+Working source: `AndreyKorabelnik/aisl-application/framework-reproducibility`.
+Drive freeze: `PROJECT_DATA/04_Source_Checkpoints/External Apps/framework-reproducibility/Checkpoints/`.
+Framework и соседние приложения не меняются. Глобальный `PROJECT_CONTINUATION`
+остаётся NONE / REASSESS; side project явно выбран пользователем для этого чата.
+
+Новый production probe использует отдельно полученный F4.103:
+
+```bash
+python -B tools/review_current_reference.py --source /absolute/f4103/source --archive /absolute/f4103/source-canonical.zip --old-source /absolute/f495/source --dependencies /absolute/sdd-dependencies --output reviewer/current-reference
+python -B tools/probe_production.py --source /absolute/f4103/source --archive /absolute/f4103/source-canonical.zip --dependencies /absolute/sdd-dependencies --pack . --work /absolute/new-evidence-directory
+```
+
+Вторая команда создаёт новый отдельный evidence directory и явную core-only
+deployment policy; reference source проверяется до/после. Это production CLI/TCP
+в source-mode, не wheel/install acceptance и не scored LLM run.
 
 SP-SDD-0.1 и 0.2 сохранены отдельно и не изменены. В 0.3 добавлены DECLARED_MODEL_CONTRACT и API_READBACK_CONTRACT, точные Java/OpenAPI evidence, 14 API request/response примеров, 2 настоящих KLC materializations и опубликованные revisions. 50 diagnostic probes PASS; 34 offline side-project tests PASS. Подтверждено endpoint-specific различие JOIN projections (S11). S10 — reversed inequality orientation — остаётся без compatibility decision; Framework не исправлялся.
 

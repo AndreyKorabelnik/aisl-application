@@ -1,5 +1,15 @@
 # Открытые пробелы перед scored run
 
+Текущее приращение SP-SDD-0.4: см. CURRENT_REFERENCE.md. F4.103 drift — 169 путей;
+старый learner inventory ещё F4.95 и требует re-export. S01/S05/S06 дополнены
+штатными KCP planning/publication и TCP consumer-проверками в явном core-only
+source-mode. Это не clean install, не проверка всех Technology Extensions и не
+Agent/DeepSeek loop. Итог текущего прогона: current-reference/PRODUCTION_PROBES.json.
+S02/S03, invalid transport/base/dependency atomic negatives S04, hidden S09 остаются
+открытыми. S10 нельзя нормализовать или исправлять в Framework в рамках этого потока.
+Удалённые после F4.95 surfaces теперь исключены, а не parked/withheld runtime;
+актуальная классификация — CURRENT_REFERENCE.md. Таблица ниже — backlog полноты.
+
 Статус SP-SDD-0.3 — declared contracts + diagnostic pipeline oracle, не завершённая SDD. S02/S03 дополнены exact Java/OpenAPI envelopes и identity vectors. S04 подтверждён server import, duplicate и successive revisions. S06 получил настоящий Core/KLC/publication/ASGI readback, но не полный KCP/consumer journey. 50 runtime assertions PASS, 34 offline tests PASS. Ни один пункт ниже не является автоматически Framework bug. S10/S11 описаны в KNOWN_CONTRACT_ISSUES.md.
 
 | ID | Пробел | Что закрывает |

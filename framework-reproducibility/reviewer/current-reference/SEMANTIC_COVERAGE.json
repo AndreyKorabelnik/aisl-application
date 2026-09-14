@@ -1,0 +1,636 @@
+{
+  "missing_semantic_content": [],
+  "missing_tool_bindings": [],
+  "product_coverage": [
+    {
+      "capabilities": [
+        "common.physical-model",
+        "common.physical-model.columns",
+        "common.physical-model.gaps",
+        "common.physical-model.indexes",
+        "common.physical-model.keys",
+        "common.physical-model.pdm",
+        "common.physical-model.relationships",
+        "common.physical-model.tables"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "physical-model",
+      "model_kind": "physical-data-model",
+      "origin_kind": "derived",
+      "schema_version": "knowledge_layer_physical_model/v2",
+      "subject_resources": [
+        "physical-model"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.sql-analysis",
+        "common.sql-attribute-insertion-context",
+        "common.sql-field-calculation",
+        "common.sql-relation-fields",
+        "common.sql-relation-semantic-roles",
+        "common.sql-source-inventory",
+        "common.sql-source-inventory-export",
+        "common.sql-target-column-lineage",
+        "common.sql-target-resolution",
+        "common.sql-workflow-bindings",
+        "common.sql-workflow-context"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "sql-analysis",
+      "model_kind": "sql-observed-data-usage",
+      "origin_kind": "derived",
+      "schema_version": "knowledge_layer_sql/v2",
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.sql-analysis",
+        "common.sql-attribute-insertion-context",
+        "common.sql-field-calculation",
+        "common.sql-relation-fields",
+        "common.sql-relation-semantic-roles",
+        "common.sql-source-inventory",
+        "common.sql-source-inventory-export",
+        "common.sql-target-column-lineage",
+        "common.sql-target-resolution",
+        "common.sql-workflow-bindings",
+        "common.sql-workflow-context",
+        "common.workspace-sql-catalog"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "workspace-sql-catalog",
+      "model_kind": "workspace-sql-catalog",
+      "origin_kind": "derived",
+      "schema_version": "workspace-sql-catalog/v1",
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.system-dependencies",
+        "common.system-description",
+        "common.system-interfaces",
+        "common.system-scenarios"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "system-description",
+      "model_kind": "system-description",
+      "origin_kind": "derived",
+      "schema_version": "system-description/v1",
+      "subject_resources": [
+        "system-description"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.declared-value-sets",
+        "common.reference-data",
+        "common.reference-data-facts"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "reference-data",
+      "model_kind": "reference-data",
+      "origin_kind": "derived",
+      "schema_version": "reference-data/v1",
+      "subject_resources": [
+        "reference-data"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.fdp-paths",
+        "workspace.persistence-lineage"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "persistence-lineage",
+      "model_kind": "persistence-lineage",
+      "origin_kind": "derived",
+      "schema_version": "persistence-lineage/v1",
+      "subject_resources": [
+        "foreign-data-persistence"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.repository-interaction-boundaries",
+        "workspace.repository-interaction-coverage",
+        "workspace.system-interactions"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "system-interactions",
+      "model_kind": "system-interactions",
+      "origin_kind": "derived",
+      "schema_version": "workspace_system_interaction/v6",
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.repository-interaction-boundaries",
+        "workspace.repository-interaction-coverage",
+        "workspace.system-interactions"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "system-interactions",
+      "model_kind": "repository_interaction_coverage",
+      "origin_kind": "derived",
+      "schema_version": "repository_interaction_coverage/v1",
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.system-interaction-field-contracts"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "interaction-field-contracts",
+      "model_kind": "interaction-field-contracts",
+      "origin_kind": "derived",
+      "schema_version": "workspace_system_interaction_field_contract/v2",
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.attribute-path-resolver",
+        "workspace.cross-repository-value-flow",
+        "workspace.repository-value-flow"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "cross-repository-value-flow",
+      "model_kind": "repository_value_flow",
+      "origin_kind": "derived",
+      "schema_version": "repository_value_flow/v6",
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.attribute-path-resolver",
+        "workspace.cross-repository-value-flow",
+        "workspace.repository-value-flow"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "cross-repository-value-flow",
+      "model_kind": "repository_attribute_path",
+      "origin_kind": "derived",
+      "schema_version": "repository_attribute_path/v2",
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.attribute-path-resolver",
+        "workspace.repository-value-flow"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "repository-value-flow",
+      "model_kind": "repository-value-flow",
+      "origin_kind": "derived",
+      "schema_version": "repository_value_flow/v6",
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "capabilities": [
+        "workspace.attribute-path-resolver",
+        "workspace.repository-value-flow"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "repository-value-flow",
+      "model_kind": "repository_attribute_path",
+      "origin_kind": "derived",
+      "schema_version": "repository_attribute_path/v2",
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.entity-table-mapping",
+        "common.field-column-mapping",
+        "common.logical-physical-mapping"
+      ],
+      "classification": "supporting",
+      "materialization_id": "logical-physical-mapping",
+      "model_kind": "logical-physical-model-mapping",
+      "origin_kind": "derived",
+      "schema_version": "logical-physical-model-mapping/v1",
+      "selectable_consumer_materializations": [
+        "effective-data-model"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "nonselectable_knowledge_dependency"
+    },
+    {
+      "capabilities": [
+        "common.code-declared-data-model",
+        "common.code-declared-entities",
+        "common.code-declared-fields",
+        "common.code-declared-inheritance",
+        "common.code-declared-relationships",
+        "common.declared-model-candidates",
+        "common.declared-model-dataset"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "code-declared-data-model",
+      "model_kind": "code-declared-data-model",
+      "origin_kind": "derived",
+      "schema_version": "code-declared-data-model/v1",
+      "subject_resources": [
+        "data-model"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.logical-storage-identity",
+        "common.logical-storage-join-semantics",
+        "common.logical-storage-mapping",
+        "common.logical-storage-relationship"
+      ],
+      "classification": "supporting",
+      "materialization_id": "logical-storage-mapping",
+      "model_kind": "logical-storage-model-mapping",
+      "origin_kind": "derived",
+      "schema_version": "logical-storage-model-mapping/v2",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "internal_materialization"
+    },
+    {
+      "capabilities": [
+        "common.sql-relation-materialization",
+        "common.sql-target-source-mapping",
+        "common.sql-target-value-source-mapping",
+        "common.sql-workflow-dependency"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "sql-target-source-mapping",
+      "model_kind": "sql-target-source-mapping",
+      "origin_kind": "derived",
+      "schema_version": "sql-target-source-mapping/v2",
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.cross-artifact-data-model-mapping",
+        "common.logical-field-sql-usage",
+        "common.relation-materialization",
+        "common.sql-physical-correspondence",
+        "common.sql-target-source-mapping",
+        "common.storage-sql-correspondence",
+        "common.value-origin-physical-lineage",
+        "common.workflow-dependency",
+        "common.workflow-projection-physical-correspondence"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "cross-artifact-data-model-mapping",
+      "model_kind": "cross-artifact-data-model-mapping",
+      "origin_kind": "derived",
+      "schema_version": "cross-artifact-data-model-mapping/v6",
+      "subject_resources": [
+        "data-model-lineage"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.cross-layer-data-model",
+        "common.effective-data-model"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "effective-data-model",
+      "model_kind": "effective-data-model",
+      "origin_kind": "derived",
+      "schema_version": "effective-data-model/v3",
+      "subject_resources": [
+        "analysis-coverage",
+        "data-model"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.cross-layer-data-model",
+        "common.effective-data-model"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "effective-data-model",
+      "model_kind": "model-domain-cluster-view",
+      "origin_kind": "derived",
+      "schema_version": "model-domain-cluster-view/v1",
+      "subject_resources": [
+        "analysis-coverage",
+        "data-model"
+      ]
+    },
+    {
+      "capabilities": [
+        "common.model-storage-semantics",
+        "common.storage-identities",
+        "common.storage-reference-lineage"
+      ],
+      "classification": "supporting",
+      "materialization_id": "model-storage-semantics",
+      "model_kind": "model-storage-semantics",
+      "origin_kind": "derived",
+      "schema_version": "model-storage-semantics/v1",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage",
+        "sql-analysis",
+        "workspace-sql-catalog"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "internal_materialization"
+    },
+    {
+      "capabilities": [
+        "common.observed-storage-usage",
+        "common.storage-access-gaps",
+        "common.storage-read-write-inventory"
+      ],
+      "classification": "consumer_discoverable",
+      "materialization_id": "observed-storage-usage",
+      "model_kind": "observed-storage-usage",
+      "origin_kind": "derived",
+      "schema_version": "observed-storage-usage/v1",
+      "subject_resources": [
+        "storage-usage"
+      ]
+    },
+    {
+      "artifact_kind": "java-type-structure-evidence",
+      "capabilities": [],
+      "classification": "supporting",
+      "materialization_id": null,
+      "model_kind": "java-type-structure-evidence",
+      "origin_kind": "observed",
+      "schema_version": "java-type-structure-evidence/v1",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "observed_evidence_dependency"
+    },
+    {
+      "artifact_kind": "sql-analysis",
+      "capabilities": [],
+      "classification": "consumer_discoverable",
+      "materialization_id": null,
+      "model_kind": "sql-analysis",
+      "origin_kind": "observed",
+      "schema_version": "sql-analysis/v1",
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    }
+  ],
+  "profile_count": 8,
+  "profile_unrouted": [],
+  "publishable_product_type_count": 24,
+  "resource_count": 12,
+  "schema_version": "semantic_knowledge_coverage_gate/v1",
+  "selectable_coverage": [
+    {
+      "knowledge_id": "attribute-lineage",
+      "materialization_id": "repository-value-flow",
+      "profile_routed_resources": [
+        "attribute-paths"
+      ],
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "knowledge_id": "code-declared-data-model",
+      "materialization_id": "code-declared-data-model",
+      "profile_routed_resources": [
+        "data-model"
+      ],
+      "subject_resources": [
+        "data-model"
+      ]
+    },
+    {
+      "knowledge_id": "cross-repository-attribute-lineage",
+      "materialization_id": "cross-repository-value-flow",
+      "profile_routed_resources": [
+        "attribute-paths"
+      ],
+      "subject_resources": [
+        "attribute-paths"
+      ]
+    },
+    {
+      "knowledge_id": "effective-data-model",
+      "materialization_id": "effective-data-model",
+      "profile_routed_resources": [
+        "analysis-coverage",
+        "data-model"
+      ],
+      "subject_resources": [
+        "analysis-coverage",
+        "data-model"
+      ]
+    },
+    {
+      "knowledge_id": "interaction-coverage",
+      "materialization_id": "system-interactions",
+      "profile_routed_resources": [
+        "system-interactions"
+      ],
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "knowledge_id": "interaction-field-contracts",
+      "materialization_id": "interaction-field-contracts",
+      "profile_routed_resources": [
+        "system-interactions"
+      ],
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "knowledge_id": "observed-storage-usage",
+      "materialization_id": "observed-storage-usage",
+      "profile_routed_resources": [
+        "storage-usage"
+      ],
+      "subject_resources": [
+        "storage-usage"
+      ]
+    },
+    {
+      "knowledge_id": "persistence-lineage",
+      "materialization_id": "persistence-lineage",
+      "profile_routed_resources": [
+        "foreign-data-persistence"
+      ],
+      "subject_resources": [
+        "foreign-data-persistence"
+      ]
+    },
+    {
+      "knowledge_id": "physical-data-model",
+      "materialization_id": "physical-model",
+      "profile_routed_resources": [
+        "physical-model"
+      ],
+      "subject_resources": [
+        "physical-model"
+      ]
+    },
+    {
+      "knowledge_id": "reference-data",
+      "materialization_id": "reference-data",
+      "profile_routed_resources": [
+        "reference-data"
+      ],
+      "subject_resources": [
+        "reference-data"
+      ]
+    },
+    {
+      "knowledge_id": "sql-source-inventory",
+      "materialization_id": "sql-analysis",
+      "profile_routed_resources": [
+        "sql-analysis"
+      ],
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    },
+    {
+      "knowledge_id": "system-description",
+      "materialization_id": "system-description",
+      "profile_routed_resources": [
+        "system-description"
+      ],
+      "subject_resources": [
+        "system-description"
+      ]
+    },
+    {
+      "knowledge_id": "system-interactions",
+      "materialization_id": "system-interactions",
+      "profile_routed_resources": [
+        "system-interactions"
+      ],
+      "subject_resources": [
+        "system-interactions"
+      ]
+    },
+    {
+      "knowledge_id": "workspace-sql-source-inventory",
+      "materialization_id": "workspace-sql-catalog",
+      "profile_routed_resources": [
+        "sql-analysis"
+      ],
+      "subject_resources": [
+        "sql-analysis"
+      ]
+    }
+  ],
+  "selectable_knowledge_count": 14,
+  "selectable_orphans": [],
+  "stale_resource_model_kinds": [],
+  "status": "pass",
+  "supporting_products": [
+    {
+      "capabilities": [
+        "common.entity-table-mapping",
+        "common.field-column-mapping",
+        "common.logical-physical-mapping"
+      ],
+      "classification": "supporting",
+      "materialization_id": "logical-physical-mapping",
+      "model_kind": "logical-physical-model-mapping",
+      "origin_kind": "derived",
+      "schema_version": "logical-physical-model-mapping/v1",
+      "selectable_consumer_materializations": [
+        "effective-data-model"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "nonselectable_knowledge_dependency"
+    },
+    {
+      "capabilities": [
+        "common.logical-storage-identity",
+        "common.logical-storage-join-semantics",
+        "common.logical-storage-mapping",
+        "common.logical-storage-relationship"
+      ],
+      "classification": "supporting",
+      "materialization_id": "logical-storage-mapping",
+      "model_kind": "logical-storage-model-mapping",
+      "origin_kind": "derived",
+      "schema_version": "logical-storage-model-mapping/v2",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "internal_materialization"
+    },
+    {
+      "capabilities": [
+        "common.model-storage-semantics",
+        "common.storage-identities",
+        "common.storage-reference-lineage"
+      ],
+      "classification": "supporting",
+      "materialization_id": "model-storage-semantics",
+      "model_kind": "model-storage-semantics",
+      "origin_kind": "derived",
+      "schema_version": "model-storage-semantics/v1",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage",
+        "sql-analysis",
+        "workspace-sql-catalog"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "internal_materialization"
+    },
+    {
+      "artifact_kind": "java-type-structure-evidence",
+      "capabilities": [],
+      "classification": "supporting",
+      "materialization_id": null,
+      "model_kind": "java-type-structure-evidence",
+      "origin_kind": "observed",
+      "schema_version": "java-type-structure-evidence/v1",
+      "selectable_consumer_materializations": [
+        "code-declared-data-model",
+        "effective-data-model",
+        "observed-storage-usage"
+      ],
+      "subject_resources": [],
+      "supporting_basis": "observed_evidence_dependency"
+    }
+  ],
+  "supporting_unclassified": []
+}

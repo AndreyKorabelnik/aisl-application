@@ -30,3 +30,10 @@
 Python 3.12.14, 43 third-party distributions в изолированном каталоге; runtime-requirements.txt фиксирует реально использованные версии, но не universal platform lockfile. Команды README используют штатных owners неизменённого reference source.
 
 Не собирать deliveries/recovery и не исправлять Framework автоматически. Все результаты этого потока сохраняются отдельно. Полный охват всего live Framework остаётся целью; пилот не сокращает её.
+# Точка продолжения SP-SDD-0.4
+
+Сначала читать CURRENT_REFERENCE.md: текущий reference F4.103, legacy vectors F4.95.
+Порядок следующего приращения: обновить выбранные learner projections; описать
+nested SQL/identity; закрыть transport atomic negatives; проверить learner-only
+install; затем скрытый acceptance. Старые формулировки полного KCP/TCP gap ниже
+уточнены текущим production report. Не расширять работу на Framework.

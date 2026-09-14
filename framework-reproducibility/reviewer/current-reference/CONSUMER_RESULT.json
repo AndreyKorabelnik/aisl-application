@@ -1,0 +1,174 @@
+{
+  "object": {
+    "annotations": [],
+    "binding_summary": {
+      "has_observed_incoming_binding": false,
+      "incoming_examples": [],
+      "incoming_examples_truncated": false,
+      "incoming_relationship_count": 0,
+      "outgoing_relationship_count": 1
+    },
+    "documentation": {},
+    "fields": [
+      {
+        "annotations": [],
+        "declared_type_expression": "String",
+        "declaring_type_occurrence_id": "code_declared_type_029de6a38b598fc41f92",
+        "derivation_kind": "resolved_inheritance",
+        "documentation": {},
+        "effective_field_occurrence_id": "code_declared_effective_field_c9b1caa30d9749ed2773",
+        "field_occurrence_id": "code_declared_field_30b0c7e5c6ad468bae56",
+        "inherited_depth": 1,
+        "is_final": false,
+        "is_inherited": true,
+        "is_static": false,
+        "name": "id",
+        "normalized_type_expression": "String",
+        "provenance": {
+          "declaring_type_occurrence_id": "code_declared_type_029de6a38b598fc41f92",
+          "source_field_occurrence_id": "code_declared_field_30b0c7e5c6ad468bae56"
+        },
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 4,
+          "line_start": 4,
+          "repository_relative_path": "Sample.java"
+        }
+      },
+      {
+        "annotations": [
+          {
+            "annotation_name": "Deprecated",
+            "annotation_occurrence_id": "code_declared_annotation_04572f255a877a4d9473",
+            "arguments_raw": null,
+            "candidate_annotation_types": [],
+            "resolution_status": "unresolved",
+            "resolved_annotation_type": null,
+            "source_ref": {
+              "extractor": "java_tree_sitter",
+              "line_end": 8,
+              "line_start": 8,
+              "repository_relative_path": "Sample.java"
+            },
+            "structured_arguments": []
+          }
+        ],
+        "declared_type_expression": "String",
+        "declaring_type_occurrence_id": "code_declared_type_8462e9190daf82fc39d9",
+        "derivation_kind": "direct_declaration",
+        "documentation": {},
+        "effective_field_occurrence_id": "code_declared_effective_field_e6172291e3f1a468e57d",
+        "field_occurrence_id": "code_declared_field_8cb145b3f82e7436da83",
+        "inherited_depth": 0,
+        "is_final": false,
+        "is_inherited": false,
+        "is_static": false,
+        "name": "nickname",
+        "normalized_type_expression": "String",
+        "provenance": {
+          "declaring_type_occurrence_id": "code_declared_type_8462e9190daf82fc39d9",
+          "source_field_occurrence_id": "code_declared_field_8cb145b3f82e7436da83"
+        },
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 9,
+          "line_start": 8,
+          "repository_relative_path": "Sample.java"
+        }
+      },
+      {
+        "annotations": [],
+        "declared_type_expression": "Profile",
+        "declaring_type_occurrence_id": "code_declared_type_8462e9190daf82fc39d9",
+        "derivation_kind": "direct_declaration",
+        "documentation": {},
+        "effective_field_occurrence_id": "code_declared_effective_field_ca87b0bd46eb1141df2c",
+        "field_occurrence_id": "code_declared_field_fd657047babdab7dc8f0",
+        "inherited_depth": 0,
+        "is_final": false,
+        "is_inherited": false,
+        "is_static": false,
+        "name": "profile",
+        "normalized_type_expression": "Profile",
+        "provenance": {
+          "declaring_type_occurrence_id": "code_declared_type_8462e9190daf82fc39d9",
+          "source_field_occurrence_id": "code_declared_field_fd657047babdab7dc8f0"
+        },
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 10,
+          "line_start": 10,
+          "repository_relative_path": "Sample.java"
+        }
+      }
+    ],
+    "fqcn": "synthetic.fixture.Customer",
+    "inheritance": [
+      {
+        "candidate_fqcns": [
+          "synthetic.fixture.BaseEntity"
+        ],
+        "declared_supertype_expression": "BaseEntity",
+        "inheritance_occurrence_id": "code_declared_inheritance_7b4ef7dc0d9c52a50d1c",
+        "relation_kind": "extends",
+        "resolution_status": "same_package",
+        "resolved_fqcn": "synthetic.fixture.BaseEntity",
+        "resolved_supertype_occurrence_id": "code_declared_type_029de6a38b598fc41f92",
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 11,
+          "line_start": 7,
+          "repository_relative_path": "Sample.java"
+        }
+      }
+    ],
+    "modifier_tokens": [
+      "final"
+    ],
+    "name": "Customer",
+    "object_id": "code_declared_type_8462e9190daf82fc39d9",
+    "package_name": "synthetic.fixture",
+    "relationships": [
+      {
+        "cardinality_basis": "declared_non_collection_type",
+        "cardinality_hint": "one",
+        "declared_type_expression": "Profile",
+        "field_occurrence_id": "code_declared_field_fd657047babdab7dc8f0",
+        "inherited_depth": 0,
+        "is_inherited": false,
+        "provenance": {
+          "basis": "resolved_effective_field_type_reference",
+          "declaration_owner_type_occurrence_id": "code_declared_type_8462e9190daf82fc39d9",
+          "does_not_imply_business_association": true,
+          "inherited_depth": 0,
+          "is_inherited": false
+        },
+        "relationship_id": "code_declared_relationship_f52579c815d05fae0ab7",
+        "relationship_kind": "declared_field_type_reference",
+        "resolution_status": "same_package",
+        "source_field": "profile",
+        "source_field_annotations": [],
+        "source_ref": {
+          "extractor": "java_tree_sitter",
+          "line_end": 10,
+          "line_start": 10,
+          "repository_relative_path": "Sample.java"
+        },
+        "target_fqcn": "synthetic.fixture.Profile",
+        "target_name": "Profile",
+        "target_type_occurrence_id": "code_declared_type_1d2f5c55c7cc750ec647"
+      }
+    ],
+    "repo_id": "fixture",
+    "source_ref": {
+      "extractor": "java_tree_sitter",
+      "line_end": 11,
+      "line_start": 7,
+      "repository_relative_path": "Sample.java"
+    },
+    "source_set": "unknown",
+    "type_kind": "class",
+    "type_parameters": []
+  },
+  "revision_id": "rev-e1b9c752d8e57cfbbb8852fa"
+}

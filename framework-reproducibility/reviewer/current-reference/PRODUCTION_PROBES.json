@@ -1,0 +1,512 @@
+{
+  "boundary": "production KCP CLI -> Runner/Core/KLC -> KCP publication adapter -> Knowledge API import CLI -> TCP API -> deterministic consumer",
+  "check_count": 54,
+  "checks": [
+    {
+      "detail": null,
+      "name": "profiles_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_resolve_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_run_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": [
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/sql-output/bundle/job-302b1efff88745829d1dca468b550dc0.aisl.zip"
+      ],
+      "name": "sql_one_publication_bundle",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_import_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_published",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_duplicate_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_duplicate_same_revision",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_resolve_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_run_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": [
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/declared-output/bundle/job-62879dd43f624826aedfafcfea80bfde.aisl.zip"
+      ],
+      "name": "declared_one_publication_bundle",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_import_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_published",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_duplicate_exit",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_duplicate_same_revision",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "tcp_server_openapi",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_1",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_1",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_2",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_2",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_3",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_3",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_all_eight_joins",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_no_duplicate_ids",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_4",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_4",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "empty_page_preserves_total",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 422,
+        "expected": 422
+      },
+      "name": "http_5",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_5",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 400,
+        "expected": 400
+      },
+      "name": "http_6",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_6",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 404,
+        "expected": 404
+      },
+      "name": "http_7",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_7",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 422,
+        "expected": 422
+      },
+      "name": "http_8",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_8",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_9",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_9",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_objects_nonempty",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_10",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_10",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "sql_pinned_profile",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_11",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_11",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_pinned_profile",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "declared_tools_authorized",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_12",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_12",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "customer_fields",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "inherited_field_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "field_evidence_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "relationship_evidence_preserved",
+      "status": "PASS"
+    },
+    {
+      "detail": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "http_13",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "http_schema_13",
+      "status": "PASS"
+    },
+    {
+      "detail": null,
+      "name": "tcp_read_without_producer_paths",
+      "status": "PASS"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_control_plane.cli",
+        "profile",
+        "list",
+        "--json"
+      ],
+      "exit_code": 0,
+      "name": "profiles"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_control_plane.cli",
+        "profile",
+        "resolve",
+        "sql-source-inventory-v1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "name": "sql_resolve"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_control_plane.cli",
+        "run",
+        "--knowledge-profile",
+        "sql-source-inventory-v1",
+        "--system-id",
+        "sdd-sql",
+        "--repository",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/fixture",
+        "--output",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/sql-output",
+        "--process-timeout-seconds",
+        "120",
+        "--json"
+      ],
+      "exit_code": 0,
+      "name": "sql_run"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_api.cli",
+        "import",
+        "--database",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/catalog.sqlite3",
+        "--artifact-store",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/artifacts",
+        "--bundle",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/sql-output/bundle/job-302b1efff88745829d1dca468b550dc0.aisl.zip",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "name": "sql_import"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_api.cli",
+        "import",
+        "--database",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/catalog.sqlite3",
+        "--artifact-store",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/artifacts",
+        "--bundle",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/sql-output/bundle/job-302b1efff88745829d1dca468b550dc0.aisl.zip",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "name": "sql_duplicate"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_control_plane.cli",
+        "profile",
+        "resolve",
+        "data-model-v1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "name": "declared_resolve"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_control_plane.cli",
+        "run",
+        "--knowledge-profile",
+        "data-model-v1",
+        "--system-id",
+        "sdd-declared",
+        "--repository",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/fixture",
+        "--output",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/declared-output",
+        "--process-timeout-seconds",
+        "120",
+        "--json"
+      ],
+      "exit_code": 0,
+      "name": "declared_run"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_api.cli",
+        "import",
+        "--database",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/catalog.sqlite3",
+        "--artifact-store",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/artifacts",
+        "--bundle",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/declared-output/bundle/job-62879dd43f624826aedfafcfea80bfde.aisl.zip",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "name": "declared_import"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_api.cli",
+        "import",
+        "--database",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/catalog.sqlite3",
+        "--artifact-store",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/artifacts",
+        "--bundle",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/analysis/declared-output/bundle/job-62879dd43f624826aedfafcfea80bfde.aisl.zip",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "name": "declared_duplicate"
+    },
+    {
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "knowledge_api.cli",
+        "serve",
+        "--database",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/catalog.sqlite3",
+        "--artifact-store",
+        "/workspace/scratch/439f6e9c0d9d/sdd04-f4103-final/server/artifacts",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "39167"
+      ],
+      "name": "serve"
+    }
+  ],
+  "deployment": "explicit core-only policy; source-mode entry points; no wheel/install claim",
+  "framework_source_unchanged": true,
+  "manifest_entries": 799,
+  "reference": "F4.103",
+  "reference_commit": "ecb6ae4833049cc382316bd11f9d2a6c7bb0b006",
+  "revisions": {
+    "declared": "rev-e1b9c752d8e57cfbbb8852fa",
+    "sql": "rev-57ef266de3b9a8f8a07d5640"
+  },
+  "scored_run": false,
+  "source_zip_sha256": "dae19d29160b464b91235652c3b012cf96a2becc8c0ded25ec4ca1ca81b40557",
+  "status": "PASS"
+}
