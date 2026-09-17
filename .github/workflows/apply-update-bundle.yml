@@ -1,0 +1,113 @@
+name: Apply Update Bundle
+
+on:
+  push:
+    branches:
+      - transport/update-bundle
+    paths:
+      - 'update-bundles/inbox/*.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout transport branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Locate uploaded bundle
+        id: bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t zips < <(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep '^update-bundles/inbox/.*\.zip$' || true)
+          if [ "${#zips[@]}" -ne 1 ]; then
+            echo "Expected exactly one changed ZIP in update-bundles/inbox, got ${#zips[@]}" >&2
+            printf '%s\n' "${zips[@]:-}" >&2
+            exit 1
+          fi
+          echo "path=${zips[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate bundle and apply exact patch
+        shell: bash
+        env:
+          BUNDLE: ${{ steps.bundle.outputs.path }}
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          unzip -q "$BUNDLE" -d "$work"
+
+          python - "$work" <<'PY'
+          import hashlib, json, pathlib, sys
+          root = pathlib.Path(sys.argv[1])
+          expected = {'UPDATE_MANIFEST.json', 'changes.patch', 'README.txt'}
+          actual = {p.name for p in root.iterdir() if p.is_file()}
+          if actual != expected:
+              raise SystemExit(f'Unexpected bundle members: {sorted(actual)}')
+          manifest = json.loads((root / 'UPDATE_MANIFEST.json').read_text(encoding='utf-8'))
+          if manifest.get('schema_version') != 'github-update-bundle/v1':
+              raise SystemExit('Unexpected schema_version')
+          if manifest.get('repository') != 'AndreyKorabelnik/aisl-application':
+              raise SystemExit('Unexpected repository')
+          patch_sha = hashlib.sha256((root / 'changes.patch').read_bytes()).hexdigest()
+          if patch_sha != manifest.get('patch_sha256'):
+              raise SystemExit(f'Patch SHA mismatch: {patch_sha} != {manifest.get("patch_sha256")}')
+          if not manifest.get('base_commit') or not manifest.get('target_branch') or not manifest.get('commit_message'):
+              raise SystemExit('Missing base_commit/target_branch/commit_message')
+          expected_tree = manifest.get('expected_tree_sha') or manifest.get('expected_candidate_tree')
+          if not expected_tree:
+              raise SystemExit('Missing expected_tree_sha/expected_candidate_tree')
+          print(json.dumps(manifest, sort_keys=True))
+          PY
+
+          base_commit="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["base_commit"])' "$work/UPDATE_MANIFEST.json")"
+          base_tree="$(python -c 'import json,sys; print(json.load(open(sys.argv[1])).get("base_tree", ""))' "$work/UPDATE_MANIFEST.json")"
+          expected_tree="$(python -c 'import json,sys; m=json.load(open(sys.argv[1])); print(m.get("expected_tree_sha") or m.get("expected_candidate_tree"))' "$work/UPDATE_MANIFEST.json")"
+          target_branch="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["target_branch"])' "$work/UPDATE_MANIFEST.json")"
+          commit_message="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["commit_message"])' "$work/UPDATE_MANIFEST.json")"
+
+          git fetch origin main
+          live_main="$(git rev-parse origin/main)"
+          if [ "$live_main" != "$base_commit" ]; then
+            echo "main moved: $live_main != $base_commit" >&2
+            exit 1
+          fi
+          if [ -n "$base_tree" ]; then
+            actual_base_tree="$(git rev-parse "$base_commit^{tree}")"
+            if [ "$actual_base_tree" != "$base_tree" ]; then
+              echo "base tree mismatch: $actual_base_tree != $base_tree" >&2
+              exit 1
+            fi
+          fi
+          if git ls-remote --exit-code --heads origin "$target_branch" >/dev/null 2>&1; then
+            echo "Target branch already exists: $target_branch" >&2
+            exit 1
+          fi
+
+          git checkout --detach "$base_commit"
+          git apply --check "$work/changes.patch"
+          git apply --index "$work/changes.patch"
+          candidate_tree="$(git write-tree)"
+          if [ "$candidate_tree" != "$expected_tree" ]; then
+            echo "candidate tree mismatch: $candidate_tree != $expected_tree" >&2
+            exit 1
+          fi
+
+          git config user.name 'AISL Update Bundle'
+          git config user.email 'actions@users.noreply.github.com'
+          commit_sha="$(printf '%s\n' "$commit_message" | git commit-tree "$candidate_tree" -p "$base_commit")"
+          parent="$(git rev-parse "$commit_sha^1")"
+          tree="$(git rev-parse "$commit_sha^{tree}")"
+          if [ "$parent" != "$base_commit" ] || [ "$tree" != "$expected_tree" ]; then
+            echo "created commit verification failed" >&2
+            exit 1
+          fi
+          git push origin "$commit_sha:refs/heads/$target_branch"
+          echo "READY_COMMIT=$commit_sha"
+          echo "READY_TREE=$tree"
+          echo "READY_BRANCH=$target_branch"
