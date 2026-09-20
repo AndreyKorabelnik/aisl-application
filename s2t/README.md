@@ -1,4 +1,4 @@
-# aisl-s2t 0.1.0a1
+# aisl-s2t 0.1.0a2
 
 Consumer-owned deterministic S2T application over pinned public AISL evidence.
 
@@ -83,3 +83,34 @@ python -m pytest tests -q
 
 The tests include opaque environment-scope identities to prove the code is not
 coupled to Insurance `stands[n]` layout.
+
+## Primary/upstream source policy v1
+
+`sql_target_source_mapping.branch_relation_name` is the mechanically published
+upstream branch identity. When it exists, S2T uses that identity as the primary
+source instead of replacing it with a downstream terminal encountered later in
+the same traversal. No file/path keywords are interpreted.
+
+Rules:
+
+1. `branch_relation_name` wins over downstream `source_sql_relation_name`.
+2. A templated branch must already be resolved by deterministic environment policy.
+3. A downstream concrete terminal never substitutes for an unresolved upstream branch.
+4. Different resolved branch identities remain separate S2T value-source rows.
+5. Syntactically different branch templates that resolve to the same exact relation
+   are deduplicated.
+6. Non-primary roles such as lookup contributions are not folded into driver sources.
+7. If no branch identity exists, a resolved driver relation or terminal relation may
+   be used as a weaker fallback with an explicit basis.
+
+CLI:
+
+```bash
+aisl-s2t collapse-primary-sources \
+  --mappings sql-target-source-mapping.json \
+  --environment-resolution environment-resolution.json \
+  --output primary-sources.json
+```
+
+This keeps history/backup/self-lifecycle traversal evidence available for audit while
+preventing it from replacing an already established upstream T-src.
