@@ -1,0 +1,18 @@
+[
+  {
+    "gap_id": "example-gap",
+    "workflow_context_file": "workflow.yml",
+    "workflow_target_logical_name": "dm.target",
+    "target_column": "id",
+    "evidence": {
+      "source_relation_name": "${$app.schema}.source_table",
+      "source_column": "id",
+      "placeholder_resolution": [
+        {
+          "placeholder": "app.schema",
+          "candidate_values": ["schema_pa", "schema_prod"]
+        }
+      ]
+    }
+  }
+]

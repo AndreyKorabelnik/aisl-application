@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aisl-s2t"
+version = "0.1.0a1"
+description = "Deterministic consumer-owned S2T builder over pinned AISL evidence"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+aisl-s2t = "aisl_s2t.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aisl_s2t*"]
