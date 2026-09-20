@@ -1,5 +1,6 @@
+from .builder import BuildResult, RowAudit, S2T_COLUMNS, build_deterministic_s2t, render_s2t_csv
+from .gaps import TypedGap
 from .primary_source import PrimarySourceDecision, collapse_primary_sources
-
 from .environment import (
     EnvironmentEvidenceIndex,
     EnvironmentPolicy,
@@ -10,6 +11,12 @@ from .environment import (
 )
 
 __all__ = [
+    "BuildResult",
+    "RowAudit",
+    "S2T_COLUMNS",
+    "TypedGap",
+    "build_deterministic_s2t",
+    "render_s2t_csv",
     "EnvironmentEvidenceIndex",
     "EnvironmentPolicy",
     "GapDecision",
@@ -20,4 +27,4 @@ __all__ = [
     "collapse_primary_sources",
 ]
 
-__version__ = "0.1.0a2"
+__version__ = "0.1.0a3"
