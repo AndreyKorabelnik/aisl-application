@@ -75,7 +75,7 @@ def test_unresolved_branch_does_not_promote_concrete_downstream_terminal():
     assert decisions[0].source_relation is None
 
 
-def test_terminal_fallback_is_used_only_when_no_branch_or_resolved_driver_exists():
+def test_current_unresolved_driver_does_not_fallback_to_terminal_relation():
     rows = [{
         "mapping_id": "m", "workflow_target_logical_name": "dm.target", "target_column": "id",
         "branch_relation_name": "", "driver_relation_status": "unresolved", "driver_relation_name": "",
@@ -83,9 +83,9 @@ def test_terminal_fallback_is_used_only_when_no_branch_or_resolved_driver_exists
     }]
     decisions = collapse_primary_sources(rows, environment_resolutions=[])
     assert len(decisions) == 1
-    assert decisions[0].status == "resolved"
-    assert decisions[0].source_relation == "src.only"
-    assert decisions[0].basis == "resolved_primary_source_identity"
+    assert decisions[0].status == "unresolved"
+    assert decisions[0].source_relation is None
+    assert decisions[0].basis == "unresolved_primary_source_template"
 
 
 def test_non_primary_relation_roles_are_not_folded_into_driver_sources():

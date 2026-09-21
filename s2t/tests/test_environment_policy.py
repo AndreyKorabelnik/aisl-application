@@ -195,3 +195,60 @@ def test_environment_scope_identity_is_opaque_and_not_tied_to_stands_array_shape
     assert decision.status == "resolved"
     assert decision.value == "prod_schema"
     assert decision.basis == "default_environment:production"
+
+def test_nested_placeholder_candidate_resolves_from_selected_environment_scope():
+    index = EnvironmentEvidenceIndex.from_observations([
+        {"placeholder": "inventory.history_schema", "value": "prod_history", "scope": "stands[4]"},
+        {"placeholder": "inventory.history_schema", "value": "uat_history", "scope": "stands[2]"},
+    ])
+    decision = resolve_placeholder(
+        {"placeholder": "history_schema", "candidate_values": ["${inventory.history_schema}"]},
+        index=index,
+        policy=_policy(),
+    )
+    assert decision.status == "resolved"
+    assert decision.value == "prod_history"
+    assert decision.basis == "default_environment:production"
+    assert decision.matching_environment_values == ("prod_history",)
+
+
+def test_nested_placeholder_candidate_without_selected_scope_stays_unresolved():
+    index = EnvironmentEvidenceIndex.from_observations([
+        {"placeholder": "inventory.history_schema", "value": "prod_history", "scope": "stands[4]"},
+    ])
+    policy = EnvironmentPolicy(environment_scopes={}, default_environment="production")
+    decision = resolve_placeholder(
+        {"placeholder": "history_schema", "candidate_values": ["${inventory.history_schema}"]},
+        index=index,
+        policy=policy,
+    )
+    assert decision.status == "unresolved"
+    assert decision.value is None
+
+
+def test_nested_placeholder_candidate_with_two_selected_values_stays_ambiguous():
+    index = EnvironmentEvidenceIndex.from_observations([
+        {"placeholder": "inventory.history_schema", "value": "prod_history_a", "scope": "stands[4]"},
+        {"placeholder": "inventory.history_schema", "value": "prod_history_b", "scope": "stands[4]"},
+    ])
+    decision = resolve_placeholder(
+        {"placeholder": "history_schema", "candidate_values": ["${inventory.history_schema}"]},
+        index=index,
+        policy=_policy(),
+    )
+    assert decision.status == "ambiguous"
+    assert decision.value is None
+    assert decision.matching_environment_values == ("prod_history_a", "prod_history_b")
+
+
+def test_non_exact_nested_template_is_not_evaluated():
+    index = EnvironmentEvidenceIndex.from_observations([
+        {"placeholder": "inventory.history_schema", "value": "prod_history", "scope": "stands[4]"},
+    ])
+    decision = resolve_placeholder(
+        {"placeholder": "history_schema", "candidate_values": ["prefix_${inventory.history_schema}"]},
+        index=index,
+        policy=_policy(),
+    )
+    assert decision.status == "unresolved"
+    assert decision.value is None
