@@ -4,13 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "repository-topology-reranker"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Non-canonical semantic reranking over frozen Repository Topology residual packages"
 requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+
+[project.scripts]
+repository-topology-reranker = "repository_topology_reranker.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
