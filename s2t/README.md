@@ -1,4 +1,4 @@
-# aisl-s2t 0.1.0a3
+# aisl-s2t 0.1.0a4
 
 Consumer-owned deterministic S2T application over pinned public AISL evidence.
 
@@ -62,22 +62,25 @@ resolved identities remain ambiguous.
 
 ## Primary/upstream source policy v1
 
-`sql_target_source_mapping.branch_relation_name` is the mechanically published
-upstream branch identity. When it exists, S2T uses that identity as the primary
-source instead of replacing it with a downstream terminal encountered later in
-the same traversal. No file/path keywords are interpreted.
+Current `sql-target-source-mapping/v2` distinguishes observed branch structure
+(`branch_relation_name`) from the derived terminal driver relation
+(`driver_relation_name`). S2T uses the producer-established driver as the primary
+source. No file/path keywords are interpreted.
 
 Rules:
 
-1. `branch_relation_name` wins over downstream `source_sql_relation_name`.
-2. A templated branch must already be resolved by deterministic environment policy.
-3. A downstream concrete terminal never substitutes for an unresolved upstream branch.
-4. Different resolved branch identities remain separate S2T value-source rows.
-5. Syntactically different branch templates that resolve to the same exact relation
-   are deduplicated.
-6. Non-primary roles such as lookup contributions are not folded into driver sources.
-7. If no branch identity exists, a resolved driver relation or terminal relation may
-   be used as a weaker fallback with an explicit basis.
+1. A `resolved` current `driver_relation_name` is the primary source identity.
+2. A `partial` driver relation is preserved literally when only an environment/
+   placeholder dimension remains unresolved; the row retains an
+   `UNRESOLVED_PLACEHOLDER` gap rather than losing the observed source table/field.
+3. An `ambiguous` or `unresolved` current driver is never replaced by
+   `branch_relation_name`.
+4. Legacy serialized inputs that predate explicit driver status may still use
+   `branch_relation_name` as the mechanically published primary identity.
+5. Different producer-established driver identities remain separate S2T value-source rows.
+6. Syntactically different templates that deterministically resolve to the same exact
+   relation are deduplicated.
+7. Non-primary roles such as lookup contributions are not folded into driver sources.
 
 CLI:
 
