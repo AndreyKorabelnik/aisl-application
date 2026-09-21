@@ -48,6 +48,9 @@ class BindingIndex:
             by_repo[binding.repository_id] = binding
         self._by_repo = by_repo
 
+    def find(self, repository_id: str) -> AislBinding | None:
+        return self._by_repo.get(repository_id)
+
     def require(self, repository_id: str) -> AislBinding:
         try:
             return self._by_repo[repository_id]
@@ -60,7 +63,11 @@ def load_bindings(path: str | Path) -> BindingIndex:
     if not isinstance(payload, Mapping):
         raise ValueError("bindings root must be an object")
     if payload.get("schema_version") != BINDINGS_SCHEMA_VERSION:
-        raise ValueError(f"unsupported bindings schema_version: {payload.get('schema_version')!r}")
+        nested = payload.get("bindings")
+        if isinstance(nested, Mapping) and nested.get("schema_version") == BINDINGS_SCHEMA_VERSION:
+            payload = nested
+        else:
+            raise ValueError(f"unsupported bindings schema_version: {payload.get('schema_version')!r}")
     rows = payload.get("repositories")
     if not isinstance(rows, list):
         raise ValueError("bindings.repositories must be an array")
