@@ -97,13 +97,34 @@ class EnvironmentResolutionIndex:
 
 
 def _primary_template(row: Mapping[str, Any]) -> tuple[str, str]:
+    """Return the current public primary-source identity or literal template.
+
+    Current AISL target-source mapping distinguishes observed branch structure
+    (branch_relation_name) from the derived terminal driver relation
+    (driver_relation_name). The S2T consumer therefore prefers the driver whenever
+    the producer established one and must not promote a branch/staging relation
+    when the producer reports an ambiguous or unresolved driver.
+
+    Older serialized inputs that predate the explicit driver contract keep the
+    branch fallback for compatibility.
+    """
+
+    driver_status = _text(row.get("driver_relation_status"))
+    driver = _text(row.get("driver_relation_name"))
+    if driver_status in {"resolved", "partial"} and driver:
+        return driver, (
+            "resolved_driver_relation"
+            if driver_status == "resolved"
+            else "partial_driver_relation_template"
+        )
+    if driver_status == "ambiguous":
+        return "", "ambiguous_driver_relation"
+    if driver_status == "unresolved" and "driver_relation_status" in row:
+        return "", "unresolved_driver_relation"
+
     branch = _text(row.get("branch_relation_name"))
     if branch:
-        return branch, "branch_relation"
-    if _text(row.get("driver_relation_status")) == "resolved":
-        driver = _text(row.get("driver_relation_name"))
-        if driver:
-            return driver, "resolved_driver_relation"
+        return branch, "legacy_branch_relation"
     terminal = _text(row.get("source_sql_relation_name") or row.get("immediate_source_relation_name"))
     if terminal:
         return terminal, "terminal_relation_fallback"
@@ -118,8 +139,10 @@ def collapse_primary_sources(
 ) -> list[PrimarySourceDecision]:
     """Collapse traversal contexts to primary/upstream source decisions.
 
-    `branch_relation_name` is mechanically published by target-source mapping and is
-    preferred over a downstream terminal relation. This function never interprets
+    Current target-source mapping publishes `driver_relation_name` as the derived
+    terminal primary-source relation and `branch_relation_name` as observed branch
+    structure. Current driver identity therefore wins; legacy inputs without the
+    explicit driver contract may still fall back to branch identity. This function never interprets
     file names such as ``hist``/``backup``/``devops``. Distinct resolved branch
     identities remain distinct decisions, preserving multiple valid value branches.
 
@@ -146,7 +169,17 @@ def collapse_primary_sources(
             source_column=source_column,
         ) if template else ("unresolved", ())
 
-        if status == "resolved" and len(resolved_values) == 1:
+        if (
+            status == "unresolved"
+            and template
+            and template_basis == "partial_driver_relation_template"
+        ):
+            # Preserve the literal producer-published source template while keeping
+            # the unresolved environment dimension explicit in the typed gaps.
+            status = "template"
+            resolved_values = (template,)
+
+        if status in {"resolved", "template"} and len(resolved_values) == 1:
             identity = resolved_values[0]
         else:
             identity = template
@@ -172,10 +205,15 @@ def collapse_primary_sources(
         if status == "resolved" and identity:
             source_relation = identity
             basis = (
-                "mechanically_observed_branch_primary_source"
-                if "branch_relation" in template_bases
+                "mechanically_observed_driver_primary_source"
+                if template_bases.intersection(
+                    {"resolved_driver_relation", "partial_driver_relation_template"}
+                )
                 else "resolved_primary_source_identity"
             )
+        elif status == "template" and identity:
+            source_relation = identity
+            basis = "mechanically_observed_driver_primary_source_template"
         elif status == "ambiguous":
             source_relation = None
             basis = "ambiguous_primary_source_template_resolution"
