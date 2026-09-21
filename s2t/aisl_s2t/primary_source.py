@@ -204,13 +204,14 @@ def collapse_primary_sources(
         template_bases = {_text(item["template_basis"]) for item in items}
         if status == "resolved" and identity:
             source_relation = identity
-            basis = (
-                "mechanically_observed_driver_primary_source"
-                if template_bases.intersection(
-                    {"resolved_driver_relation", "partial_driver_relation_template"}
-                )
-                else "resolved_primary_source_identity"
-            )
+            if template_bases.intersection(
+                {"resolved_driver_relation", "partial_driver_relation_template"}
+            ):
+                basis = "mechanically_observed_driver_primary_source"
+            elif "legacy_branch_relation" in template_bases:
+                basis = "mechanically_observed_branch_primary_source"
+            else:
+                basis = "resolved_primary_source_identity"
         elif status == "template" and identity:
             source_relation = identity
             basis = "mechanically_observed_driver_primary_source_template"
