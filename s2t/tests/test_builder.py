@@ -363,3 +363,17 @@ def test_non_ambiguous_usage_context_does_not_generate_candidate_set():
     }]
     result = build_deterministic_s2t(mappings, mapping_gaps=gaps, column_usage_contexts=[context])
     assert not any(g.gap_type == BOUNDED_PRODUCER_AMBIGUITY for g in result.gaps)
+
+def test_builder_preserves_partial_driver_template_and_typed_gap():
+    mappings = [{
+        "mapping_id": "m", "workflow_target_logical_name": "mart.target", "target_column": "id",
+        "source_relation_role": "driver_path", "branch_relation_name": "stage.branch",
+        "driver_relation_status": "partial", "driver_relation_name": "${$opaque.scope}.real",
+        "source_sql_relation_name": "${$opaque.scope}.real", "source_sql_column": "id",
+    }]
+    result = build_deterministic_s2t(mappings)
+    row = result.rows[0]
+    assert row[_idx("T-src-schema")] == "${$opaque.scope}"
+    assert row[_idx("T-src")] == "real"
+    assert row[_idx("T-src-f-name")] == "id"
+    assert any(gap.gap_type == UNRESOLVED_PLACEHOLDER for gap in result.gaps)

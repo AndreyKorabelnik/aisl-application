@@ -224,3 +224,60 @@ def test_ambiguous_environment_resolution_keeps_branch_unresolved():
     decision = collapse_primary_sources(rows, environment_resolutions=env)[0]
     assert decision.status == "unresolved"
     assert decision.source_relation is None
+
+def test_current_driver_relation_wins_over_observed_branch_structure():
+    rows = [{
+        "mapping_id": "m", "workflow_target_logical_name": "mart.target", "target_column": "id",
+        "source_relation_role": "driver_path", "branch_relation_name": "stage.branch",
+        "driver_relation_status": "resolved", "driver_relation_name": "source.real",
+        "source_sql_relation_name": "source.real", "source_sql_column": "id",
+    }]
+    decision = collapse_primary_sources(rows, environment_resolutions=[])[0]
+    assert decision.status == "resolved"
+    assert decision.source_relation == "source.real"
+    assert decision.basis == "mechanically_observed_driver_primary_source"
+
+
+def test_partial_current_driver_template_is_preserved_as_literal():
+    rows = [{
+        "mapping_id": "m", "workflow_target_logical_name": "mart.target", "target_column": "id",
+        "source_relation_role": "driver_path", "branch_relation_name": "stage.branch",
+        "driver_relation_status": "partial", "driver_relation_name": "${$opaque.scope}.real",
+        "source_sql_relation_name": "${$opaque.scope}.real", "source_sql_column": "id",
+    }]
+    decision = collapse_primary_sources(rows, environment_resolutions=[])[0]
+    assert decision.status == "template"
+    assert decision.source_relation == "${$opaque.scope}.real"
+    assert decision.basis == "mechanically_observed_driver_primary_source_template"
+
+
+def test_ambiguous_current_driver_does_not_promote_branch_structure():
+    rows = [{
+        "mapping_id": "m", "workflow_target_logical_name": "mart.target", "target_column": "id",
+        "source_relation_role": "driver_path", "branch_relation_name": "stage.branch",
+        "driver_relation_status": "ambiguous", "driver_relation_name": "",
+        "source_sql_relation_name": "source.a", "source_sql_column": "id",
+    }]
+    decision = collapse_primary_sources(rows, environment_resolutions=[])[0]
+    assert decision.status == "unresolved"
+    assert decision.source_relation is None
+
+
+def test_current_driver_selection_is_input_order_invariant():
+    rows = [
+        {
+            "mapping_id": "a", "workflow_target_logical_name": "mart.target", "target_column": "id",
+            "source_relation_role": "driver_path", "branch_relation_name": "stage.a",
+            "driver_relation_status": "resolved", "driver_relation_name": "source.real",
+            "source_sql_relation_name": "source.real", "source_sql_column": "id",
+        },
+        {
+            "mapping_id": "b", "workflow_target_logical_name": "mart.target", "target_column": "id",
+            "source_relation_role": "driver_path", "branch_relation_name": "stage.b",
+            "driver_relation_status": "resolved", "driver_relation_name": "source.real",
+            "source_sql_relation_name": "source.real", "source_sql_column": "id",
+        },
+    ]
+    forward = collapse_primary_sources(rows, environment_resolutions=[])
+    reverse = collapse_primary_sources(list(reversed(rows)), environment_resolutions=[])
+    assert [item.to_dict() for item in forward] == [item.to_dict() for item in reverse]

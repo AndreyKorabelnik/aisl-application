@@ -376,6 +376,17 @@ def classify_primary_source_residuals(
     for decision in decisions:
         if decision.status == "resolved":
             continue
+        if decision.status == "template":
+            typed.append(_make_gap(
+                gap_type=UNRESOLVED_PLACEHOLDER,
+                target_relation=decision.target_relation,
+                target_column=decision.target_column,
+                basis="primary_source_relation_template_preserved_literal",
+                evidence_refs=[
+                    f"mapping_id:{value}" for value in decision.mapping_ids
+                ],
+            ))
+            continue
         env_statuses: set[str] = set()
         env_gap_ids: set[str] = set()
         for template in decision.primary_templates:

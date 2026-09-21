@@ -303,7 +303,7 @@ def build_deterministic_s2t(
     resolved_targets: set[tuple[str, str]] = set()
     for decision in primary:
         target_key = (decision.target_relation, decision.target_column)
-        if decision.status != "resolved" or not decision.source_relation:
+        if decision.status not in {"resolved", "template"} or not decision.source_relation:
             continue
         resolved_targets.add(target_key)
         base = _base_row(decision.target_relation, decision.target_column, metadata.get(target_key))

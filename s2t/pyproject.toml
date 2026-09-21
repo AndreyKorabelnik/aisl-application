@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aisl-s2t"
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Deterministic consumer-owned S2T builder over pinned AISL evidence"
 requires-python = ">=3.10"
 dependencies = []
