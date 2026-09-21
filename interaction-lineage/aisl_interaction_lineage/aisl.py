@@ -17,6 +17,10 @@ class AislPathGateway(Protocol):
     ) -> Mapping[str, Any]: ...
 
 
+class AislReadinessGateway(AislPathGateway, Protocol):
+    def revision_status(self, binding: AislBinding) -> Mapping[str, Any]: ...
+
+
 class KnowledgeApiGateway:
     """Thin caller of the public revision-pinned Knowledge API."""
 
@@ -27,6 +31,25 @@ class KnowledgeApiGateway:
 
     def close(self) -> None:
         self._client.close()
+
+    def revision_status(self, binding: AislBinding) -> Mapping[str, Any]:
+        from aisl_sdk import AislApiError, AislContractError, AislTransportError
+
+        try:
+            pinned = self._client.revision(binding.system_id, binding.revision_id)
+        except AislTransportError as exc:
+            return {"status": "server_unavailable", "capabilities": [], "diagnostic": str(exc)}
+        except AislApiError as exc:
+            status = "missing_revision" if exc.status_code == 404 else "api_error"
+            return {"status": status, "capabilities": [], "diagnostic": str(exc)}
+        except AislContractError as exc:
+            return {"status": "contract_error", "capabilities": [], "diagnostic": str(exc)}
+        return {
+            "status": "ready",
+            "system_id": pinned.system_id,
+            "revision_id": pinned.revision_id,
+            "capabilities": list(pinned.capabilities),
+        }
 
     def resolve_attribute_paths(
         self,
