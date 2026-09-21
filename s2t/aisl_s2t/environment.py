@@ -108,6 +108,18 @@ class EnvironmentEvidenceIndex:
     def scopes_for(self, placeholder: str, value: str) -> frozenset[str]:
         return frozenset(self._value_scopes.get((placeholder.strip(), value.strip()), ()))
 
+    def values_for_scopes(self, placeholder: str, scopes: Iterable[str]) -> tuple[str, ...]:
+        """Return exact observed concrete values for one placeholder in selected scopes."""
+        selected = frozenset(str(scope).strip() for scope in scopes if str(scope).strip())
+        if not selected:
+            return ()
+        key = str(placeholder or "").strip()
+        return tuple(sorted({
+            value
+            for (candidate_placeholder, value), observed_scopes in self._value_scopes.items()
+            if candidate_placeholder == key and selected.intersection(observed_scopes)
+        }))
+
     @classmethod
     def from_observations(cls, observations: Iterable[Mapping[str, Any]]) -> "EnvironmentEvidenceIndex":
         index = cls()
@@ -159,6 +171,45 @@ def _concrete_candidates(values: Iterable[Any]) -> tuple[str, ...]:
     return tuple(sorted({str(value).strip() for value in values if _is_concrete(str(value))}))
 
 
+def _exact_placeholder_reference(value: Any) -> str | None:
+    """Return one exact placeholder identity without evaluating template expressions."""
+    text = str(value or "").strip()
+    if not (text.startswith("${") && text.endswith("}")):
+        return None
+    inner = text[2:-1].strip()
+    if inner.startswith("$"):
+        inner = inner[1:].strip()
+    if not inner or "${" in inner or "{{" in inner or "}" in inner:
+        return None
+    return inner
+
+
+def _environment_expanded_candidates(
+    values: Iterable[Any],
+    *,
+    index: EnvironmentEvidenceIndex,
+    selected_scopes: Iterable[str],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Expand only exact placeholder-to-concrete bindings observed in selected scopes.
+
+    Candidate templates are public evidence, not source text. A nested candidate is
+    composed only when it is exactly one placeholder token and the environment index
+    publishes concrete values for that nested placeholder in the already selected
+    environment scope. Prefix/suffix templates and arbitrary expression evaluation are
+    deliberately out of scope and remain unresolved.
+    """
+    concrete = set(_concrete_candidates(values))
+    environment_values: set[str] = set()
+    for raw in values:
+        nested = _exact_placeholder_reference(raw)
+        if not nested:
+            continue
+        observed = index.values_for_scopes(nested, selected_scopes)
+        concrete.update(observed)
+        environment_values.update(observed)
+    return tuple(sorted(concrete)), tuple(sorted(environment_values))
+
+
 def resolve_placeholder(
     item: Mapping[str, Any],
     *,
@@ -166,9 +217,14 @@ def resolve_placeholder(
     policy: EnvironmentPolicy,
 ) -> PlaceholderDecision:
     placeholder = str(item.get("placeholder") or "").strip()
-    candidates = _concrete_candidates(item.get("candidate_values") or ())
+    raw_values = tuple(item.get("candidate_values") or ())
+    direct_candidates = _concrete_candidates(raw_values)
+    selected_scopes = policy.selected_scopes
+    candidates, nested_environment_values = _environment_expanded_candidates(
+        raw_values, index=index, selected_scopes=selected_scopes
+    )
 
-    if len(candidates) == 1:
+    if len(candidates) == 1 and not nested_environment_values:
         return PlaceholderDecision(
             placeholder=placeholder,
             status="resolved",
@@ -179,13 +235,14 @@ def resolve_placeholder(
             matching_environment_values=(),
         )
 
-    selected_scopes = policy.selected_scopes
-    matching = tuple(
-        value
-        for value in candidates
-        if selected_scopes.intersection(index.scopes_for(placeholder, value))
-    )
-    matching = tuple(sorted(set(matching)))
+    matching = tuple(sorted({
+        *nested_environment_values,
+        *(
+            value
+            for value in direct_candidates
+            if selected_scopes.intersection(index.scopes_for(placeholder, value))
+        ),
+    }))
     basis_prefix = "explicit_environment" if policy.explicit_environment else "default_environment"
 
     if len(matching) == 1:

@@ -1,4 +1,4 @@
-# aisl-s2t 0.1.0a4
+# aisl-s2t 0.1.0a5
 
 Consumer-owned deterministic S2T application over pinned public AISL evidence.
 
@@ -37,10 +37,13 @@ Environment choice is a deterministic S2T policy, not an AISL fact.
    `prod/prom` substrings or repository-specific naming conventions.
 5. A placeholder resolves only when the selected environment yields exactly one
    mechanically observed candidate value.
-6. One concrete literal candidate is deterministic without environment selection.
-7. Multiple matching values or no matching value remain unresolved.
-8. PA/deployment/non-production is selected only by explicit context.
-9. Every decision retains resolution basis for audit.
+6. An exact placeholder-valued candidate may be composed through one already-published
+   environment binding in the selected scope (for example `outer -> ${inner} -> value`).
+   Arbitrary template/expression evaluation is not performed.
+7. One concrete literal candidate is deterministic without environment selection.
+8. Multiple matching values or no matching value remain unresolved.
+9. PA/deployment/non-production is selected only by explicit context.
+10. Every decision retains resolution basis for audit.
 
 CLI:
 
