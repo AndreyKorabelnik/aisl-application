@@ -111,6 +111,13 @@ class FakeGateway:
             },
         }
 
+    def list_repository_value_nodes(
+        self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+        operation: str | None = None, max_results: int = 500, page_token: str = "",
+    ) -> Mapping[str, Any]:
+        self.calls.append({"repo": repository_id, "list_nodes": True, "operation": operation})
+        return {"result": {"items": [], "total_count": 0, "returned_count": 0, "truncated": False}}
+
 
 def bindings() -> BindingIndex:
     return BindingIndex([
@@ -155,22 +162,162 @@ def test_ambiguous_display_ref_is_resolved_only_by_exact_topology_interface_id()
     gateway = FakeGateway(ambiguous=True)
     result = build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway, transport_roles=("request",))
     journey = result["journeys"][0]
-    assert journey["source_side"]["anchor_selection_basis"] == "exact_topology_interface_id"
-    assert journey["target_side"]["anchor_selection_basis"] == "exact_topology_interface_id"
+    assert journey["source_side"]["anchor_selection_basis"] == "canonical_wire_display_ref:exact_topology_interface_id"
+    assert journey["target_side"]["anchor_selection_basis"] == "canonical_wire_display_ref:exact_topology_interface_id"
     assert any(call["source"] == "caller-wanted" for call in gateway.calls)
     assert any(call["source"] == "service-wanted" for call in gateway.calls)
 
 
 def test_missing_anchor_stays_partial_gap_without_guessing() -> None:
     ref = wire_display_ref("response", "profile.id")
-    gateway = FakeGateway(missing={("caller", ref)})
+    gateway = FakeGateway(missing={("caller", ref), ("caller", "profile.id")})
     result = build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway, transport_roles=("response",))
     journey = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
-    assert journey["crossing"]["status"] == "partial"
+    assert journey["crossing"]["status"] == "resolved"
     assert journey["target_side"]["anchor_status"] == "unresolved"
-    assert any(gap["reason"] == "target_boundary_anchor_unresolved" for gap in result["gaps"])
+    assert any(gap["reason"] == "target_local_anchor_unresolved" for gap in result["gaps"])
 
 
 def test_rejects_active_revision_binding() -> None:
     with pytest.raises(ValueError, match="exact immutable revision"):
         AislBinding.from_payload({"repository_id": "r", "system_id": "s", "revision_id": "latest"})
+
+
+def test_exact_topology_local_payload_binding_can_anchor_when_wire_ref_is_absent() -> None:
+    payload = topology()
+    payload["edges"][0]["source_half_wires"][0]["resolution_traces"] = [{
+        "local_bindings": [{
+            "declared_type": "RequestDto",
+            "binding_status": "exact_single_assignment",
+            "symbol": "request",
+        }]
+    }]
+    wire = wire_display_ref("request", "id")
+    gateway = FakeGateway(missing={("caller", wire)})
+    result = build_interaction_lineage(
+        payload,
+        edge_id=EDGE_ID,
+        bindings=bindings(),
+        gateway=gateway,
+        transport_roles=("request",),
+    )
+    journey = result["journeys"][0]
+    assert journey["source_side"]["anchor_status"] == "resolved"
+    assert journey["source_side"]["anchor_selection_basis"] == (
+        "exact_topology_local_payload_binding:unique_exact_display_ref"
+    )
+    assert any(call.get("source") == "request.id" for call in gateway.calls)
+
+
+class ReverseProofGateway(FakeGateway):
+    def resolve_attribute_paths(
+        self,
+        binding: AislBinding,
+        *,
+        source: str,
+        selected_repo_ids: Sequence[str],
+        direction: str,
+    ) -> Mapping[str, Any]:
+        repo = selected_repo_ids[0]
+        self.calls.append({"repo": repo, "source": source, "direction": direction})
+        if source in {wire_display_ref("response", "profile.id"), "profile.id"}:
+            return {"result": {"status": "source_not_found", "paths": [], "gaps": []}}
+        if source == "id":
+            return {"result": {
+                "status": "source_ambiguous",
+                "source_candidates": [
+                    {"repo_id": repo, "owner_ref": "Mapper.other", "operation": "Mapper.other", "value_node_id": "other-id", "display_ref": "id"},
+                    {"repo_id": repo, "owner_ref": "Mapper.map", "operation": "Mapper.map", "value_node_id": "wanted-id", "display_ref": "id"},
+                ],
+                "paths": [],
+                "gaps": [],
+            }}
+        if source == "other-id":
+            node = {"repo_id": repo, "operation": "Mapper.other", "value_node_id": source, "display_ref": "id"}
+            return {"result": {"status": "partial", "source": node, "paths": [{"start": node, "end": node, "steps": []}], "gaps": []}}
+        if source == "wanted-id":
+            node = {"repo_id": repo, "operation": "Mapper.map", "value_node_id": source, "display_ref": "id"}
+            upstream = {"repo_id": repo, "operation": "Mapper.map", "value_node_id": "profile-id", "display_ref": "request.profile.id"}
+            reverse = {"result": {"status": "partial", "source": node, "paths": [{"start": node, "end": upstream, "steps": []}], "gaps": []}}
+            if direction == "reverse":
+                return reverse
+            return {"result": {"status": "partial", "source": node, "paths": [{"start": node, "end": node, "steps": []}], "gaps": []}}
+        return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+
+def test_nested_leaf_ambiguity_resolves_only_with_exact_reverse_path_proof() -> None:
+    gateway = ReverseProofGateway()
+    result = build_interaction_lineage(
+        topology(),
+        edge_id=EDGE_ID,
+        bindings=bindings(),
+        gateway=gateway,
+        transport_roles=("response",),
+    )
+    journey = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
+    assert journey["target_side"]["anchor_status"] == "resolved"
+    assert journey["target_side"]["resolved_anchor"]["value_node_id"] == "wanted-id"
+    assert journey["target_side"]["anchor_selection_basis"] == "exact_reverse_path_to_topology_field"
+
+
+class ChildExpansionGateway(FakeGateway):
+    def resolve_attribute_paths(
+        self,
+        binding: AislBinding,
+        *,
+        source: str,
+        selected_repo_ids: Sequence[str],
+        direction: str,
+    ) -> Mapping[str, Any]:
+        repo = selected_repo_ids[0]
+        self.calls.append({"repo": repo, "source": source, "direction": direction})
+        if source == wire_display_ref("response", "profile") and repo == "caller":
+            return {"result": {"status": "source_not_found", "paths": [], "gaps": []}}
+        if source == "profile" and repo == "caller":
+            node = {
+                "repo_id": repo,
+                "owner_ref": "Mapper.map",
+                "operation": "Mapper.map",
+                "value_node_id": "profile-node",
+                "display_ref": "profile",
+            }
+            return {"result": {"status": "partial", "source": node, "paths": [{"start": node, "end": node, "steps": []}], "gaps": []}}
+        if source in {"profile-name", "profile-surname"}:
+            node = {"repo_id": repo, "operation": "Mapper.map", "value_node_id": source, "display_ref": "profile." + ("name" if source.endswith("name") else "surname")}
+            return {"result": {"status": "partial", "source": node, "paths": [{"start": node, "end": node, "steps": []}], "gaps": []}}
+        return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+    def list_repository_value_nodes(
+        self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+        operation: str | None = None, max_results: int = 500, page_token: str = "",
+    ) -> Mapping[str, Any]:
+        self.calls.append({"repo": repository_id, "list_nodes": True, "operation": operation})
+        if repository_id == "caller" and operation == "Mapper.map":
+            return {"result": {
+                "items": [
+                    {"repo_id": repository_id, "operation": operation, "node_kind": "field", "value_node_id": "profile-name", "display_ref": "profile.name"},
+                    {"repo_id": repository_id, "operation": operation, "node_kind": "field", "value_node_id": "profile-surname", "display_ref": "profile.surname"},
+                    {"repo_id": repository_id, "operation": operation, "node_kind": "field", "value_node_id": "deep", "display_ref": "profile.address.city"},
+                ],
+                "total_count": 3,
+                "returned_count": 3,
+                "truncated": False,
+            }}
+        return {"result": {"items": [], "total_count": 0, "returned_count": 0, "truncated": False}}
+
+
+def test_observed_child_expansion_lists_only_direct_children_of_exact_anchor_operation() -> None:
+    gateway = ChildExpansionGateway()
+    result = build_interaction_lineage(
+        topology(),
+        edge_id=EDGE_ID,
+        bindings=bindings(),
+        gateway=gateway,
+        transport_roles=("response",),
+    )
+    journey = next(item for item in result["journeys"] if item["field_path"] == "profile")
+    expansion = journey["target_side"]["observed_child_expansion"]
+    assert expansion["basis"] == "exact_operation_local_field_prefix"
+    assert expansion["operation"] == "Mapper.map"
+    assert [item["field"] for item in expansion["children"]] == ["name", "surname"]
+    assert all(item["query"]["result"]["status"] == "partial" for item in expansion["children"])

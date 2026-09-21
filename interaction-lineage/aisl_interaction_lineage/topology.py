@@ -141,3 +141,32 @@ def wire_display_ref(transport_role: str, field_path: str) -> str:
     if role not in {"request", "response"} or not path:
         raise ValueError("transport role and field path are required")
     return f"HTTP {role} {path.casefold()}"
+
+
+def local_payload_binding_symbols(
+    edge: Mapping[str, Any],
+    *,
+    repository_id: str,
+    payload_identity: str | None,
+) -> tuple[str, ...]:
+    """Return exact local symbols explicitly typed as the topology payload.
+
+    Repository Topology already owns source-side transport binding evidence.  The
+    interaction-lineage consumer may reuse that exact evidence, but it must not infer
+    symbols from naming conventions or source text.
+    """
+    payload = str(payload_identity or "").strip()
+    if not payload:
+        return ()
+    symbols: list[str] = []
+    for half_wire in _half_wires(edge, repository_id):
+        for trace in _rows(half_wire.get("resolution_traces")):
+            for binding in _rows(trace.get("local_bindings")):
+                if str(binding.get("declared_type") or "").strip() != payload:
+                    continue
+                if str(binding.get("binding_status") or "") != "exact_single_assignment":
+                    continue
+                symbol = str(binding.get("symbol") or "").strip()
+                if symbol and symbol not in symbols:
+                    symbols.append(symbol)
+    return tuple(symbols)

@@ -111,24 +111,30 @@ def check_interaction_lineage(
                 binding = bindings.require(repository_id)
                 resolved = _resolve_side(
                     gateway,
+                    edge=edge,
+                    field=field,
+                    side=side,
                     binding=binding,
                     repository_id=repository_id,
                     interface_ids=interface_ids,
+                    payload_identity=(
+                        field.source_payload_identity if side == "source" else field.target_payload_identity
+                    ),
                     source_ref=source_ref,
                     direction=direction,
                 )
                 row["boundary_anchor_count"] = int(row.get("boundary_anchor_count") or 0) + 1
                 if resolved["anchor_status"] != "resolved":
                     row["boundary_anchor_missing_count"] = int(row.get("boundary_anchor_missing_count") or 0) + 1
-                    row["status"] = "boundary_anchor_not_published"
                     diagnostics.append({
-                        "code": "boundary_anchor_missing",
+                        "code": "local_anchor_gap",
                         "repository_id": repository_id,
                         "edge_id": edge_id,
                         "transport_role": field.transport_role,
                         "field_path": field.field_path,
                         "side": side,
                         "requested_anchor": source_ref,
+                        "blocking": False,
                     })
 
     items = [repositories[key] for key in sorted(repositories)]

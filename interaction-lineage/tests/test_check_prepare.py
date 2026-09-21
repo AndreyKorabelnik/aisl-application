@@ -50,6 +50,12 @@ class ReadinessGateway:
         }
         return {"result": {"status": "confirmed_complete", "source": node, "paths": []}}
 
+    def list_repository_value_nodes(
+        self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+        operation: str | None = None, max_results: int = 500, page_token: str = "",
+    ) -> Mapping[str, Any]:
+        return {"result": {"items": [], "total_count": 0, "returned_count": 0, "truncated": False}}
+
 
 def bindings() -> BindingIndex:
     return BindingIndex([
@@ -102,12 +108,13 @@ def test_check_server_unavailable_is_not_ready_without_fallback() -> None:
     assert any(item["code"] == "server_unavailable" for item in result["diagnostics"])
 
 
-def test_check_missing_boundary_anchor_blocks_ready_state() -> None:
-    gateway = ReadinessGateway(missing_anchors={("caller", "HTTP response profile.id")})
+def test_check_missing_local_anchor_is_non_blocking_coverage_gap() -> None:
+    gateway = ReadinessGateway(missing_anchors={("caller", "HTTP response profile.id"), ("caller", "profile.id")})
     result = check_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway)
     caller = next(item for item in result["repositories"] if item["repository_id"] == "caller")
-    assert caller["status"] == "boundary_anchor_not_published"
-    assert result["status"] == "not_ready"
+    assert caller["status"] == "ready"
+    assert result["status"] == "ready"
+    assert any(item["code"] == "local_anchor_gap" and item["blocking"] is False for item in result["diagnostics"])
 
 
 class FakePreparationGateway:
