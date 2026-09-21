@@ -16,6 +16,17 @@ class AislPathGateway(Protocol):
         direction: str,
     ) -> Mapping[str, Any]: ...
 
+    def list_repository_value_nodes(
+        self,
+        binding: AislBinding,
+        *,
+        repository_id: str,
+        node_kind: str | None = None,
+        operation: str | None = None,
+        max_results: int = 500,
+        page_token: str = "",
+    ) -> Mapping[str, Any]: ...
+
 
 class AislReadinessGateway(AislPathGateway, Protocol):
     def revision_status(self, binding: AislBinding) -> Mapping[str, Any]: ...
@@ -73,3 +84,28 @@ class KnowledgeApiGateway:
         if direction != "forward":
             payload["direction"] = direction
         return self._client.post_json(path, payload, params={"revision_id": binding.revision_id})
+
+    def list_repository_value_nodes(
+        self,
+        binding: AislBinding,
+        *,
+        repository_id: str,
+        node_kind: str | None = None,
+        operation: str | None = None,
+        max_results: int = 500,
+        page_token: str = "",
+    ) -> Mapping[str, Any]:
+        system_id = quote(binding.system_id, safe="")
+        path = f"/api/knowledge/v1/systems/{system_id}/repository-value-nodes"
+        params: dict[str, Any] = {
+            "revision_id": binding.revision_id,
+            "repo_id": repository_id,
+            "max_results": max_results,
+        }
+        if node_kind:
+            params["node_kind"] = node_kind
+        if operation:
+            params["operation"] = operation
+        if page_token:
+            params["page_token"] = page_token
+        return self._client.get_json(path, params=params)
