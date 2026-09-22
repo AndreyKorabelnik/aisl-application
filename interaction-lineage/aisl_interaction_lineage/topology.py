@@ -143,6 +143,33 @@ def wire_display_ref(transport_role: str, field_path: str) -> str:
     return f"HTTP {role} {path.casefold()}"
 
 
+def route_boundary_ref(edge: Mapping[str, Any], transport_role: str, field_path: str) -> str | None:
+    """Return an exact REST boundary occurrence reference when topology proves the route.
+
+    This is a deterministic identity bridge only: it reuses the exact topology route and
+    field path and never infers names, payloads, or repository-local symbols.
+    """
+    protocol = str(edge.get("protocol") or "").strip().casefold()
+    role = str(transport_role or "").strip().casefold()
+    path = str(field_path or "").strip()
+    endpoint = str(edge.get("matched_identity") or "").strip()
+    if protocol != "http" or role not in {"request", "response"} or not path or not endpoint:
+        return None
+    return f"boundary:rest:{endpoint}:{role}.{path}"
+
+
+def expected_interface_direction(edge: Mapping[str, Any], repository_id: str) -> str | None:
+    """Return the exact topology interface direction for one edge repository."""
+    repo = str(repository_id or "").strip()
+    source = str(edge.get("source_repository_id") or "").strip()
+    target = str(edge.get("target_repository_id") or "").strip()
+    if repo and repo == source and repo != target:
+        return "outbound"
+    if repo and repo == target and repo != source:
+        return "inbound"
+    return None
+
+
 def local_payload_binding_symbols(
     edge: Mapping[str, Any],
     *,
