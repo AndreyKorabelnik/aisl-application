@@ -79,3 +79,20 @@ def test_csv_cli_writes_semicolon_utf8_human_projection(tmp_path) -> None:
     assert len(rows) == 1
     assert rows[0]["crossing_attribute"] == "ucpID"
     assert list(rows[0]) == list(HUMAN_CSV_COLUMNS)
+
+
+def test_nested_crossing_attributes_are_separate_human_rows() -> None:
+    payload = lineage()
+    base = payload["journeys"][0]
+    first = dict(base)
+    first["field_path"] = "clientInfo.identifications.documentSeries"
+    second = dict(base)
+    second["field_path"] = "clientInfo.identifications.documentNumber"
+    payload["journeys"] = [first, second]
+
+    rows = human_rows(payload)
+
+    assert [row["crossing_attribute"] for row in rows] == [
+        "clientInfo.identifications.documentSeries",
+        "clientInfo.identifications.documentNumber",
+    ]
