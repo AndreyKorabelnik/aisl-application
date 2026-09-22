@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 
 import pytest
 
-from aisl_interaction_lineage.builder import build_interaction_lineage
+from aisl_interaction_lineage.builder import _topology_relative_suffix, build_interaction_lineage
 from aisl_interaction_lineage.contracts import AislBinding, BindingIndex
 from aisl_interaction_lineage.topology import boundary_fields, select_edge, wire_display_ref
 
@@ -321,3 +321,127 @@ def test_observed_child_expansion_lists_only_direct_children_of_exact_anchor_ope
     assert expansion["operation"] == "Mapper.map"
     assert [item["field"] for item in expansion["children"]] == ["name", "surname"]
     assert all(item["query"]["result"]["status"] == "partial" for item in expansion["children"])
+
+
+class RelativeCompositeGateway(FakeGateway):
+    def __init__(self, *, mismatched_child_operation: bool = False) -> None:
+        super().__init__()
+        self.mismatched_child_operation = mismatched_child_operation
+
+    def resolve_attribute_paths(
+        self,
+        binding: AislBinding,
+        *,
+        source: str,
+        selected_repo_ids: Sequence[str],
+        direction: str,
+    ) -> Mapping[str, Any]:
+        repo = selected_repo_ids[0]
+        self.calls.append({"repo": repo, "source": source, "direction": direction})
+
+        # Force the nested topology path to need composition rather than a direct
+        # wire/full-path anchor.
+        if repo == "caller" and source in {
+            wire_display_ref("response", "profile.id"),
+            "boundary:rest:/example:response.profile.id",
+            "profile.id",
+            "id",
+        }:
+            return {"result": {"status": "source_not_found", "paths": [], "gaps": []}}
+
+        # The exact topology parent maps to a shorter repository-local symbol.
+        if repo == "caller" and source == wire_display_ref("response", "profile"):
+            parent = {
+                "repo_id": repo,
+                "owner_ref": "Mapper.map",
+                "operation": "Mapper.map",
+                "value_node_id": "identity-parent",
+                "display_ref": "identity",
+            }
+            return {
+                "result": {
+                    "status": "partial",
+                    "source": parent,
+                    "paths": [{"start": parent, "end": parent, "steps": []}],
+                    "gaps": [],
+                }
+            }
+
+        if repo == "caller" and source == "identity.id":
+            operation = "Mapper.other" if self.mismatched_child_operation else "Mapper.map"
+            child = {
+                "repo_id": repo,
+                "owner_ref": operation,
+                "operation": operation,
+                "value_node_id": "identity-id",
+                "display_ref": "identity.id",
+            }
+            destination = {
+                "repo_id": repo,
+                "owner_ref": operation,
+                "operation": operation,
+                "value_node_id": "target-id",
+                "display_ref": "target.id",
+            }
+            return {
+                "result": {
+                    "status": "partial",
+                    "source": child,
+                    "paths": [{"start": child, "end": destination, "steps": []}],
+                    "gaps": [],
+                }
+            }
+
+        return super().resolve_attribute_paths(
+            binding,
+            source=source,
+            selected_repo_ids=selected_repo_ids,
+            direction=direction,
+        )
+
+
+def test_nested_topology_child_resolves_only_under_exact_local_parent_operation() -> None:
+    gateway = RelativeCompositeGateway()
+    result = build_interaction_lineage(
+        topology(),
+        edge_id=EDGE_ID,
+        bindings=bindings(),
+        gateway=gateway,
+        transport_roles=("response",),
+    )
+
+    parent = next(item for item in result["journeys"] if item["field_path"] == "profile")
+    child = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
+
+    assert parent["target_side"]["resolved_anchor"]["display_ref"] == "identity"
+    assert child["target_side"]["anchor_status"] == "resolved"
+    assert child["target_side"]["resolved_anchor"]["display_ref"] == "identity.id"
+    assert child["target_side"]["resolved_anchor"]["operation"] == "Mapper.map"
+    assert child["target_side"]["anchor_selection_basis"] == (
+        "exact_topology_relative_child_under_resolved_parent_operation"
+    )
+    assert any(call.get("source") == "identity.id" for call in gateway.calls)
+
+
+def test_nested_topology_child_does_not_cross_operation_boundary() -> None:
+    gateway = RelativeCompositeGateway(mismatched_child_operation=True)
+    result = build_interaction_lineage(
+        topology(),
+        edge_id=EDGE_ID,
+        bindings=bindings(),
+        gateway=gateway,
+        transport_roles=("response",),
+    )
+    child = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
+
+    assert child["target_side"]["anchor_status"] == "unresolved"
+    assert any(
+        gap["reason"] == "target_local_anchor_unresolved"
+        and gap["field_path"] == "profile.id"
+        for gap in result["gaps"]
+    )
+
+
+def test_topology_relative_suffix_preserves_array_item_semantics() -> None:
+    assert _topology_relative_suffix("items", "items[].code") == "[].code"
+    assert _topology_relative_suffix("items", "itemsExtra.code") is None
