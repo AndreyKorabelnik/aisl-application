@@ -95,3 +95,40 @@ The first MVP recipe prepares only the already-existing `attribute-lineage` Know
 Product (`repository-value-flow`, `workspace.attribute-path-resolver`). SQL and
 persistence enrichment stay outside this first `/cpcGet` acceptance and are reconsidered
 only after the mandatory STOP/REASSESS.
+
+## Human CSV
+
+The canonical result remains `interaction-attribute-lineage/v1` JSON. A compact
+human-readable CSV can be rendered deterministically from that JSON without calling
+AISL Server or KCP:
+
+```bash
+interaction-lineage csv \
+  --input lineage.json \
+  --output lineage.csv
+```
+
+The CSV is a projection only; it creates no new lineage claims. One row represents one
+interaction attribute journey and is rendered in actual data-flow direction. The columns
+are:
+
+```text
+role
+start_attribute
+source_repository
+source_origin
+source_transformation
+crossing_attribute
+transport
+target_repository
+target_transformation
+target_destination
+gap
+full_attribute_path
+```
+
+`crossing_attribute` is the exact topology transport field. `start_attribute`,
+transformations, destinations and gaps are projected only from the already-published
+journey evidence. Technical anchor-selection and crossing-basis fields stay in the JSON
+and are intentionally omitted from the human CSV.
+
