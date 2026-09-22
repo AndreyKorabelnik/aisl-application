@@ -174,7 +174,7 @@ def _concrete_candidates(values: Iterable[Any]) -> tuple[str, ...]:
 def _exact_placeholder_reference(value: Any) -> str | None:
     """Return one exact placeholder identity without evaluating template expressions."""
     text = str(value or "").strip()
-    if not (text.startswith("${") && text.endswith("}")):
+    if not (text.startswith("${") and text.endswith("}")):
         return None
     inner = text[2:-1].strip()
     if inner.startswith("$"):
