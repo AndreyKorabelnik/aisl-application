@@ -221,6 +221,13 @@ def _attempt_ref(
     return second, second_result, selected, basis
 
 
+def _exact_topology_suffix_refs(field_path: str) -> tuple[str, ...]:
+    parts = [part for part in str(field_path or "").strip().split(".") if part]
+    # Keep at least two exact structural segments. A one-segment leaf is handled
+    # separately by reverse proof because it is too weak to establish ownership.
+    return tuple(".".join(parts[index:]) for index in range(1, max(1, len(parts) - 1)))
+
+
 def _resolve_leaf_by_reverse_proof(
     gateway: AislPathGateway,
     *,
@@ -330,6 +337,8 @@ def _resolve_side(
         attempts.append((f"{symbol}.{field.field_path}", "exact_topology_local_payload_binding"))
 
     attempts.append((field.field_path, "exact_topology_field_path"))
+    for suffix_ref in _exact_topology_suffix_refs(field.field_path):
+        attempts.append((suffix_ref, "exact_topology_structural_suffix"))
     if "." not in field.field_path:
         attempts.append((f"this.{field.field_path}", "exact_payload_field"))
 
