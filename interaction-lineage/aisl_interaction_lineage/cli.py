@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import shlex
+import sys
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -10,6 +11,7 @@ from .aisl import KnowledgeApiGateway
 from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings
+from .human_csv import write_human_csv
 from .prepare import KnowledgeApiCliImporter, KnowledgeControlPlaneGateway, prepare_interaction_lineage
 
 
@@ -37,6 +39,10 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--transport-role", choices=("request", "response", "all"), default="all")
         command.add_argument("--output", required=True)
 
+    csv_command = sub.add_parser("csv", help="Render human-readable CSV from interaction lineage JSON")
+    csv_command.add_argument("--input", required=True)
+    csv_command.add_argument("--output", required=True)
+
     prepare = sub.add_parser("prepare")
     prepare.add_argument("--topology", required=True)
     prepare.add_argument("--edge-id", required=True)
@@ -48,6 +54,14 @@ def main(argv: list[str] | None = None) -> int:
     prepare.add_argument("--output", required=True)
 
     args = parser.parse_args(argv)
+    if args.command == "csv":
+        try:
+            write_human_csv(_load_object(args.input), args.output)
+            return 0
+        except Exception as exc:
+            print(f"interaction-lineage csv failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
+
     topology = _load_object(args.topology)
     bindings = _bindings(args.bindings)
     roles = ("request", "response") if args.transport_role == "all" else (args.transport_role,)
