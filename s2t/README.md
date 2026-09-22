@@ -164,3 +164,28 @@ The suite includes metamorphic input-order and file/path-rename checks, multiple
 branch preservation, fail-closed primary-source cases, bounded-candidate gap
 classification, ambiguous-unqualified survivor generation, and the exact 26-column
 CSV contract. Production code contains no acceptance-corpus names or paths.
+
+
+## Clean delivery
+
+The reproducible clean-delivery owner is `tools/build-aisl-s2t-delivery.py`, following
+the same project convention as Framework and Repository Inventory deliveries.
+
+The delivery contains only install/runtime artifacts and metadata: one first-party
+`aisl-s2t` wheel, manifest, versions, README and SHA-256 checksums. Source trees,
+tests, build residue and third-party wheels are not included. Any declared third-party
+dependencies are resolved by pip from the configured package index.
+
+From the `s2t/` source directory inside a Git checkout:
+
+```bash
+python tools/build-aisl-s2t-delivery.py . ./delivery-out
+```
+
+For an unpacked/non-Git source tree, pass the exact owning repository identity:
+
+```bash
+python tools/build-aisl-s2t-delivery.py . ./delivery-out \
+  --source-commit <COMMIT> \
+  --source-tree <TREE>
+```
