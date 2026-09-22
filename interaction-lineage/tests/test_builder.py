@@ -321,3 +321,15 @@ def test_observed_child_expansion_lists_only_direct_children_of_exact_anchor_ope
     assert expansion["operation"] == "Mapper.map"
     assert [item["field"] for item in expansion["children"]] == ["name", "surname"]
     assert all(item["query"]["result"]["status"] == "partial" for item in expansion["children"])
+
+
+def test_exact_topology_suffix_refs_keep_structural_context_and_exclude_leaf() -> None:
+    from aisl_interaction_lineage.builder import _exact_topology_suffix_refs
+
+    assert _exact_topology_suffix_refs("clientInfo.identifications.documentType.code") == (
+        "identifications.documentType.code",
+        "documentType.code",
+    )
+    assert _exact_topology_suffix_refs("clientInfo.identifications.documentSeries") == (
+        "identifications.documentSeries",
+    )
