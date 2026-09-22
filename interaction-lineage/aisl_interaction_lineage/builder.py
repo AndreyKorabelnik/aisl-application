@@ -274,6 +274,109 @@ def _resolve_leaf_by_reverse_proof(
     return response, result, selected, "exact_reverse_path_to_topology_field"
 
 
+def _topology_relative_suffix(parent_field_path: str, child_field_path: str) -> str | None:
+    parent = str(parent_field_path or "").strip()
+    child = str(child_field_path or "").strip()
+    if not parent or not child or parent == child or not child.startswith(parent):
+        return None
+    suffix = child[len(parent):]
+    if not (suffix.startswith(".") or suffix.startswith("[]")):
+        return None
+    return suffix
+
+
+def _nearest_resolved_parent(
+    cache: Mapping[tuple[str, str, str], Mapping[str, Any]],
+    *,
+    transport_role: str,
+    repository_id: str,
+    child_field_path: str,
+) -> tuple[str, Mapping[str, Any]] | None:
+    matches: list[tuple[str, Mapping[str, Any]]] = []
+    for (role, repo, parent_path), side in cache.items():
+        if role != transport_role or repo != repository_id:
+            continue
+        if str(side.get("anchor_status") or "") != "resolved":
+            continue
+        if _topology_relative_suffix(parent_path, child_field_path) is None:
+            continue
+        matches.append((parent_path, side))
+    if not matches:
+        return None
+    matches.sort(key=lambda item: (-len(item[0]), item[0]))
+    return matches[0]
+
+
+def _resolve_relative_child_from_parent(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    parent_field_path: str,
+    child_field_path: str,
+    parent_side: Mapping[str, Any],
+    direction: str,
+) -> tuple[Mapping[str, Any], Mapping[str, Any], Mapping[str, Any], str] | None:
+    """Resolve one topology child only under an already exact local composite parent.
+
+    Topology proves the structural parent/child relation. AISL must still publish
+    an exact value node for the local relative path, in the same operation as the
+    resolved parent. This composes existing evidence without same-name search
+    outside that parent, schema-only value-flow, or source fallback.
+    """
+    suffix = _topology_relative_suffix(parent_field_path, child_field_path)
+    anchor = parent_side.get("resolved_anchor")
+    if suffix is None or not isinstance(anchor, Mapping):
+        return None
+    parent_ref = str(anchor.get("display_ref") or "").strip()
+    parent_operation = str(anchor.get("operation") or "").strip()
+    if not parent_ref or not parent_operation:
+        return None
+
+    local_ref = parent_ref + suffix
+    response = gateway.resolve_attribute_paths(
+        binding,
+        source=local_ref,
+        selected_repo_ids=[repository_id],
+        direction=direction,
+    )
+    result = _result(response)
+    selected: Mapping[str, Any] | None = None
+    if str(result.get("status") or "") == "source_ambiguous":
+        matches = [
+            item
+            for item in _candidate_rows(result, repository_id=repository_id)
+            if str(item.get("display_ref") or "").strip() == local_ref
+            and str(item.get("operation") or "").strip() == parent_operation
+        ]
+        if len(matches) != 1:
+            return None
+        selected = matches[0]
+        response, result = _run_selected(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            selected=selected,
+            direction=direction,
+        )
+    else:
+        source = result.get("source")
+        if not isinstance(source, Mapping):
+            return None
+        if str(source.get("display_ref") or "").strip() != local_ref:
+            return None
+        if str(source.get("operation") or "").strip() != parent_operation:
+            return None
+        selected = source
+
+    return (
+        response,
+        result,
+        selected,
+        "exact_topology_relative_child_under_resolved_parent_operation",
+    )
+
+
 def _resolved_side(
     *,
     repository_id: str,
@@ -315,6 +418,8 @@ def _resolve_side(
     payload_identity: str | None,
     source_ref: str,
     direction: str,
+    parent_field_path: str | None = None,
+    parent_side: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     attempted: list[str] = []
     attempts: list[tuple[str, str]] = [(source_ref, "canonical_wire_display_ref")]
@@ -389,6 +494,31 @@ def _resolve_side(
             selected=selected,
             basis=basis,
         )
+
+    if parent_field_path and parent_side is not None:
+        relative = _resolve_relative_child_from_parent(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            parent_field_path=parent_field_path,
+            child_field_path=field.field_path,
+            parent_side=parent_side,
+            direction=direction,
+        )
+        if relative is not None:
+            response, result, selected, basis = relative
+            attempted.append(str(selected.get("display_ref") or ""))
+            return _resolved_side(
+                repository_id=repository_id,
+                binding=binding,
+                direction=direction,
+                requested_anchor=source_ref,
+                attempted_anchors=attempted,
+                response=response,
+                result=result,
+                selected=selected,
+                basis=basis,
+            )
 
     if last is None:
         response: Mapping[str, Any] = {"result": {"status": "source_not_found", "paths": [], "gaps": []}}
@@ -500,6 +630,8 @@ def build_interaction_lineage(
     journeys: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
     used_bindings: dict[str, Any] = {}
+    source_side_cache: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    target_side_cache: dict[tuple[str, str, str], Mapping[str, Any]] = {}
 
     for role in transport_roles:
         for field in boundary_fields(edge, transport_role=role):
@@ -508,6 +640,18 @@ def build_interaction_lineage(
             used_bindings[source_binding.repository_id] = source_binding
             used_bindings[target_binding.repository_id] = target_binding
             source_ref = wire_display_ref(field.transport_role, field.field_path)
+            source_parent = _nearest_resolved_parent(
+                source_side_cache,
+                transport_role=field.transport_role,
+                repository_id=field.source_repository_id,
+                child_field_path=field.field_path,
+            )
+            target_parent = _nearest_resolved_parent(
+                target_side_cache,
+                transport_role=field.transport_role,
+                repository_id=field.target_repository_id,
+                child_field_path=field.field_path,
+            )
 
             source_side = _resolve_side(
                 gateway,
@@ -520,6 +664,8 @@ def build_interaction_lineage(
                 payload_identity=field.source_payload_identity,
                 source_ref=source_ref,
                 direction="reverse",
+                parent_field_path=source_parent[0] if source_parent else None,
+                parent_side=source_parent[1] if source_parent else None,
             )
             target_side = _resolve_side(
                 gateway,
@@ -532,7 +678,11 @@ def build_interaction_lineage(
                 payload_identity=field.target_payload_identity,
                 source_ref=source_ref,
                 direction="forward",
+                parent_field_path=target_parent[0] if target_parent else None,
+                parent_side=target_parent[1] if target_parent else None,
             )
+            source_side_cache[(field.transport_role, field.source_repository_id, field.field_path)] = source_side
+            target_side_cache[(field.transport_role, field.target_repository_id, field.field_path)] = target_side
             child_expansion = _observed_child_expansion(
                 gateway,
                 binding=target_binding,
