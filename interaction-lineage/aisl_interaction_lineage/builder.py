@@ -9,7 +9,9 @@ from .contracts import BindingIndex, OUTPUT_FORMAT
 from .topology import (
     BoundaryField,
     boundary_fields,
+    expected_interface_direction,
     local_payload_binding_symbols,
+    route_boundary_ref,
     select_edge,
     wire_display_ref,
 )
@@ -43,6 +45,40 @@ def _anchor_candidate_by_interface(
 ) -> Mapping[str, Any] | None:
     allowed = set(interface_ids)
     matches = [item for item in _candidate_rows(result, repository_id=repository_id) if str(item.get("owner_ref") or "") in allowed]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _anchor_candidate_by_transport(
+    result: Mapping[str, Any],
+    *,
+    edge: Mapping[str, Any],
+    repository_id: str,
+    transport_role: str,
+) -> Mapping[str, Any] | None:
+    protocol = str(edge.get("protocol") or "").strip().casefold()
+    endpoint = str(edge.get("matched_identity") or "").strip()
+    method = str(edge.get("method") or "").strip().upper()
+    role = str(transport_role or "").strip().casefold()
+    interface_direction = expected_interface_direction(edge, repository_id)
+    if not protocol or not endpoint or role not in {"request", "response"} or interface_direction is None:
+        return None
+
+    matches: list[Mapping[str, Any]] = []
+    for item in _candidate_rows(result, repository_id=repository_id):
+        transport = item.get("transport")
+        if not isinstance(transport, Mapping):
+            continue
+        if str(transport.get("protocol") or "").strip().casefold() != protocol:
+            continue
+        if str(transport.get("endpoint") or "").strip() != endpoint:
+            continue
+        if str(transport.get("payload_role") or "").strip().casefold() != role:
+            continue
+        if str(transport.get("interface_direction") or "").strip().casefold() != interface_direction:
+            continue
+        if protocol == "http" and method and str(transport.get("http_method") or "").strip().upper() != method:
+            continue
+        matches.append(item)
     return matches[0] if len(matches) == 1 else None
 
 
@@ -135,6 +171,8 @@ def _attempt_ref(
     gateway: AislPathGateway,
     *,
     binding,
+    edge: Mapping[str, Any],
+    transport_role: str,
     repository_id: str,
     interface_ids: Sequence[str],
     payload_identity: str | None,
@@ -154,6 +192,14 @@ def _attempt_ref(
 
     selected = _anchor_candidate_by_interface(result, repository_id=repository_id, interface_ids=interface_ids)
     basis = "exact_topology_interface_id"
+    if selected is None:
+        selected = _anchor_candidate_by_transport(
+            result,
+            edge=edge,
+            repository_id=repository_id,
+            transport_role=transport_role,
+        )
+        basis = "exact_topology_transport_identity"
     if selected is None:
         selected = _anchor_candidate_by_payload_owner(
             result,
@@ -272,6 +318,9 @@ def _resolve_side(
 ) -> dict[str, Any]:
     attempted: list[str] = []
     attempts: list[tuple[str, str]] = [(source_ref, "canonical_wire_display_ref")]
+    route_ref = route_boundary_ref(edge, field.transport_role, field.field_path)
+    if route_ref:
+        attempts.append((route_ref, "exact_topology_route_boundary"))
 
     for symbol in local_payload_binding_symbols(
         edge,
@@ -294,6 +343,8 @@ def _resolve_side(
         response, result, selected, basis = _attempt_ref(
             gateway,
             binding=binding,
+            edge=edge,
+            transport_role=field.transport_role,
             repository_id=repository_id,
             interface_ids=interface_ids,
             payload_identity=payload_identity,
