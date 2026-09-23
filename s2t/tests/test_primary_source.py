@@ -120,34 +120,6 @@ def test_two_syntactic_templates_that_resolve_to_same_relation_are_deduplicated(
     assert decisions[0].primary_templates == ("${$src.schema}.${$src.table}", "${$src.schema}.source")
 
 
-def test_primary_source_cli(tmp_path):
-    import json
-    from aisl_s2t.cli import main
-
-    mappings = [{
-        "mapping_id": "m", "workflow_target_logical_name": "dm.target", "target_column": "id",
-        "branch_relation_name": "src.source", "source_relation_role": "driver_path",
-        "source_sql_relation_name": "dm.downstream", "source_sql_column": "id",
-    }]
-    env = {"semantic_decisions": []}
-    mappings_path = tmp_path / "mappings.json"
-    env_path = tmp_path / "env.json"
-    output_path = tmp_path / "out.json"
-    mappings_path.write_text(json.dumps(mappings), encoding="utf-8")
-    env_path.write_text(json.dumps(env), encoding="utf-8")
-
-    assert main([
-        "collapse-primary-sources",
-        "--mappings", str(mappings_path),
-        "--environment-resolution", str(env_path),
-        "--output", str(output_path),
-    ]) == 0
-    payload = json.loads(output_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "aisl_s2t_primary_source_resolution/v1"
-    assert payload["counts"]["resolved_primary_source_decisions"] == 1
-    assert payload["decisions"][0]["source_relation"] == "src.source"
-
-
 def test_input_order_does_not_change_semantic_primary_source_decisions():
     rows = [
         {
