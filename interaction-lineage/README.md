@@ -113,22 +113,24 @@ interaction attribute journey and is rendered in actual data-flow direction. The
 are:
 
 ```text
+interaction
 role
-start_attribute
-source_repository
-source_origin
-source_transformation
+producer_repository
+producer_attribute
 crossing_attribute
-transport
-target_repository
-target_transformation
-target_destination
+consumer_repository
+consumer_attribute
 gap
 full_attribute_path
 ```
 
-`crossing_attribute` is the exact topology transport field. `start_attribute`,
-transformations, destinations and gaps are projected only from the already-published
-journey evidence. Technical anchor-selection and crossing-basis fields stay in the JSON
-and are intentionally omitted from the human CSV.
+`producer_attribute` is the normalized local origin before the transport crossing when
+one is mechanically resolved. `crossing_attribute` is the exact topology transport
+field. `consumer_attribute` is the first mechanically resolved local attribute after the
+crossing, not the final downstream destination. An unresolved producer/consumer anchor
+is left empty and described in `gap`. Human `gap` values are rendered in Russian while
+`full_attribute_path` intentionally keeps the original machine gap code for audit and
+cross-reference with the canonical JSON. Detailed operations, transformations, branch
+provenance and anchor-selection evidence remain in the JSON and are intentionally not
+duplicated as separate human CSV columns.
 

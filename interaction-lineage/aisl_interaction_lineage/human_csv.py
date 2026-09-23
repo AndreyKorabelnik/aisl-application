@@ -6,19 +6,23 @@ from typing import Any, Iterable, Mapping, Sequence
 
 LINEAGE_FORMAT = "interaction-attribute-lineage/v1"
 HUMAN_CSV_COLUMNS = (
+    "interaction",
     "role",
-    "start_attribute",
-    "source_repository",
-    "source_origin",
-    "source_transformation",
+    "producer_repository",
+    "producer_attribute",
     "crossing_attribute",
-    "transport",
-    "target_repository",
-    "target_transformation",
-    "target_destination",
+    "consumer_repository",
+    "consumer_attribute",
     "gap",
     "full_attribute_path",
 )
+
+_GAP_LABELS_RU = {
+    "source_local_anchor_unresolved": "не удалось определить источник атрибута внутри producer",
+    "target_local_anchor_unresolved": "не удалось определить дальнейшее использование атрибута в consumer",
+    "payload_identity_not_exactly_compatible": "не удалось доказать точное соответствие transport payload",
+    "OBSERVED_TERMINAL_NO_USE": "дальнейшее использование атрибута не наблюдается",
+}
 
 
 def _mapping(value: Any) -> Mapping[str, Any]:
@@ -31,10 +35,6 @@ def _sequence(value: Any) -> Sequence[Any]:
 
 def _display_ref(node: Any) -> str:
     return str(_mapping(node).get("display_ref") or "").strip()
-
-
-def _operation(node: Any) -> str:
-    return str(_mapping(node).get("operation") or "").strip()
 
 
 def _transformation(step: Any) -> str:
@@ -64,27 +64,61 @@ def _paths(side: Any) -> list[Mapping[str, Any]]:
     return [item for item in _sequence(_result(side).get("paths")) if isinstance(item, Mapping)]
 
 
-def _source_projection(side: Any) -> tuple[str, str, str]:
+def _source_projection(side: Any) -> tuple[str, str]:
     """Project reverse AISL paths into actual data-flow direction: local origin -> boundary."""
     paths = _paths(side)
     if not paths:
         anchor = _mapping(_mapping(side).get("resolved_anchor"))
-        return _display_ref(anchor), _operation(anchor), ""
+        return _display_ref(anchor), ""
 
     starts: list[str] = []
-    origins: list[str] = []
     transformations: list[str] = []
     for path in paths:
         origin = _mapping(path.get("end"))
         starts.append(_display_ref(origin))
-        origins.append(_operation(origin) or _display_ref(origin))
         steps = [item for item in _sequence(path.get("steps")) if isinstance(item, Mapping)]
         transformations.extend(_transformation(step) for step in reversed(steps))
     return (
         _join_unique(starts, separator=" | OR | "),
-        _join_unique(origins, separator=" | OR | "),
         _join_unique(transformations, separator=" -> "),
     )
+
+
+def _producer_attribute(side: Any, start_attribute: str, crossing_attribute: str) -> str:
+    if str(_mapping(side).get("anchor_status") or "") != "resolved":
+        return ""
+    starts = [_display_ref(_mapping(path.get("end"))) for path in _paths(side)]
+    unique = _join_unique(starts, separator=" | OR | ")
+    if unique and " | OR | " not in unique:
+        return unique
+    if unique:
+        return crossing_attribute
+    return start_attribute or crossing_attribute
+
+
+def _consumer_attribute(side: Any) -> str:
+    """Return the first mechanically proven local attribute after the crossing."""
+    if str(_mapping(side).get("anchor_status") or "") != "resolved":
+        return ""
+    anchor = _display_ref(_mapping(_mapping(side).get("resolved_anchor")))
+    if anchor:
+        return anchor
+    starts = [_display_ref(_mapping(path.get("start"))) for path in _paths(side)]
+    unique = _join_unique(starts, separator=" | OR | ")
+    return unique if " | OR | " not in unique else ""
+
+
+def _human_gap(reasons: Iterable[str]) -> str:
+    translated: list[str] = []
+    for reason in reasons:
+        value = str(reason or "").strip()
+        if not value:
+            continue
+        try:
+            translated.append(_GAP_LABELS_RU[value])
+        except KeyError as exc:
+            raise ValueError(f"Russian human CSV label is not defined for gap reason: {value}") from exc
+    return _join_unique(translated, separator="; ")
 
 
 def _target_projection(side: Any) -> tuple[str, str]:
@@ -149,15 +183,18 @@ def human_rows(lineage: Mapping[str, Any]) -> list[dict[str, str]]:
         source_side = _mapping(journey.get("source_side"))
         target_side = _mapping(journey.get("target_side"))
 
-        start_attribute, source_origin, source_transformation = _source_projection(source_side)
+        start_attribute, source_transformation = _source_projection(source_side)
         target_transformation, target_destination = _target_projection(target_side)
+        producer_attribute = _producer_attribute(source_side, start_attribute, crossing_attribute)
+        consumer_attribute = _consumer_attribute(target_side)
 
         reasons = [
             *gaps.get((role, crossing_attribute, source_repository, "source"), []),
             *gaps.get((role, crossing_attribute, target_repository, "target"), []),
             *gaps.get((role, crossing_attribute, source_repository, "crossing"), []),
         ]
-        gap = _join_unique(reasons)
+        machine_gap = _join_unique(reasons)
+        gap = _human_gap(reasons)
 
         source_path = start_attribute or "[unresolved source]"
         if source_transformation:
@@ -178,20 +215,17 @@ def human_rows(lineage: Mapping[str, Any]) -> list[dict[str, str]]:
             f"== {transport} / {role} ==> "
             f"{target_repository}: {target_path}"
         )
-        if gap:
-            full_path += f" [GAP: {gap}]"
+        if machine_gap:
+            full_path += f" [GAP: {machine_gap}]"
 
         rows.append({
+            "interaction": transport,
             "role": role,
-            "start_attribute": start_attribute,
-            "source_repository": source_repository,
-            "source_origin": source_origin,
-            "source_transformation": source_transformation,
+            "producer_repository": source_repository,
+            "producer_attribute": producer_attribute,
             "crossing_attribute": crossing_attribute,
-            "transport": transport,
-            "target_repository": target_repository,
-            "target_transformation": target_transformation,
-            "target_destination": target_destination,
+            "consumer_repository": target_repository,
+            "consumer_attribute": consumer_attribute,
             "gap": gap,
             "full_attribute_path": full_path,
         })
