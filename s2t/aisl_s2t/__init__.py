@@ -10,6 +10,7 @@ from .environment import (
     resolve_environment_gap,
 )
 
+
 __all__ = [
     "BuildResult",
     "RowAudit",
@@ -27,4 +28,5 @@ __all__ = [
     "collapse_primary_sources",
 ]
 
-__version__ = "0.1.0a5"
+
+__version__ = "0.1.0a6"

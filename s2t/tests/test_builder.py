@@ -1,6 +1,5 @@
 import csv
 import io
-import json
 
 from aisl_s2t.builder import S2T_COLUMNS, build_deterministic_s2t, render_s2t_csv
 from aisl_s2t.gaps import (
@@ -203,32 +202,6 @@ def test_csv_contract_has_header_description_row_and_real_embedded_newline():
     assert parsed[0] == list(S2T_COLUMNS)
     assert len(parsed[0]) == len(parsed[1]) == len(parsed[2]) == 26
     assert "\n*рекомендовано" in parsed[1][_idx("T-trg-f")]
-
-
-def test_build_cli_writes_csv_and_typed_gap_audit(tmp_path):
-    from aisl_s2t.cli import main
-
-    mappings_path = tmp_path / "mappings.json"
-    gaps_path = tmp_path / "gaps.json"
-    csv_path = tmp_path / "s2t.csv"
-    audit_path = tmp_path / "audit.json"
-    mappings_path.write_text(json.dumps([_driver()]), encoding="utf-8")
-    gaps_path.write_text(json.dumps([]), encoding="utf-8")
-    assert main([
-        "build-deterministic",
-        "--mappings", str(mappings_path),
-        "--mapping-gaps", str(gaps_path),
-        "--system-id", "system-x",
-        "--revision-id", "revision-y",
-        "--csv-output", str(csv_path),
-        "--audit-output", str(audit_path),
-    ]) == 0
-    audit = json.loads(audit_path.read_text(encoding="utf-8"))
-    assert audit["schema_version"] == "aisl_s2t_deterministic_audit/v1"
-    assert audit["system_id"] == "system-x"
-    assert audit["revision_id"] == "revision-y"
-    assert audit["counts"]["deterministic_rows"] == 1
-    assert csv_path.read_text(encoding="utf-8").startswith("T-trg-platform,")
 
 
 def _ambiguous_usage_context(usage_id="usage-1", *, relations=None):

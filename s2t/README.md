@@ -1,158 +1,115 @@
-# aisl-s2t 0.1.0a5
+# aisl-s2t 0.1.0a6
 
-Consumer-owned deterministic S2T application over pinned public AISL evidence.
+Consumer-owned deterministic S2T application over one exact immutable AISL revision.
 
 `aisl-s2t` lives in the separate `aisl-application` repository. It is not part of
-AISL Core/KLC and must not write consumer policy back into AISL knowledge.
-
-Current bounded scope: deterministic environment selection, primary/upstream source
-collapse, canonical 26-column deterministic row assembly, and typed residual-gap
-classification. LLM question generation/ranking is deliberately not part of this
-version.
+AISL Core/KLC and does not write consumer policy back into AISL knowledge.
 
 ## Boundary
 
 ```text
-AISL / Knowledge API / public artifacts
-             ↓
-        aisl-sdk / export
-             ↓
-           aisl-s2t
-             ↓
- deterministic S2T + typed gaps
+repository
+   ↓
+knowledge-control-plane
+   --knowledge-profile sql-source-inventory-v1
+   ↓
+AISL publication bundle
+   ↓
+aisl-server / Knowledge API
+   ↓
+(system_id, revision_id)
+   ↓
+aisl-sdk + sql-analysis/v1
+   ↓
+aisl-s2t
+   ↓
+S2T.csv + deterministic audit
 ```
 
 The application does not import Core, Runner or KLC, does not read AISL storage,
-and does not read repository source.
+and does not read repository source. The public Python `aisl-sdk` is the only AISL
+transport/integration dependency.
 
-## Environment policy v1
+## Product CLI
 
-Environment choice is a deterministic S2T policy, not an AISL fact.
-
-1. Explicit caller/input environment wins.
-2. Otherwise `default_environment = production`.
-3. Environment roles map to exact observed environment-scope identities supplied
-   by caller/configuration/evidence.
-4. Production is never inferred from schema names, cluster names, array order,
-   `prod/prom` substrings or repository-specific naming conventions.
-5. A placeholder resolves only when the selected environment yields exactly one
-   mechanically observed candidate value.
-6. An exact placeholder-valued candidate may be composed through one already-published
-   environment binding in the selected scope (for example `outer -> ${inner} -> value`).
-   Arbitrary template/expression evaluation is not performed.
-7. One concrete literal candidate is deterministic without environment selection.
-8. Multiple matching values or no matching value remain unresolved.
-9. PA/deployment/non-production is selected only by explicit context.
-10. Every decision retains resolution basis for audit.
-
-CLI:
+The caller supplies only the system, exact revision and output CSV path:
 
 ```bash
-aisl-s2t resolve-environment \
-  --gaps gaps.json \
-  --environment-observations environment-observations.json \
-  --policy environment-policy.json \
-  --output environment-resolution.json
-```
-
-Use `--environment <role>` for an explicit override. Without it,
-`default_environment` is used and defaults to `production`.
-
-The output contains per-diagnostic decisions plus semantically deduplicated source
-decisions. Several workflow contexts may describe the same source decision; a
-resolved identity is accepted only when all resolved contexts agree. Conflicting
-resolved identities remain ambiguous.
-
-## Primary/upstream source policy v1
-
-Current `sql-target-source-mapping/v2` distinguishes observed branch structure
-(`branch_relation_name`) from the derived terminal driver relation
-(`driver_relation_name`). S2T uses the producer-established driver as the primary
-source. No file/path keywords are interpreted.
-
-Rules:
-
-1. A `resolved` current `driver_relation_name` is the primary source identity.
-2. A `partial` driver relation is preserved literally when only an environment/
-   placeholder dimension remains unresolved; the row retains an
-   `UNRESOLVED_PLACEHOLDER` gap rather than losing the observed source table/field.
-3. An `ambiguous` or `unresolved` current driver is never replaced by
-   `branch_relation_name`.
-4. Legacy serialized inputs that predate explicit driver status may still use
-   `branch_relation_name` as the mechanically published primary identity.
-5. Different producer-established driver identities remain separate S2T value-source rows.
-6. Syntactically different templates that deterministically resolve to the same exact
-   relation are deduplicated.
-7. Non-primary roles such as lookup contributions are not folded into driver sources.
-
-CLI:
-
-```bash
-aisl-s2t collapse-primary-sources \
-  --mappings sql-target-source-mapping.json \
-  --environment-resolution environment-resolution.json \
-  --output primary-sources.json
-```
-
-## Deterministic builder + typed gaps v1
-
-The builder consumes serialized **public AISL evidence only**. It does not discover
-candidate sources from source code and does not rank ambiguous producers.
-
-```bash
-aisl-s2t build-deterministic \
-  --mappings sql-target-source-mapping.json \
-  --mapping-gaps sql-target-source-mapping-gaps.json \
-  --environment-resolution environment-resolution.json \
-  --target-fields explicit-target-fields.json \
-  --column-usage-contexts column-usage-contexts.json \
+aisl-s2t build \
   --system-id <system-id> \
   --revision-id <revision-id> \
-  --csv-output deterministic-s2t.csv \
-  --audit-output deterministic-s2t.audit.json
+  --output s2t.csv
 ```
 
-`--mapping-gaps`, `--environment-resolution`, `--target-fields`, and
-`--column-usage-contexts` are optional. Target fields may come from explicit caller
-scope or separately accepted public target evidence; the builder does not select
-targets by naming convention. Column-usage contexts are raw public
-`get_sql_column_usage_context` responses keyed by their published usage IDs.
+The audit sidecar is written automatically next to the CSV as `s2t.audit.json`.
+There are no public `--mappings`, `--mapping-gaps`, `--target-fields`,
+`--environment-resolution` or `--column-usage-contexts` inputs. Those facts belong
+to the published AISL revision, not to the S2T caller.
 
-Output rules:
+Infrastructure settings are environment variables rather than business arguments:
 
-1. CSV uses the existing `report/s2t/v1` 26-column contract exactly.
-2. Every resolved primary branch becomes its own row. Multiple real value branches
-   remain separate.
-3. Lookup/enrichment never replaces a proven primary source. Lookup-only evidence
-   leaves `T-src*` blank and is retained as `CONSUMER_CONVENTION` in the audit sidecar.
-4. `driver_candidate`/`unknown` are never promoted to primary sources.
-5. An unresolved upstream template is never replaced by a concrete downstream terminal.
-6. `T-src-f-name` is filled only when the source field identity is explicitly present
-   in public mapping evidence; matching target/source names are not assumed.
-7. `T-src-f` accepts only explicitly linked, resolved, non-direct target expressions.
-   Raw SQL text is not reinterpreted by this application.
-8. Exact visible 26-column duplicates are removed; provenance is merged in the audit
-   sidecar.
-9. Observed target fields with unresolved source identity remain as truthful
-   target-only CSV rows.
-10. For an `ambiguous_unqualified` SQL usage, the optional public column-usage
-    context may shrink the candidate set only by negative evidence: a relation is
-    excluded when its output contract is `complete` and the referenced column is
-    absent. Partial/unknown contracts survive. The consumer never selects a survivor
-    and never promotes a single survivor to `T-src` unless AISL itself publishes that
-    resolved source.
+```bash
+export AISL_BASE_URL=http://127.0.0.1:8080
+export AISL_TIMEOUT_SECONDS=30
+```
 
-Typed residual categories currently emitted by the deterministic classifier use the
-Task-23 taxonomy, including `UNRESOLVED_PLACEHOLDER`, `ENVIRONMENT_AMBIGUITY`,
-`BOUNDED_PRODUCER_AMBIGUITY`, `CONSUMER_CONVENTION`, and
-`INSUFFICIENT_EVIDENCE`. A bounded ambiguity is classified only from candidate
-identities already published by AISL or from a deterministic survivor set over public
-`get_sql_column_usage_context` facts using the complete-output-contract negative rule
-above. Classification does **not** mean LLM eligibility and no candidate is ranked or
-selected here.
+## Required AISL revision
 
-The audit sidecar retains deterministic row provenance, mapping IDs, primary
-relation templates, source public gap IDs, bounded candidate IDs, and gap counts.
+A revision intended for S2T is normally produced with:
+
+```bash
+knowledge-control-plane run \
+  --knowledge-profile sql-source-inventory-v1 \
+  --repository /path/to/repository \
+  --system-id <system-id>
+```
+
+The S2T application pins the exact `(system_id, revision_id)`, loads the canonical
+`sql-analysis/v1` Integration Profile and requires these published capabilities:
+
+- `common.sql-target-resolution`;
+- `common.sql-target-value-source-mapping`.
+
+If either capability is missing, the build fails closed instead of silently creating
+a reduced or guessed S2T.
+
+## Revision-backed deterministic flow
+
+1. `find_sql_target_candidates` is paged completely. `rank` is never treated as
+   confidence or finality. Explicit intermediate and disabled targets are excluded;
+   eligible observed workflow/published targets are deduplicated by published identity.
+2. For every eligible target, `list_sql_target_value_sources` is read in bounded
+   target-column pages. Every `sources[]` endpoint is preserved independently.
+3. A physical target relation is used only when AISL reports
+   `target_relation_recommendation_status=confirmed_unique`; otherwise the observed
+   logical workflow target identity is preserved without guessing a physical schema.
+4. Only `source_relation_role=driver_path` can populate primary `T-src*` fields.
+   Enrichment, driver candidates and unknown roles never replace a missing primary
+   source.
+5. `target_expression_refs` are resolved only against the page's published
+   `target_expressions`. Resolved non-direct expressions may populate `T-src-f`;
+   expression refs are never interpreted as confidence or ranking.
+6. `sources=[]` and unresolved source evidence retain a truthful target-only row.
+7. Exact visible 26-column duplicates are removed deterministically; distinct source
+   endpoints remain distinct rows.
+8. Public gaps are retained in the audit sidecar. Truncated gap pages are reported in
+   retrieval audit metadata rather than guessed or reconstructed from source.
+
+## Output
+
+CSV uses the canonical `report/s2t/v1` 26-column contract exactly. The second record
+contains the canonical column descriptions. Values not supported by public AISL
+evidence remain empty.
+
+The audit sidecar contains:
+
+- exact `system_id` and `revision_id`;
+- deterministic row provenance and typed residual gaps;
+- mapping IDs used for visible rows;
+- Integration Profile id and required capabilities;
+- target discovery/page counts;
+- skipped intermediate/disabled target counts;
+- per-target retrieval counts and gap truncation indicators.
 
 ## Tests
 
@@ -160,7 +117,7 @@ relation templates, source public gap IDs, bounded candidate IDs, and gap counts
 python -m pytest tests -q
 ```
 
-The suite includes metamorphic input-order and file/path-rename checks, multiple
-branch preservation, fail-closed primary-source cases, bounded-candidate gap
-classification, ambiguous-unqualified survivor generation, and the exact 26-column
-CSV contract. Production code contains no acceptance-corpus names or paths.
+Revision adapter tests cover exact revision pinning, capability gating, target
+selection without rank-based winner choice, multiple real source endpoints,
+expression references, target-only gaps and fail-closed malformed public contracts.
+Production code contains no acceptance-corpus names or paths.
