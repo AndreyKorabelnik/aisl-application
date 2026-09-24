@@ -350,3 +350,68 @@ def test_builder_preserves_partial_driver_template_and_typed_gap():
     assert row[_idx("T-src")] == "real"
     assert row[_idx("T-src-f-name")] == "id"
     assert any(gap.gap_type == UNRESOLVED_PLACEHOLDER for gap in result.gaps)
+
+
+def test_resolved_environment_closes_primary_and_public_placeholder_gaps():
+    template = "${$app.schema || '.source'}"
+    mappings = [{
+        "mapping_id": "m-env",
+        "workflow_target_logical_name": "mart.target",
+        "target_column": "id",
+        "branch_relation_name": template,
+        "driver_relation_name": template,
+        "driver_relation_status": "partial",
+        "source_relation_role": "driver_path",
+        "source_sql_relation_name": template,
+        "source_sql_column": "id",
+    }]
+    public_gaps = [{
+        "gap_id": "g-env",
+        "workflow_target_logical_name": "mart.target",
+        "target_column": "id",
+        "gap_kind": "source_relation_placeholder_unresolved",
+        "mapping_basis": "observed_workflow_placeholder_binding_resolution",
+        "evidence": {
+            "source_relation_name": template,
+            "source_column": "id",
+            "placeholder_resolution": [{
+                "placeholder": "app.schema",
+                "candidate_values": ["uat_schema", "prod_schema"],
+            }],
+        },
+    }]
+    environment = [{
+        "semantic_key": ["mart.target", "id", template, "id"],
+        "status": "resolved",
+        "resolved_source_relation": "prod_schema.source",
+    }]
+    result = build_deterministic_s2t(
+        mappings,
+        mapping_gaps=public_gaps,
+        environment_resolutions=environment,
+    )
+    row = result.rows[0]
+    assert row[_idx("T-src-schema")] == "prod_schema"
+    assert row[_idx("T-src")] == "source"
+    assert not any(gap.gap_type == UNRESOLVED_PLACEHOLDER for gap in result.gaps)
+
+
+def test_unresolved_environment_keeps_public_placeholder_gap():
+    template = "${$app.schema || '.source'}"
+    public_gaps = [{
+        "gap_id": "g-env",
+        "workflow_target_logical_name": "mart.target",
+        "target_column": "id",
+        "gap_kind": "source_relation_placeholder_unresolved",
+        "mapping_basis": "observed_workflow_placeholder_binding_resolution",
+        "evidence": {
+            "source_relation_name": template,
+            "source_column": "id",
+            "placeholder_resolution": [{
+                "placeholder": "app.schema",
+                "candidate_values": ["uat_schema", "prod_schema"],
+            }],
+        },
+    }]
+    result = build_deterministic_s2t([], mapping_gaps=public_gaps)
+    assert any(gap.gap_type == UNRESOLVED_PLACEHOLDER for gap in result.gaps)

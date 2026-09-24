@@ -252,3 +252,44 @@ def test_non_exact_nested_template_is_not_evaluated():
     )
     assert decision.status == "unresolved"
     assert decision.value is None
+
+
+def test_literal_suffix_relation_template_resolves_in_default_production_environment():
+    gap = {
+        "gap_id": "g-literal-suffix",
+        "workflow_context_file": "workflow.yml",
+        "workflow_target_logical_name": "dm.target",
+        "target_column": "id",
+        "evidence": {
+            "source_relation_name": "${$app.schema || '.source'}",
+            "source_column": "id",
+            "placeholder_resolution": [{
+                "placeholder": "app.schema",
+                "candidate_values": ["uat_schema", "prod_schema"],
+            }],
+        },
+    }
+    decision = resolve_environment_gap(gap, index=_index(), policy=_policy())
+    assert decision.status == "resolved"
+    assert decision.resolved_source_relation == "prod_schema.source"
+    assert decision.placeholder_decisions[0].basis == "default_environment:production"
+
+
+def test_literal_suffix_template_with_extra_expression_stays_unresolved():
+    gap = {
+        "gap_id": "g-unsupported-expression",
+        "workflow_context_file": "workflow.yml",
+        "workflow_target_logical_name": "dm.target",
+        "target_column": "id",
+        "evidence": {
+            "source_relation_name": "${$app.schema || '.source' || '.extra'}",
+            "source_column": "id",
+            "placeholder_resolution": [{
+                "placeholder": "app.schema",
+                "candidate_values": ["uat_schema", "prod_schema"],
+            }],
+        },
+    }
+    decision = resolve_environment_gap(gap, index=_index(), policy=_policy())
+    assert decision.status == "unresolved"
+    assert decision.resolved_source_relation is None

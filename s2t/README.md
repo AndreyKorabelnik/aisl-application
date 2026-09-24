@@ -1,4 +1,4 @@
-# aisl-s2t 0.1.0a6
+# aisl-s2t 0.1.0a8
 
 Consumer-owned deterministic S2T application over one exact immutable AISL revision.
 
@@ -32,7 +32,7 @@ transport/integration dependency.
 
 ## Product CLI
 
-The caller supplies only the system, exact revision and output CSV path:
+The base call supplies only the system, exact revision and output CSV path:
 
 ```bash
 aisl-s2t build \
@@ -41,7 +41,32 @@ aisl-s2t build \
   --output s2t.csv
 ```
 
-The audit sidecar is written automatically next to the CSV as `s2t.audit.json`.
+When published source identities contain environment-dependent placeholders, the
+consumer may additionally supply its environment policy and observed placeholder
+values:
+
+```bash
+aisl-s2t build \
+  --system-id <system-id> \
+  --revision-id <revision-id> \
+  --environment-policy environment-policy.json \
+  --environment-observations environment-observations.json \
+  --output s2t.csv
+```
+
+The policy maps semantic environment roles to opaque observed scope identities. If
+`--environment` is not supplied, `default_environment` is used; its default is
+`production`. The consumer never infers production from schema names, stand order,
+repository paths or source text. Policy and observations must be supplied together;
+incomplete configuration fails closed.
+
+Environment resolution supports exact placeholder replacement and the bounded
+composition `${$placeholder || '.literal_suffix'}`. It does not evaluate arbitrary
+template expressions. Resolved source-relation placeholder gaps are removed only
+when the exact target/column/template/source-column semantic key is resolved.
+
+The audit sidecar is written automatically next to the CSV as `s2t.audit.json` and
+records the selected environment/scopes when environment resolution is enabled.
 There are no public `--mappings`, `--mapping-gaps`, `--target-fields`,
 `--environment-resolution` or `--column-usage-contexts` inputs. Those facts belong
 to the published AISL revision, not to the S2T caller.

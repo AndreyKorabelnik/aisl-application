@@ -261,6 +261,7 @@ def classify_public_mapping_gaps(
     *,
     mapping_rows: Iterable[Mapping[str, Any]] = (),
     column_usage_contexts: Iterable[Mapping[str, Any]] = (),
+    environment_semantic_decisions: Iterable[Mapping[str, Any]] = (),
     max_bounded_candidates: int = 5,
 ) -> list[TypedGap]:
     """Classify public AISL mapping gaps without generating or ranking candidates.
@@ -281,6 +282,17 @@ def classify_public_mapping_gaps(
                 mappings_by_id[identity] = row
 
     usage_context_by_id = _column_usage_context_index(column_usage_contexts)
+    resolved_environment_keys: set[tuple[str, str, str, str]] = set()
+    for item in environment_semantic_decisions:
+        key = item.get("semantic_key") or ()
+        if (
+            isinstance(key, Sequence)
+            and not isinstance(key, (str, bytes))
+            and len(key) == 4
+            and _text(item.get("status")) == "resolved"
+            and _text(item.get("resolved_source_relation"))
+        ):
+            resolved_environment_keys.add(tuple(_text(value) for value in key))
 
     typed: list[TypedGap] = []
     for row in mapping_gaps:
@@ -311,6 +323,15 @@ def classify_public_mapping_gaps(
             }))
 
         serialized = json.dumps(evidence, ensure_ascii=False, sort_keys=True)
+        if gap_kind == "source_relation_placeholder_unresolved":
+            environment_key = (
+                target_relation,
+                target_column,
+                _text(evidence.get("source_relation_name")),
+                _text(evidence.get("source_column")),
+            )
+            if all(environment_key) and environment_key in resolved_environment_keys:
+                continue
         if "placeholder" in gap_kind.casefold() or _contains_placeholder(serialized):
             gap_type = UNRESOLVED_PLACEHOLDER
             typed_basis = basis or "public_gap_contains_unresolved_placeholder_evidence"
