@@ -377,6 +377,7 @@ def build_deterministic_s2t(
         mapping_gaps,
         mapping_rows=mapping_rows,
         column_usage_contexts=column_usage_contexts,
+        environment_semantic_decisions=environment_resolutions,
     )
     primary_gaps = classify_primary_source_residuals(
         primary,
