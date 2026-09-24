@@ -276,8 +276,40 @@ def resolve_placeholder(
     )
 
 
+def _exact_placeholder_literal_suffix(value: Any) -> tuple[str, str] | None:
+    """Parse one exact placeholder-plus-literal-suffix expression.
+
+    Supported shape: `${$placeholder || '.literal_suffix'}`. This composes
+    consumer-selected environment evidence with one literal suffix only; arbitrary
+    template expressions remain unresolved.
+    """
+    text = str(value or "").strip()
+    if not (text.startswith("${") and text.endswith("}")):
+        return None
+    inner = text[2:-1].strip()
+    if inner.count("||") != 1:
+        return None
+    left, right = (part.strip() for part in inner.split("||", 1))
+    if not left.startswith("$"):
+        return None
+    placeholder = left[1:].strip()
+    if not placeholder or any(marker in placeholder for marker in ("${", "{{", "}", "|")):
+        return None
+    if len(right) < 2 or right[0] not in ("'", '"') or right[-1] != right[0]:
+        return None
+    suffix = right[1:-1]
+    if any(marker in suffix for marker in ("${", "{{", "}")):
+        return None
+    return placeholder, suffix
+
+
 def _substitute_relation_template(template: str, bindings: Mapping[str, str]) -> str:
     result = str(template or "")
+    whole = _exact_placeholder_literal_suffix(result)
+    if whole is not None:
+        placeholder, suffix = whole
+        value = bindings.get(placeholder)
+        return f"{value}{suffix}" if value is not None else result
     for placeholder, value in sorted(bindings.items()):
         result = result.replace("${$" + placeholder + "}", value)
     return result
