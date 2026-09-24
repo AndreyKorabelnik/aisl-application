@@ -476,6 +476,18 @@ def collect_revision_inputs(client: Any, *, system_id: str, revision_id: str) ->
         if all(key):
             fields_by_key.setdefault(key, field)
 
+    if (
+        int(target_stats.get("eligible_targets") or 0) > 0
+        and not mappings_by_id
+        and not gaps_by_key
+        and not fields_by_key
+    ):
+        raise RevisionSourceError(
+            f"AISL revision {system_id}/{revision_id} discovered "
+            f"{target_stats['eligible_targets']} eligible SQL targets, but public "
+            "target-value-source evidence contains 0 target fields, 0 mappings and 0 gaps"
+        )
+
     retrieval = {
         "schema_version": "aisl_s2t_revision_retrieval/v1",
         "system_id": system_id,
