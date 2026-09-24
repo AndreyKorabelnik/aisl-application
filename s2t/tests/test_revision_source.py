@@ -190,6 +190,22 @@ def test_revision_inputs_preserve_multiple_sources_expression_and_gap_only_targe
     assert missing[0][idx["T-src"]] == ""
 
 
+def test_eligible_targets_with_no_fields_mappings_or_gaps_fail_closed():
+    candidates = [_candidate("target", physical="mart.target")]
+    pages = {
+        ("target", 0): _page("target", 0, 0, []),
+    }
+    with pytest.raises(
+        RevisionSourceError,
+        match=r"eligible_targets=1, target_fields=0, mapping_rows=0, mapping_gaps=0",
+    ):
+        collect_revision_inputs(
+            _Client(_Pinned(_Integration(candidates, pages))),
+            system_id="system-x",
+            revision_id="revision-y",
+        )
+
+
 def test_missing_required_capability_fails_closed():
     integration = _Integration([], {})
     client = _Client(_Pinned(integration, capabilities={"common.sql-target-resolution"}))
