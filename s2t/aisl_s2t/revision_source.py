@@ -490,6 +490,17 @@ def collect_revision_inputs(client: Any, *, system_id: str, revision_id: str) ->
         "targets": target_details,
         "any_gap_page_truncated": any(bool(item.get("gaps_truncated")) for item in target_details),
     }
+    if (
+        int(target_stats.get("eligible_targets") or 0) > 0
+        and not mappings_by_id
+        and not gaps_by_key
+        and not fields_by_key
+    ):
+        raise RevisionSourceError(
+            "AISL revision exposed eligible S2T targets but target-value-source knowledge is empty: "
+            f"eligible_targets={target_stats['eligible_targets']}, "
+            "target_fields=0, mapping_rows=0, mapping_gaps=0"
+        )
     return RevisionBuildInputs(
         mapping_rows=tuple(mappings_by_id[key] for key in sorted(mappings_by_id)),
         mapping_gaps=tuple(
