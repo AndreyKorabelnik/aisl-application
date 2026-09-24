@@ -476,6 +476,19 @@ def collect_revision_inputs(client: Any, *, system_id: str, revision_id: str) ->
         if all(key):
             fields_by_key.setdefault(key, field)
 
+    if (
+        target_stats["eligible_targets"] > 0
+        and not mappings_by_id
+        and not gaps_by_key
+        and not fields_by_key
+    ):
+        raise RevisionSourceError(
+            "AISL revision exposed eligible SQL targets but no target-column knowledge: "
+            f"eligible_targets={target_stats['eligible_targets']}, "
+            "target_fields=0, mapping_rows=0, mapping_gaps=0. "
+            "The published target-source knowledge is inconsistent with target discovery."
+        )
+
     retrieval = {
         "schema_version": "aisl_s2t_revision_retrieval/v1",
         "system_id": system_id,

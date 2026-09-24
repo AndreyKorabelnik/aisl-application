@@ -210,3 +210,31 @@ def test_invalid_expression_reference_fails_closed():
             _Client(_Pinned(_Integration(candidates, pages))),
             system_id="system-x", revision_id="revision-y",
         )
+
+
+def test_eligible_targets_with_no_fields_mappings_or_gaps_fail_closed():
+    candidates = [_candidate("target", physical="mart.target")]
+    pages = {
+        ("target", 0): _page("target", 0, 0, []),
+    }
+    with pytest.raises(
+        RevisionSourceError,
+        match=r"eligible_targets=1, target_fields=0, mapping_rows=0, mapping_gaps=0",
+    ):
+        collect_revision_inputs(
+            _Client(_Pinned(_Integration(candidates, pages))),
+            system_id="system-x",
+            revision_id="revision-y",
+        )
+
+
+def test_zero_eligible_targets_may_return_empty_public_inputs():
+    inputs = collect_revision_inputs(
+        _Client(_Pinned(_Integration([], {}))),
+        system_id="system-x",
+        revision_id="revision-y",
+    )
+    assert inputs.mapping_rows == ()
+    assert inputs.mapping_gaps == ()
+    assert inputs.target_fields == ()
+    assert inputs.retrieval["eligible_targets"] == 0
