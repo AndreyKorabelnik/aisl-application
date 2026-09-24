@@ -33,6 +33,20 @@ def _text(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _same_mapping_except_target_column_case(
+    left: Mapping[str, Any], right: Mapping[str, Any]
+) -> bool:
+    left_column = _text(left.get("target_column"))
+    right_column = _text(right.get("target_column"))
+    if not left_column or left_column.casefold() != right_column.casefold():
+        return False
+    left_normalized = dict(left)
+    right_normalized = dict(right)
+    left_normalized["target_column"] = left_column.casefold()
+    right_normalized["target_column"] = right_column.casefold()
+    return left_normalized == right_normalized
+
+
 def _objects(value: Any, name: str) -> list[dict[str, Any]]:
     if value is None:
         return []
@@ -457,11 +471,30 @@ def collect_revision_inputs(client: Any, *, system_id: str, revision_id: str) ->
         mapping_id = _text(row.get("mapping_id"))
         previous = mappings_by_id.get(mapping_id)
         if previous is not None and previous != row:
+            if _same_mapping_except_target_column_case(previous, row):
+                continue
             raise RevisionSourceError(f"conflicting public value mapping id: {mapping_id}")
         mappings_by_id[mapping_id] = row
 
+    # A stable mapping id may surface the same SQL target column with different
+    # letter case. Once that equivalence is proven by the mapping id, reuse the
+    # retained spelling for fields and gaps so the consumer does not emit a
+    # second target-only row for the same observed target field.
+    canonical_target_columns: dict[tuple[str, str], str] = {}
+    for row in mappings_by_id.values():
+        relation = _text(row.get("workflow_target_logical_name") or row.get("target_relation"))
+        column = _text(row.get("target_column"))
+        if relation and column:
+            canonical_target_columns.setdefault((relation.casefold(), column.casefold()), column)
+
     gaps_by_key: dict[tuple[str, str, str, str], dict[str, Any]] = {}
-    for gap in mapping_gaps:
+    for original_gap in mapping_gaps:
+        gap = dict(original_gap)
+        relation = _text(gap.get("workflow_target_logical_name") or gap.get("target_relation"))
+        column = _text(gap.get("target_column"))
+        canonical_column = canonical_target_columns.get((relation.casefold(), column.casefold()))
+        if canonical_column:
+            gap["target_column"] = canonical_column
         key = (
             _text(gap.get("gap_id")),
             _text(gap.get("workflow_target_logical_name")),
@@ -471,7 +504,13 @@ def collect_revision_inputs(client: Any, *, system_id: str, revision_id: str) ->
         gaps_by_key.setdefault(key, gap)
 
     fields_by_key: dict[tuple[str, str], dict[str, Any]] = {}
-    for field in target_fields:
+    for original_field in target_fields:
+        field = dict(original_field)
+        relation = _text(field.get("target_relation"))
+        column = _text(field.get("target_column"))
+        canonical_column = canonical_target_columns.get((relation.casefold(), column.casefold()))
+        if canonical_column:
+            field["target_column"] = canonical_column
         key = (_text(field.get("target_relation")), _text(field.get("target_column")))
         if all(key):
             fields_by_key.setdefault(key, field)
