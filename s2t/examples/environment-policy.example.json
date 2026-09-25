@@ -1,7 +1,0 @@
-{
-  "default_environment": "production",
-  "environment_scopes": {
-    "production": ["environment-scope-prod"],
-    "pa": ["environment-scope-pa"]
-  }
-}
