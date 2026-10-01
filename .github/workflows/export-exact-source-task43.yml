@@ -1,0 +1,51 @@
+name: Export exact source snapshot for Task 43
+
+on:
+  push:
+    branches:
+      - automation/task43-source-export-20261001
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_SHA: dd30fab1486778b490531d53291afdc4dee020d4
+      SOURCE_TREE: 8968aeca58804e402265066f2fe5ce8c23ac163d
+      ARCHIVE_NAME: aisl-application-source-main-dd30fab1.zip
+      ARTIFACT_NAME: aisl-application-source-main-dd30fab1
+    steps:
+      - name: Check out exact source commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 0
+      - name: Verify exact Git identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git rev-parse HEAD^{tree})" = "$SOURCE_TREE"
+          test -z "$(git status --porcelain)"
+      - name: Create exact Git archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=zip --output="/tmp/$ARCHIVE_NAME" "$SOURCE_SHA"
+          {
+            echo "repository=AndreyKorabelnik/aisl-application"
+            echo "commit=$SOURCE_SHA"
+            echo "tree=$SOURCE_TREE"
+            sha256sum "/tmp/$ARCHIVE_NAME"
+          } > /tmp/source-identity.txt
+      - name: Upload exact source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            /tmp/${{ env.ARCHIVE_NAME }}
+            /tmp/source-identity.txt
