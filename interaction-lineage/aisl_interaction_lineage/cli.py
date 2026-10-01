@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shlex
 import sys
 from pathlib import Path
 from typing import Any, Mapping
@@ -12,7 +11,7 @@ from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings
 from .human_csv import write_human_csv
-from .prepare import KnowledgeApiCliImporter, KnowledgeControlPlaneGateway, prepare_interaction_lineage
+from .prepare import KnowledgeControlPlaneGateway, prepare_interaction_lineage
 
 
 def _load_object(path: str) -> Mapping[str, Any]:
@@ -46,10 +45,9 @@ def main(argv: list[str] | None = None) -> int:
     prepare = sub.add_parser("prepare")
     prepare.add_argument("--topology", required=True)
     prepare.add_argument("--edge-id", required=True)
-    prepare.add_argument("--bindings", help="Optional existing exact bindings; prepare fills missing/not-ready repositories")
+    prepare.add_argument("--bindings", help="Optional existing exact bindings; prepare fills generic preparable knowledge gaps")
     prepare.add_argument("--aisl-base-url", required=True)
     prepare.add_argument("--kcp-base-url", required=True)
-    prepare.add_argument("--knowledge-api-command", default="knowledge-api")
     prepare.add_argument("--transport-role", choices=("request", "response", "all"), default="all")
     prepare.add_argument("--output", required=True)
 
@@ -79,14 +77,12 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.command == "prepare":
                 kcp = KnowledgeControlPlaneGateway(args.kcp_base_url)
-                importer = KnowledgeApiCliImporter(shlex.split(args.knowledge_api_command))
                 result = prepare_interaction_lineage(
                     topology,
                     edge_id=args.edge_id,
                     bindings=bindings,
                     readiness_gateway=gateway,
                     preparation_gateway=kcp,
-                    importer=importer,
                     transport_roles=roles,
                 )
             else:
@@ -112,7 +108,7 @@ def main(argv: list[str] | None = None) -> int:
         if gateway is not None:
             gateway.close()
     Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return 0 if result.get("status") not in {"not_ready", "failed"} else 2
+    return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit"} else 2
 
 
 if __name__ == "__main__":
