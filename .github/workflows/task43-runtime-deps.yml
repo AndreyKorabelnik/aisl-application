@@ -1,0 +1,27 @@
+name: Task43 runtime dependency cache
+
+on:
+  push:
+    branches:
+      - automation/task43-source-export-20261001
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download compatible FastAPI wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip download --only-binary=:all: --no-deps 'fastapi>=0.137,<1' -d /tmp/task43-deps
+          sha256sum /tmp/task43-deps/* > /tmp/task43-deps/SHA256SUMS.txt
+      - name: Upload dependency artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: task43-fastapi-runtime-dep
+          retention-days: 1
+          if-no-files-found: error
+          path: /tmp/task43-deps
