@@ -12,16 +12,19 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - name: Download compatible FastAPI wheel
+      - name: Download compatible runtime wheels
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p /tmp/task43-deps
           python -m pip download --only-binary=:all: --no-deps 'fastapi>=0.137,<1' -d /tmp/task43-deps
+          python -m pip download --only-binary=:all: --no-deps 'proto-schema-parser==2.1.0' -d /tmp/task43-deps
+          python -m pip download --only-binary=:all: --no-deps 'antlr4-python3-runtime==4.13.2' -d /tmp/task43-deps
           sha256sum /tmp/task43-deps/* > /tmp/task43-deps/SHA256SUMS.txt
       - name: Upload dependency artifact
         uses: actions/upload-artifact@v4
         with:
-          name: task43-fastapi-runtime-dep
+          name: task43-runtime-deps
           retention-days: 1
           if-no-files-found: error
           path: /tmp/task43-deps
