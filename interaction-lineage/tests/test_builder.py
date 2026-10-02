@@ -333,3 +333,103 @@ def test_exact_topology_suffix_refs_keep_structural_context_and_exclude_leaf() -
     assert _exact_topology_suffix_refs("clientInfo.identifications.documentSeries") == (
         "identifications.documentSeries",
     )
+
+class StructuralBoundaryCatalogGateway(FakeGateway):
+    def resolve_attribute_paths(
+        self,
+        binding: AislBinding,
+        *,
+        source: str,
+        selected_repo_ids: Sequence[str],
+        direction: str,
+    ) -> Mapping[str, Any]:
+        repo = selected_repo_ids[0]
+        self.calls.append({"repo": repo, "source": source, "direction": direction, "selected_repo_ids": list(selected_repo_ids)})
+        if repo == "caller" and source == wire_display_ref("response", "profile"):
+            anchor = {"repo_id": repo, "owner_ref": "caller-if", "value_node_id": "wire-profile", "display_ref": source}
+            end = {"repo_id": repo, "owner_ref": "Mapper.map", "value_node_id": "local-profile", "display_ref": "model.profile"}
+            return {"result": {"status": "confirmed_complete", "source": anchor, "paths": [{"start": anchor, "end": end, "steps": [{"edge_kind": "field_flow"}]}], "gaps": []}}
+        return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+    def list_repository_value_nodes(
+        self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+        operation: str | None = None, max_results: int = 500, page_token: str = "",
+    ) -> Mapping[str, Any]:
+        self.calls.append({"repo": repository_id, "list_nodes": True, "operation": operation})
+        if repository_id == "service" and operation is None:
+            def field(path: str) -> dict[str, Any]:
+                return {
+                    "repo_id": "service",
+                    "node_kind": "field",
+                    "value_node_id": "field-" + path.replace(".", "-"),
+                    "display_ref": "boundary:rest:/example:response." + path,
+                    "type_ref": "String",
+                    "payload_json": {"source_occurrence": {
+                        "boundary_kind": "rest",
+                        "boundary_path": "/example",
+                        "payload_role": "response",
+                        "payload_type": "ResponseDto",
+                        "interaction_direction": "outbound",
+                        "wire_field_path": path,
+                    }},
+                }
+            items = [field("profile"), field("profile.id"), field("profile.name")]
+            return {"result": {"items": items, "total_count": len(items), "returned_count": len(items), "truncated": False}}
+        return super().list_repository_value_nodes(binding, repository_id=repository_id, node_kind=node_kind, operation=operation, max_results=max_results, page_token=page_token)
+
+
+def test_http_topology_can_expand_exact_rest_boundary_shape_under_observed_branch() -> None:
+    gateway = StructuralBoundaryCatalogGateway()
+    result = build_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway, transport_roles=("response",),
+    )
+    assert [item["field_path"] for item in result["journeys"]] == ["profile", "profile.id", "profile.name"]
+    expanded = next(item for item in result["journeys"] if item["field_path"] == "profile.name")
+    assert expanded["topology_basis"] == "published_source_boundary_shape_under_observed_topology_branch"
+
+
+class StructuralTerminalGateway(StructuralBoundaryCatalogGateway):
+    def resolve_attribute_paths(
+        self, binding: AislBinding, *, source: str, selected_repo_ids: Sequence[str], direction: str,
+    ) -> Mapping[str, Any]:
+        repo = selected_repo_ids[0]
+        if source.endswith("profile.name") or source == "profile.name":
+            self.calls.append({"repo": repo, "source": source, "direction": direction, "selected_repo_ids": list(selected_repo_ids)})
+            return {"result": {"status": "source_not_found", "paths": [], "gaps": []}}
+        return super().resolve_attribute_paths(
+            binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction
+        )
+
+
+def test_structural_expansion_without_field_specific_flow_is_terminal_not_gap() -> None:
+    result = build_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=StructuralTerminalGateway(),
+        transport_roles=("response",),
+    )
+    expanded = next(item for item in result["journeys"] if item["field_path"] == "profile.name")
+    assert expanded["source_side"]["anchor_status"] == "terminal"
+    assert expanded["target_side"]["anchor_status"] == "terminal"
+    assert result["summary"]["gap_count"] == 0
+
+
+class SelectedRepoIdsGateway(FakeGateway):
+    def __init__(self) -> None:
+        super().__init__()
+        self.selected: list[tuple[str, ...]] = []
+
+    def resolve_attribute_paths(
+        self, binding: AislBinding, *, source: str, selected_repo_ids: Sequence[str], direction: str,
+    ) -> Mapping[str, Any]:
+        self.selected.append(tuple(selected_repo_ids))
+        return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+
+def test_builder_queries_framework_composite_selected_repo_ids() -> None:
+    gateway = SelectedRepoIdsGateway()
+    composite = BindingIndex([
+        AislBinding("caller", "caller-system", "caller-rev", ("caller", "maven:g:a:1.2.3")),
+        AislBinding("service", "service-system", "service-rev", ("service", "maven:g:b:4.5.6")),
+    ])
+    build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=composite, gateway=gateway, transport_roles=("request",))
+    assert ("caller", "maven:g:a:1.2.3") in gateway.selected
+    assert ("service", "maven:g:b:4.5.6") in gateway.selected

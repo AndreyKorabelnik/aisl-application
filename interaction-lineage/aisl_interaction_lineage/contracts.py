@@ -21,6 +21,7 @@ class AislBinding:
     repository_id: str
     system_id: str
     revision_id: str
+    selected_repo_ids: tuple[str, ...] = ()
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, Any]) -> "AislBinding":
@@ -29,14 +30,37 @@ class AislBinding:
         revision_id = _text(payload.get("revision_id"), "revision_id")
         if revision_id.casefold() in {"active", "latest"}:
             raise ValueError("revision_id must be an exact immutable revision, not active/latest")
-        return cls(repository_id=repository_id, system_id=system_id, revision_id=revision_id)
+        raw_selected = payload.get("selected_repo_ids")
+        selected_repo_ids = tuple(
+            dict.fromkeys(
+                str(value).strip()
+                for value in (raw_selected if isinstance(raw_selected, list) else ())
+                if str(value).strip()
+            )
+        )
+        return cls(
+            repository_id=repository_id,
+            system_id=system_id,
+            revision_id=revision_id,
+            selected_repo_ids=selected_repo_ids,
+        )
 
-    def to_dict(self) -> dict[str, str]:
-        return {
+    def query_repo_ids(self, fallback_repository_id: str | None = None) -> tuple[str, ...]:
+        fallback = str(fallback_repository_id or self.repository_id).strip()
+        values = list(self.selected_repo_ids)
+        if fallback and fallback not in values:
+            values.insert(0, fallback)
+        return tuple(values)
+
+    def to_dict(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "repository_id": self.repository_id,
             "system_id": self.system_id,
             "revision_id": self.revision_id,
         }
+        if self.selected_repo_ids:
+            payload["selected_repo_ids"] = list(self.selected_repo_ids)
+        return payload
 
 
 class BindingIndex:
