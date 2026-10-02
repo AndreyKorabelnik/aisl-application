@@ -386,6 +386,110 @@ def _payload_scoped_structural_candidates(
     return [unique[key] for key in sorted(unique)]
 
 
+def _payload_instance_scoped_structural_candidates(
+    catalog: Sequence[Mapping[str, Any]],
+    *,
+    repository_id: str,
+    payload_identity: str,
+    field_path: str,
+) -> list[Mapping[str, Any]]:
+    payload_instances: dict[str, set[str]] = {}
+    for item in catalog:
+        if str(item.get("repo_id") or "") != repository_id:
+            continue
+        if str(item.get("type_ref") or "") != payload_identity:
+            continue
+        if str(item.get("node_kind") or "") not in {"parameter", "local_value", "return_value"}:
+            continue
+        operation = str(item.get("operation") or "")
+        display_ref = str(item.get("display_ref") or "")
+        if operation and display_ref:
+            payload_instances.setdefault(operation, set()).add(display_ref)
+
+    candidates: list[Mapping[str, Any]] = []
+    for item in catalog:
+        if str(item.get("repo_id") or "") != repository_id:
+            continue
+        if str(item.get("node_kind") or "") not in _STRUCTURAL_NODE_KINDS:
+            continue
+        operation = str(item.get("operation") or "")
+        display_ref = str(item.get("display_ref") or "")
+        if not operation or not display_ref:
+            continue
+        if any(display_ref == f"{payload_ref}.{field_path}" for payload_ref in payload_instances.get(operation, ())):
+            candidates.append(item)
+
+    unique: dict[tuple[str, str, str, str], Mapping[str, Any]] = {}
+    for item in candidates:
+        signature = (
+            str(item.get("operation") or ""),
+            str(item.get("display_ref") or ""),
+            str(item.get("node_kind") or ""),
+            str(item.get("source_path") or ""),
+        )
+        current = unique.get(signature)
+        if current is None or str(item.get("value_node_id") or "") < str(current.get("value_node_id") or ""):
+            unique[signature] = item
+    return [unique[key] for key in sorted(unique)]
+
+
+def _source_published_fallback(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    payload_identity: str | None,
+    field_path: str,
+    direction: str,
+    requested_anchor: str,
+    attempted_anchors: list[str],
+    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+) -> dict[str, Any] | None:
+    payload = str(payload_identity or "").strip()
+    if direction != "reverse" or not payload or not field_path:
+        return None
+    catalog, complete = _repository_node_catalog(
+        gateway,
+        binding=binding,
+        repository_id=repository_id,
+        cache=cache,
+    )
+    if not complete:
+        return None
+    candidates = _payload_instance_scoped_structural_candidates(
+        catalog,
+        repository_id=repository_id,
+        payload_identity=payload,
+        field_path=field_path,
+    )
+    if len(candidates) != 1:
+        return None
+    selected = candidates[0]
+    response, result = _run_selected(
+        gateway,
+        binding=binding,
+        repository_id=repository_id,
+        selected=selected,
+        direction=direction,
+    )
+    status = str(result.get("status") or "")
+    source = result.get("source")
+    if not isinstance(source, Mapping) or status.startswith("source_") or status == "unavailable":
+        return None
+    attempted = [*attempted_anchors, str(selected.get("value_node_id") or "")]
+    return _resolved_side(
+        repository_id=repository_id,
+        binding=binding,
+        direction=direction,
+        requested_anchor=requested_anchor,
+        attempted_anchors=attempted,
+        response=response,
+        result=result,
+        selected=selected,
+        basis="published_payload_instance_structural_candidate:unique_semantic_node",
+    )
+
+
 def _target_published_fallback(
     gateway: AislPathGateway,
     *,
@@ -564,6 +668,21 @@ def _resolve_side(
                 selected=selected,
                 basis=f"{strategy}:{basis}",
             )
+
+    if side == "source":
+        fallback = _source_published_fallback(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            payload_identity=payload_identity,
+            field_path=field.field_path,
+            direction=direction,
+            requested_anchor=source_ref,
+            attempted_anchors=attempted,
+            cache=node_catalog_cache if node_catalog_cache is not None else {},
+        )
+        if fallback is not None:
+            return fallback
 
     if side == "target":
         fallback = _target_published_fallback(

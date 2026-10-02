@@ -58,6 +58,22 @@ def _bindings() -> BindingIndex:
     ])
 
 
+def _request_topology(field_path: str = "channel") -> dict[str, Any]:
+    topology = _topology(field_path)
+    edge = topology["edges"][0]
+    edge["source_half_wires"][0]["request_field_names"] = [field_path]
+    edge["source_half_wires"][0]["response_field_paths"] = []
+    edge["target_half_wires"][0]["request_field_names"] = [field_path]
+    edge["target_half_wires"][0]["response_field_paths"] = []
+    edge["attribute_flows"] = [{
+        "transport_role": "request",
+        "source_repository_id": "caller",
+        "target_repository_id": "service",
+        "attribute_names": [field_path.split(".", 1)[0]],
+    }]
+    return topology
+
+
 class PublishedFallbackGateway:
     def __init__(self, pages: dict[str, list[Mapping[str, Any]]], *, incomplete: bool = False) -> None:
         self.pages = pages
@@ -141,6 +157,43 @@ def _candidate(value_node_id: str = "candidate-good", display_ref: str = "status
     }
 
 
+def _payload_local(
+    value_node_id: str = "payload-local",
+    *,
+    operation: str = "Client.call",
+    display_ref: str = "request",
+    type_ref: str = "RequestDto",
+    source_path: str = "Client.java",
+) -> dict[str, Any]:
+    return {
+        "repo_id": "caller",
+        "value_node_id": value_node_id,
+        "node_kind": "local_value",
+        "operation": operation,
+        "display_ref": display_ref,
+        "type_ref": type_ref,
+        "source_path": source_path,
+    }
+
+
+def _source_candidate(
+    value_node_id: str = "source-candidate-good",
+    *,
+    operation: str = "Client.call",
+    display_ref: str = "request.channel",
+    source_path: str = "Client.java",
+) -> dict[str, Any]:
+    return {
+        "repo_id": "caller",
+        "value_node_id": value_node_id,
+        "node_kind": "field",
+        "operation": operation,
+        "display_ref": display_ref,
+        "type_ref": None,
+        "source_path": source_path,
+    }
+
+
 def _journey(result: Mapping[str, Any], field_path: str) -> Mapping[str, Any]:
     return next(item for item in result["journeys"] if item["field_path"] == field_path)
 
@@ -212,3 +265,79 @@ def test_multiple_payload_scoped_structural_candidates_remain_unresolved() -> No
     journey = _journey(result, "status")
     assert journey["target_side"]["anchor_status"] == "unresolved"
     assert result["summary"]["target_local_anchor_gap_count"] == 1
+
+
+def test_source_fallback_resolves_exact_field_of_exact_payload_instance() -> None:
+    gateway = PublishedFallbackGateway({"first": [_payload_local(), _source_candidate()]})
+    result = build_interaction_lineage(
+        _request_topology("channel"),
+        edge_id=EDGE_ID,
+        bindings=_bindings(),
+        gateway=gateway,
+        transport_roles=("request",),
+    )
+    journey = _journey(result, "channel")
+    assert journey["source_side"]["anchor_status"] == "resolved"
+    assert journey["source_side"]["resolved_anchor"]["value_node_id"] == "source-candidate-good"
+    assert journey["source_side"]["anchor_selection_basis"] == (
+        "published_payload_instance_structural_candidate:unique_semantic_node"
+    )
+    assert result["summary"]["source_local_anchor_gap_count"] == 0
+
+
+def test_source_fallback_requires_exact_payload_type_context() -> None:
+    wrong_payload = _payload_local(type_ref="OtherRequest")
+    gateway = PublishedFallbackGateway({"first": [wrong_payload, _source_candidate()]})
+    result = build_interaction_lineage(
+        _request_topology("channel"),
+        edge_id=EDGE_ID,
+        bindings=_bindings(),
+        gateway=gateway,
+        transport_roles=("request",),
+    )
+    journey = _journey(result, "channel")
+    assert journey["source_side"]["anchor_status"] == "unresolved"
+    assert result["summary"]["source_local_anchor_gap_count"] == 1
+
+
+def test_source_fallback_keeps_multiple_exact_payload_operations_ambiguous() -> None:
+    pages = {
+        "first": [
+            _payload_local(),
+            _source_candidate(),
+            _payload_local("payload-local-2", operation="Client2.call", source_path="Client2.java"),
+            _source_candidate(
+                "source-candidate-2",
+                operation="Client2.call",
+                source_path="Client2.java",
+            ),
+        ]
+    }
+    gateway = PublishedFallbackGateway(pages)
+    result = build_interaction_lineage(
+        _request_topology("channel"),
+        edge_id=EDGE_ID,
+        bindings=_bindings(),
+        gateway=gateway,
+        transport_roles=("request",),
+    )
+    journey = _journey(result, "channel")
+    assert journey["source_side"]["anchor_status"] == "unresolved"
+    assert result["summary"]["source_local_anchor_gap_count"] == 1
+
+
+def test_source_fallback_does_not_resolve_from_incomplete_node_scan() -> None:
+    gateway = PublishedFallbackGateway(
+        {"first": [_payload_local(), _source_candidate()]},
+        incomplete=True,
+    )
+    result = build_interaction_lineage(
+        _request_topology("channel"),
+        edge_id=EDGE_ID,
+        bindings=_bindings(),
+        gateway=gateway,
+        transport_roles=("request",),
+    )
+    journey = _journey(result, "channel")
+    assert journey["source_side"]["anchor_status"] == "unresolved"
+    assert result["summary"]["source_local_anchor_gap_count"] == 1
