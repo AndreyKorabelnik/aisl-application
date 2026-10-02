@@ -203,11 +203,12 @@ def human_rows(lineage: Mapping[str, Any]) -> list[dict[str, str]]:
             source_path += f" → {crossing_attribute}"
 
         target_path = crossing_attribute
+        target_terminal = str(target_side.get("anchor_status") or "") == "terminal"
         if target_transformation:
             target_path += f" --[{target_transformation}]→ {target_destination or '[unresolved target]'}"
         elif target_destination and target_destination != crossing_attribute:
             target_path += f" → {target_destination}"
-        elif not target_destination:
+        elif not target_destination and not target_terminal:
             target_path += " → [unresolved target]"
 
         full_path = (

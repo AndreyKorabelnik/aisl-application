@@ -170,6 +170,7 @@ def check_interaction_lineage(
     repositories: dict[str, dict[str, Any]] = {}
     diagnostics: list[dict[str, Any]] = []
     preparation_requirements: list[dict[str, Any]] = []
+    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] = {}
 
     for repository_id in _repo_ids(edge, transport_roles):
         binding = bindings.find(repository_id)
@@ -261,9 +262,10 @@ def check_interaction_lineage(
                     ),
                     source_ref=source_ref,
                     direction=direction,
+                    node_catalog_cache=node_catalog_cache,
                 )
                 row["boundary_anchor_count"] = int(row.get("boundary_anchor_count") or 0) + 1
-                if resolved["anchor_status"] != "resolved":
+                if resolved["anchor_status"] == "unresolved":
                     row["boundary_anchor_missing_count"] = int(row.get("boundary_anchor_missing_count") or 0) + 1
                     diagnostics.append({
                         "code": "local_anchor_gap",
