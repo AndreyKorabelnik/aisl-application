@@ -329,6 +329,147 @@ def _repository_node_catalog(
     return value
 
 
+def _node_payload(item: Mapping[str, Any]) -> Mapping[str, Any]:
+    value = item.get("payload_json")
+    return value if isinstance(value, Mapping) else {}
+
+
+def _route_wire_candidates(
+    catalog: Sequence[Mapping[str, Any]],
+    *,
+    edge: Mapping[str, Any],
+    repository_id: str,
+    transport_role: str,
+    field_path: str | None = None,
+) -> list[Mapping[str, Any]]:
+    protocol = str(edge.get("protocol") or "").strip().casefold()
+    endpoint = str(edge.get("matched_identity") or "").strip()
+    method = str(edge.get("method") or "").strip().upper()
+    role = str(transport_role or "").strip().casefold()
+    expected_field = str(field_path or "").strip()
+    if not protocol or not endpoint or role not in {"request", "response"}:
+        return []
+
+    matches: list[Mapping[str, Any]] = []
+    for item in catalog:
+        if str(item.get("repo_id") or "") != repository_id:
+            continue
+        if str(item.get("node_kind") or "") != "wire_field":
+            continue
+        if expected_field and str(item.get("wire_path") or "").strip() != expected_field:
+            continue
+        transport = _node_payload(item).get("transport")
+        if not isinstance(transport, Mapping):
+            continue
+        if str(transport.get("protocol") or "").strip().casefold() != protocol:
+            continue
+        if str(transport.get("endpoint") or "").strip() != endpoint:
+            continue
+        if str(transport.get("payload_role") or "").strip().casefold() != role:
+            continue
+        if str(transport.get("interface_direction") or "").strip().casefold() != "outbound":
+            continue
+        if protocol == "http" and method and str(transport.get("http_method") or "").strip().upper() != method:
+            continue
+        matches.append(item)
+
+    unique: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    for item in matches:
+        signature = (
+            str(item.get("operation") or ""),
+            str(item.get("wire_path") or ""),
+            str(item.get("owner_ref") or ""),
+        )
+        current = unique.get(signature)
+        if current is None or str(item.get("value_node_id") or "") < str(current.get("value_node_id") or ""):
+            unique[signature] = item
+    return [unique[key] for key in sorted(unique)]
+
+
+def _source_counterpart_shape_proof(
+    edge: Mapping[str, Any],
+    *,
+    field: BoundaryField,
+) -> list[Mapping[str, Any]]:
+    if not field.source_payload_identity or field.source_payload_identity != field.target_payload_identity:
+        return []
+    if "." in field.field_path:
+        return []
+
+    rows: list[Mapping[str, Any]] = []
+    for flow in edge.get("attribute_flows") or ():
+        if not isinstance(flow, Mapping):
+            continue
+        if str(flow.get("transport_role") or "").strip().casefold() != field.transport_role:
+            continue
+        if str(flow.get("source_repository_id") or "") != field.source_repository_id:
+            continue
+        if str(flow.get("target_repository_id") or "") != field.target_repository_id:
+            continue
+        for basis in flow.get("basis") or ():
+            if not isinstance(basis, Mapping):
+                continue
+            if str(basis.get("attribute_name") or "") != field.field_path:
+                continue
+            rows.append(basis)
+    if not rows:
+        return []
+
+    source_interfaces = set(field.source_interface_ids)
+    target_interfaces = set(field.target_interface_ids)
+    payload = field.source_payload_identity
+    for item in rows:
+        if str(item.get("evidence_mode") or "") != "exact_payload_identity_counterpart_shape":
+            return []
+        if str(item.get("payload_identity") or "") != payload:
+            return []
+        if str(item.get("source_shape_status") or "") != "unavailable_external_declaration":
+            return []
+        if str(item.get("target_shape_status") or "") != "available_local_declaration":
+            return []
+        source_interface = str(item.get("edge_source_interface_id") or "")
+        target_interface = str(item.get("edge_target_interface_id") or "")
+        if source_interface and source_interface not in source_interfaces:
+            return []
+        if target_interface and target_interface not in target_interfaces:
+            return []
+    return rows
+
+
+def _published_route_wire_side(
+    *,
+    repository_id: str,
+    binding,
+    direction: str,
+    requested_anchor: str,
+    attempted_anchors: list[str],
+    selected: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "repository_id": repository_id,
+        "system_id": binding.system_id,
+        "revision_id": binding.revision_id,
+        "direction": direction,
+        "requested_anchor": requested_anchor,
+        "attempted_anchors": [*attempted_anchors, str(selected.get("value_node_id") or "")],
+        "resolved_anchor": dict(selected),
+        "anchor_status": "resolved",
+        "anchor_selection_basis": "published_route_wire_field:exact_transport_and_field",
+        "query": {
+            "result": {
+                "status": "resolved_terminal",
+                "source": dict(selected),
+                "paths": [],
+                "gaps": [],
+            }
+        },
+        "terminal_proof": {
+            "published_wire_field": True,
+            "exact_transport_context": True,
+        },
+    }
+
+
 def _operation_accepts_payload(
     catalog: Sequence[Mapping[str, Any]],
     *,
@@ -436,6 +577,8 @@ def _payload_instance_scoped_structural_candidates(
 def _source_published_fallback(
     gateway: AislPathGateway,
     *,
+    edge: Mapping[str, Any],
+    field: BoundaryField,
     binding,
     repository_id: str,
     payload_identity: str | None,
@@ -462,32 +605,124 @@ def _source_published_fallback(
         payload_identity=payload,
         field_path=field_path,
     )
-    if len(candidates) != 1:
+    if len(candidates) > 1:
         return None
-    selected = candidates[0]
-    response, result = _run_selected(
-        gateway,
-        binding=binding,
+    if len(candidates) == 1:
+        selected = candidates[0]
+        response, result = _run_selected(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            selected=selected,
+            direction=direction,
+        )
+        status = str(result.get("status") or "")
+        source = result.get("source")
+        if not isinstance(source, Mapping) or status.startswith("source_") or status == "unavailable":
+            return None
+        attempted = [*attempted_anchors, str(selected.get("value_node_id") or "")]
+        return _resolved_side(
+            repository_id=repository_id,
+            binding=binding,
+            direction=direction,
+            requested_anchor=requested_anchor,
+            attempted_anchors=attempted,
+            response=response,
+            result=result,
+            selected=selected,
+            basis="published_payload_instance_structural_candidate:unique_semantic_node",
+        )
+
+    wire_candidates = _route_wire_candidates(
+        catalog,
+        edge=edge,
         repository_id=repository_id,
-        selected=selected,
-        direction=direction,
+        transport_role=field.transport_role,
+        field_path=field.field_path,
     )
-    status = str(result.get("status") or "")
-    source = result.get("source")
-    if not isinstance(source, Mapping) or status.startswith("source_") or status == "unavailable":
+    if len(wire_candidates) == 1:
+        return _published_route_wire_side(
+            repository_id=repository_id,
+            binding=binding,
+            direction=direction,
+            requested_anchor=requested_anchor,
+            attempted_anchors=attempted_anchors,
+            selected=wire_candidates[0],
+        )
+    if wire_candidates:
         return None
-    attempted = [*attempted_anchors, str(selected.get("value_node_id") or "")]
-    return _resolved_side(
+
+    counterpart_proof = _source_counterpart_shape_proof(edge, field=field)
+    if not counterpart_proof:
+        return None
+    route_nodes = _route_wire_candidates(
+        catalog,
+        edge=edge,
         repository_id=repository_id,
-        binding=binding,
-        direction=direction,
-        requested_anchor=requested_anchor,
-        attempted_anchors=attempted,
-        response=response,
-        result=result,
-        selected=selected,
-        basis="published_payload_instance_structural_candidate:unique_semantic_node",
+        transport_role=field.transport_role,
     )
+    route_interfaces = {
+        (
+            str(item.get("operation") or "").strip(),
+            str(item.get("owner_ref") or "").strip(),
+        )
+        for item in route_nodes
+        if str(item.get("operation") or "").strip() and str(item.get("owner_ref") or "").strip()
+    }
+    if len(route_interfaces) != 1:
+        return None
+    operation, route_owner_ref = next(iter(route_interfaces))
+    payload_instances = [
+        item
+        for item in catalog
+        if str(item.get("repo_id") or "") == repository_id
+        and str(item.get("operation") or "") == operation
+        and str(item.get("type_ref") or "") == payload
+        and str(item.get("node_kind") or "") in {"parameter", "local_value", "return_value"}
+        and str(item.get("display_ref") or "").strip()
+    ]
+    semantic_instances: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    for item in payload_instances:
+        signature = (
+            str(item.get("node_kind") or ""),
+            str(item.get("display_ref") or ""),
+            str(item.get("source_path") or ""),
+        )
+        current = semantic_instances.get(signature)
+        if current is None or str(item.get("value_node_id") or "") < str(current.get("value_node_id") or ""):
+            semantic_instances[signature] = item
+    if len(semantic_instances) != 1:
+        return None
+    selected_payload = next(iter(semantic_instances.values()))
+    return {
+        "repository_id": repository_id,
+        "system_id": binding.system_id,
+        "revision_id": binding.revision_id,
+        "direction": direction,
+        "requested_anchor": requested_anchor,
+        "attempted_anchors": [*attempted_anchors, str(selected_payload.get("value_node_id") or "")],
+        "resolved_anchor": dict(selected_payload),
+        "anchor_status": "terminal",
+        "anchor_selection_basis": "topology_counterpart_shape_with_unique_published_payload_instance:resolved_terminal",
+        "query": {
+            "result": {
+                "status": "resolved_terminal",
+                "source": dict(selected_payload),
+                "paths": [],
+                "gaps": [],
+            }
+        },
+        "terminal_proof": {
+            "payload_identity": payload,
+            "field_path": field.field_path,
+            "operation": operation,
+            "repository_value_node_scan_complete": True,
+            "exact_route_interface_count": 1,
+            "route_owner_ref": route_owner_ref,
+            "exact_payload_instance_count": 1,
+            "topology_basis": [dict(item) for item in counterpart_proof],
+        },
+    }
 
 
 def _target_published_fallback(
@@ -672,6 +907,8 @@ def _resolve_side(
     if side == "source":
         fallback = _source_published_fallback(
             gateway,
+            edge=edge,
+            field=field,
             binding=binding,
             repository_id=repository_id,
             payload_identity=payload_identity,
@@ -885,7 +1122,7 @@ def build_interaction_lineage(
             )
             if not payload_compatible:
                 gaps.append(_gap(field.source_repository_id, field, "crossing", "payload_identity_not_exactly_compatible"))
-            if source_side["anchor_status"] != "resolved":
+            if source_side["anchor_status"] == "unresolved":
                 gaps.append(_gap(field.source_repository_id, field, "source", "source_local_anchor_unresolved"))
             if target_side["anchor_status"] == "unresolved":
                 gaps.append(_gap(field.target_repository_id, field, "target", "target_local_anchor_unresolved"))
