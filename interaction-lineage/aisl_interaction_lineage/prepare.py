@@ -111,7 +111,16 @@ def _binding_updates(result: Mapping[str, Any]) -> dict[str, AislBinding]:
             continue
         if revision_id.casefold() in {"active", "latest"}:
             raise RuntimeError("Framework preparation returned a non-immutable revision binding")
-        updates[repository_id] = AislBinding(repository_id, system_id, revision_id)
+        selected_repo_ids = tuple(
+            dict.fromkeys(
+                str(value).strip()
+                for value in ref.get("selected_repo_ids") or ()
+                if str(value).strip()
+            )
+        )
+        updates[repository_id] = AislBinding(
+            repository_id, system_id, revision_id, selected_repo_ids
+        )
     return updates
 
 

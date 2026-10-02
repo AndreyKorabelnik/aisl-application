@@ -37,6 +37,7 @@ def _external_client_boundary_requirement(
     field_path: str,
     side: str,
     direction: str,
+    selected_repo_ids: Sequence[str] | None = None,
 ) -> dict[str, Any] | None:
     """Return a preparation hint only from producer-owned client boundary facts."""
     query = resolved.get("query")
@@ -144,7 +145,7 @@ def _external_client_boundary_requirement(
                 "system_id": system_id,
                 "revision_id": revision_id,
                 "source": source_id,
-                "selected_repo_ids": [repository_id],
+                "selected_repo_ids": list(selected_repo_ids or (repository_id,)),
                 "direction": direction,
             },
         },
@@ -288,6 +289,7 @@ def check_interaction_lineage(
                         field_path=field.field_path,
                         side=side,
                         direction=direction,
+                        selected_repo_ids=binding.query_repo_ids(repository_id),
                     )
                     if requirement is not None:
                         preparation_requirements.append(requirement)

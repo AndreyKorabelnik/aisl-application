@@ -161,7 +161,7 @@ def _run_selected(
     response = gateway.resolve_attribute_paths(
         binding,
         source=query_ref,
-        selected_repo_ids=[repository_id],
+        selected_repo_ids=binding.query_repo_ids(repository_id),
         direction=direction,
     )
     return response, _result(response)
@@ -183,7 +183,7 @@ def _attempt_ref(
     response = gateway.resolve_attribute_paths(
         binding,
         source=source_ref,
-        selected_repo_ids=[repository_id],
+        selected_repo_ids=binding.query_repo_ids(repository_id),
         direction=direction,
     )
     result = _result(response)
@@ -242,7 +242,7 @@ def _resolve_leaf_by_reverse_proof(
     first = gateway.resolve_attribute_paths(
         binding,
         source=leaf,
-        selected_repo_ids=[repository_id],
+        selected_repo_ids=binding.query_repo_ids(repository_id),
         direction="reverse",
     )
     first_result = _result(first)
@@ -836,6 +836,38 @@ def _resolved_side(
     }
 
 
+def _local_continuation_score(
+    result: Mapping[str, Any],
+    *,
+    anchor: Mapping[str, Any],
+) -> tuple[int, int, int, int]:
+    """Rank only exact deterministic anchors by observed local continuation.
+
+    Different exact aliases can identify the same transport field.  A wire alias
+    often resolves only to itself while an exact local payload alias reaches the
+    already-published repository-local value-flow.  Prefer the alias that exposes
+    more observed continuation; never use names, fuzzy matching, or semantic
+    inference.  Stable attempt order remains the tie-breaker.
+    """
+    paths = [item for item in result.get("paths") or () if isinstance(item, Mapping)]
+    anchor_id = str(anchor.get("value_node_id") or "")
+    anchor_ref = str(anchor.get("display_ref") or "")
+    max_steps = 0
+    non_self_paths = 0
+    transformed_paths = 0
+    for path in paths:
+        steps = [item for item in path.get("steps") or () if isinstance(item, Mapping)]
+        max_steps = max(max_steps, len(steps))
+        if steps:
+            transformed_paths += 1
+        end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+        end_id = str(end.get("value_node_id") or "")
+        end_ref = str(end.get("display_ref") or "")
+        if (anchor_id and end_id and end_id != anchor_id) or (anchor_ref and end_ref and end_ref != anchor_ref):
+            non_self_paths += 1
+    return (max_steps, non_self_paths, transformed_paths, len(paths))
+
+
 def _resolve_side(
     gateway: AislPathGateway,
     *,
@@ -871,7 +903,8 @@ def _resolve_side(
 
     seen: set[str] = set()
     last: tuple[Mapping[str, Any], Mapping[str, Any], Mapping[str, Any] | None, str] | None = None
-    for ref, strategy in attempts:
+    best: tuple[tuple[int, int, int, int], int, Mapping[str, Any], Mapping[str, Any], Mapping[str, Any] | None, str] | None = None
+    for attempt_index, (ref, strategy) in enumerate(attempts):
         if not ref or ref in seen:
             continue
         seen.add(ref)
@@ -888,21 +921,29 @@ def _resolve_side(
             source_ref=ref,
             direction=direction,
         )
-        last = (response, result, selected, f"{strategy}:{basis}")
+        resolved_basis = f"{strategy}:{basis}"
+        last = (response, result, selected, resolved_basis)
         status = str(result.get("status") or "")
         anchor = result.get("source") if isinstance(result.get("source"), Mapping) else selected
         if anchor is not None and not status.startswith("source_") and status != "unavailable":
-            return _resolved_side(
-                repository_id=repository_id,
-                binding=binding,
-                direction=direction,
-                requested_anchor=source_ref,
-                attempted_anchors=attempted,
-                response=response,
-                result=result,
-                selected=selected,
-                basis=f"{strategy}:{basis}",
-            )
+            score = _local_continuation_score(result, anchor=anchor)
+            candidate = (score, -attempt_index, response, result, selected, resolved_basis)
+            if best is None or candidate[:2] > best[:2]:
+                best = candidate
+
+    if best is not None:
+        _score, _order, response, result, selected, basis = best
+        return _resolved_side(
+            repository_id=repository_id,
+            binding=binding,
+            direction=direction,
+            requested_anchor=source_ref,
+            attempted_anchors=attempted,
+            response=response,
+            result=result,
+            selected=selected,
+            basis=basis,
+        )
 
     if side == "source":
         fallback = _source_published_fallback(
@@ -1017,7 +1058,7 @@ def _observed_child_expansion(
         query = gateway.resolve_attribute_paths(
             binding,
             source=value_node_id,
-            selected_repo_ids=[repository_id],
+            selected_repo_ids=binding.query_repo_ids(repository_id),
             direction="forward",
         )
         children.append({
@@ -1037,6 +1078,155 @@ def _observed_child_expansion(
         "next_token": listing_result.get("next_token"),
     }
 
+
+
+def _side_has_observed_continuation(side: Mapping[str, Any]) -> bool:
+    if str(side.get("anchor_status") or "") != "resolved":
+        return False
+    anchor = side.get("resolved_anchor")
+    query = side.get("query")
+    if not isinstance(anchor, Mapping) or not isinstance(query, Mapping):
+        return False
+    result = _result(query)
+    score = _local_continuation_score(result, anchor=anchor)
+    return score[0] > 0 or score[1] > 0
+
+
+def _is_collection_type(type_ref: str) -> bool:
+    text = str(type_ref or "").replace(" ", "")
+    return text.endswith("[]") or any(
+        marker in text for marker in ("List<", "Set<", "Collection<", "Iterable<")
+    )
+
+
+def _source_boundary_shape_fields(
+    catalog: Sequence[Mapping[str, Any]],
+    *,
+    edge: Mapping[str, Any],
+    parent_fields: Sequence[BoundaryField],
+    expandable_parents: set[str],
+) -> list[BoundaryField]:
+    """Project exact published source boundary structure under used topology branches.
+
+    Topology remains the transport owner: this only extends an already matched edge
+    under a published topology parent.  Structure comes from the exact route/payload
+    boundary facts already published by AISL.  The most-specific published topology
+    parent gates each descendant, so an unused sibling branch cannot expand merely
+    because its schema exists.
+    """
+    if not parent_fields:
+        return []
+    exemplar = parent_fields[0]
+    endpoint = str(edge.get("matched_identity") or "").strip()
+    role = exemplar.transport_role
+    payload_identity = str(exemplar.source_payload_identity or "").strip()
+    repository_id = exemplar.source_repository_id
+
+    raw_nodes: dict[str, Mapping[str, Any]] = {}
+    for item in catalog:
+        if str(item.get("repo_id") or "") != repository_id:
+            continue
+        if str(item.get("node_kind") or "") != "field":
+            continue
+        payload = _node_payload(item)
+        occurrence = payload.get("source_occurrence")
+        if not isinstance(occurrence, Mapping):
+            continue
+        boundary_kind = str(occurrence.get("boundary_kind") or "").strip().casefold()
+        edge_protocol = str(edge.get("protocol") or "").strip().casefold()
+        if edge_protocol == "http":
+            if boundary_kind not in {"http", "rest"}:
+                continue
+        elif boundary_kind != edge_protocol:
+            continue
+        if str(occurrence.get("boundary_path") or "").strip() != endpoint:
+            continue
+        if str(occurrence.get("payload_role") or "").strip().casefold() != role:
+            continue
+        if str(occurrence.get("interaction_direction") or "").strip().casefold() != "outbound":
+            continue
+        if payload_identity and str(occurrence.get("payload_type") or "").strip() != payload_identity:
+            continue
+        raw_path = str(occurrence.get("wire_field_path") or item.get("wire_path") or "").strip()
+        if not raw_path:
+            continue
+        current = raw_nodes.get(raw_path)
+        if current is None or str(item.get("value_node_id") or "") < str(current.get("value_node_id") or ""):
+            raw_nodes[raw_path] = item
+
+    if not raw_nodes:
+        return []
+
+    collection_prefixes = {
+        path for path, item in raw_nodes.items()
+        if _is_collection_type(str(item.get("type_ref") or ""))
+    }
+
+    def canonical_path(raw_path: str) -> str:
+        parts = raw_path.split(".")
+        out: list[str] = []
+        prefix: list[str] = []
+        for index, part in enumerate(parts):
+            prefix.append(part)
+            rendered = part
+            if index < len(parts) - 1 and ".".join(prefix) in collection_prefixes:
+                rendered += "[]"
+            out.append(rendered)
+        return ".".join(out)
+
+    base_paths = {field.field_path for field in parent_fields}
+    result: list[BoundaryField] = []
+    seen: set[str] = set()
+    for raw_path in sorted(raw_nodes):
+        path = canonical_path(raw_path)
+        if path in base_paths:
+            continue
+        matching_parents = [
+            parent for parent in base_paths
+            if path.startswith(parent + ".") or path.startswith(parent + "[]" + ".")
+        ]
+        if not matching_parents:
+            continue
+        most_specific = max(matching_parents, key=lambda value: (len(value), value))
+        if most_specific not in expandable_parents:
+            continue
+        if path in seen:
+            continue
+        seen.add(path)
+        result.append(BoundaryField(
+            transport_role=role,
+            field_path=path,
+            source_repository_id=exemplar.source_repository_id,
+            target_repository_id=exemplar.target_repository_id,
+            source_interface_ids=exemplar.source_interface_ids,
+            target_interface_ids=exemplar.target_interface_ids,
+            source_payload_identity=exemplar.source_payload_identity,
+            target_payload_identity=exemplar.target_payload_identity,
+            topology_basis="published_source_boundary_shape_under_observed_topology_branch",
+        ))
+    return result
+
+
+def _structural_terminal_side(
+    *, repository_id: str, binding, direction: str, field: BoundaryField,
+) -> dict[str, Any]:
+    return {
+        "repository_id": repository_id,
+        "system_id": binding.system_id,
+        "revision_id": binding.revision_id,
+        "direction": direction,
+        "requested_anchor": wire_display_ref(field.transport_role, field.field_path),
+        "attempted_anchors": [],
+        "resolved_anchor": None,
+        "anchor_status": "terminal",
+        "anchor_selection_basis": "exact_transport_structure_no_observed_local_use",
+        "query": {"result": {"status": "resolved_terminal", "paths": [], "gaps": []}},
+        "terminal_proof": {
+            "source_boundary_structure": True,
+            "payload_identity_exact": _payload_compatible(field),
+            "field_path": field.field_path,
+        },
+    }
 
 def _payload_compatible(field: BoundaryField) -> bool:
     return bool(
@@ -1070,85 +1260,114 @@ def build_interaction_lineage(
     used_bindings: dict[str, Any] = {}
     node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] = {}
 
-    for role in transport_roles:
-        for field in boundary_fields(edge, transport_role=role):
-            source_binding = bindings.require(field.source_repository_id)
-            target_binding = bindings.require(field.target_repository_id)
-            used_bindings[source_binding.repository_id] = source_binding
-            used_bindings[target_binding.repository_id] = target_binding
-            source_ref = wire_display_ref(field.transport_role, field.field_path)
-
-            source_side = _resolve_side(
-                gateway,
-                edge=edge,
-                field=field,
-                side="source",
-                binding=source_binding,
-                repository_id=field.source_repository_id,
-                interface_ids=field.source_interface_ids,
-                payload_identity=field.source_payload_identity,
-                source_ref=source_ref,
-                direction="reverse",
-                node_catalog_cache=node_catalog_cache,
-            )
-            target_side = _resolve_side(
-                gateway,
-                edge=edge,
-                field=field,
-                side="target",
-                binding=target_binding,
-                repository_id=field.target_repository_id,
-                interface_ids=field.target_interface_ids,
-                payload_identity=field.target_payload_identity,
-                source_ref=source_ref,
-                direction="forward",
-                node_catalog_cache=node_catalog_cache,
-            )
-            child_expansion = _observed_child_expansion(
-                gateway,
-                binding=target_binding,
-                repository_id=field.target_repository_id,
-                side=target_side,
-            )
-            if child_expansion is not None:
-                target_side["observed_child_expansion"] = child_expansion
-
-            payload_compatible = _payload_compatible(field)
-            crossing_status = "resolved" if payload_compatible else "partial"
-            crossing_basis = (
-                "exact_field_path_within_matched_transport_payload"
-                if payload_compatible
-                else "insufficient_exact_boundary_evidence"
-            )
-            if not payload_compatible:
-                gaps.append(_gap(field.source_repository_id, field, "crossing", "payload_identity_not_exactly_compatible"))
+    def process(field: BoundaryField, *, structural_expansion: bool = False) -> dict[str, Any]:
+        source_binding = bindings.require(field.source_repository_id)
+        target_binding = bindings.require(field.target_repository_id)
+        used_bindings[source_binding.repository_id] = source_binding
+        used_bindings[target_binding.repository_id] = target_binding
+        source_ref = wire_display_ref(field.transport_role, field.field_path)
+        source_side = _resolve_side(
+            gateway, edge=edge, field=field, side="source", binding=source_binding,
+            repository_id=field.source_repository_id, interface_ids=field.source_interface_ids,
+            payload_identity=field.source_payload_identity, source_ref=source_ref, direction="reverse",
+            node_catalog_cache=node_catalog_cache,
+        )
+        target_side = _resolve_side(
+            gateway, edge=edge, field=field, side="target", binding=target_binding,
+            repository_id=field.target_repository_id, interface_ids=field.target_interface_ids,
+            payload_identity=field.target_payload_identity, source_ref=source_ref, direction="forward",
+            node_catalog_cache=node_catalog_cache,
+        )
+        if structural_expansion and _payload_compatible(field):
+            # A structural-expanded row asserts only exact transport shape beneath
+            # an already-observed topology branch.  If repository-local value flow
+            # does not resolve on either side, preserve that distinction as a
+            # terminal/no-field-specific-flow state rather than manufacturing a
+            # lineage gap.  Any observed local flow still wins and stays resolved.
             if source_side["anchor_status"] == "unresolved":
-                gaps.append(_gap(field.source_repository_id, field, "source", "source_local_anchor_unresolved"))
+                source_side = _structural_terminal_side(
+                    repository_id=field.source_repository_id, binding=source_binding,
+                    direction="reverse", field=field,
+                )
             if target_side["anchor_status"] == "unresolved":
-                gaps.append(_gap(field.target_repository_id, field, "target", "target_local_anchor_unresolved"))
+                target_side = _structural_terminal_side(
+                    repository_id=field.target_repository_id, binding=target_binding,
+                    direction="forward", field=field,
+                )
 
-            journey_identity = {
-                "edge_id": edge_id,
-                "transport_role": field.transport_role,
-                "field_path": field.field_path,
-                "source_repository_id": field.source_repository_id,
-                "target_repository_id": field.target_repository_id,
-            }
-            journeys.append({
-                "journey_id": "interaction_attribute_journey_" + _fingerprint(journey_identity)[:24],
-                **journey_identity,
-                "topology_basis": field.topology_basis,
-                "crossing": {
-                    "status": crossing_status,
-                    "basis": crossing_basis,
-                    "source_payload_identity": field.source_payload_identity,
-                    "target_payload_identity": field.target_payload_identity,
-                    "source_interface_ids": list(field.source_interface_ids),
-                    "target_interface_ids": list(field.target_interface_ids),
-                },
-                "source_side": source_side,
-                "target_side": target_side,
-            })
+        payload_compatible = _payload_compatible(field)
+        crossing_status = "resolved" if payload_compatible else "partial"
+        crossing_basis = (
+            "exact_field_path_within_matched_transport_payload"
+            if payload_compatible else "insufficient_exact_boundary_evidence"
+        )
+        if not payload_compatible:
+            gaps.append(_gap(field.source_repository_id, field, "crossing", "payload_identity_not_exactly_compatible"))
+        if source_side["anchor_status"] == "unresolved":
+            gaps.append(_gap(field.source_repository_id, field, "source", "source_local_anchor_unresolved"))
+        if target_side["anchor_status"] == "unresolved":
+            gaps.append(_gap(field.target_repository_id, field, "target", "target_local_anchor_unresolved"))
+
+        identity = {
+            "edge_id": edge_id,
+            "transport_role": field.transport_role,
+            "field_path": field.field_path,
+            "source_repository_id": field.source_repository_id,
+            "target_repository_id": field.target_repository_id,
+        }
+        journey = {
+            "journey_id": "interaction_attribute_journey_" + _fingerprint(identity)[:24],
+            **identity,
+            "topology_basis": field.topology_basis,
+            "crossing": {
+                "status": crossing_status,
+                "basis": crossing_basis,
+                "source_payload_identity": field.source_payload_identity,
+                "target_payload_identity": field.target_payload_identity,
+                "source_interface_ids": list(field.source_interface_ids),
+                "target_interface_ids": list(field.target_interface_ids),
+            },
+            "source_side": source_side,
+            "target_side": target_side,
+        }
+        journeys.append(journey)
+        return journey
+
+    for role in transport_roles:
+        base_fields = boundary_fields(edge, transport_role=role)
+        base_journeys: dict[str, dict[str, Any]] = {}
+        for field in base_fields:
+            base_journeys[field.field_path] = process(field)
+
+        # Old topology fixtures intentionally publish only stable branch roots.
+        # Extend those roots from exact source route-boundary facts, but only below
+        # the most-specific topology branch that has observed consumer continuation.
+        expandable = {
+            path for path, journey in base_journeys.items()
+            if _side_has_observed_continuation(journey["target_side"])
+        }
+        if base_fields and expandable:
+            source_binding = bindings.require(base_fields[0].source_repository_id)
+            catalog, complete = _repository_node_catalog(
+                gateway, binding=source_binding,
+                repository_id=base_fields[0].source_repository_id, cache=node_catalog_cache,
+            )
+            if complete:
+                for field in _source_boundary_shape_fields(
+                    catalog, edge=edge, parent_fields=base_fields, expandable_parents=expandable,
+                ):
+                    process(field, structural_expansion=True)
+
+    # Attach direct observed target child evidence for diagnostics/UI only; the
+    # canonical journey rows above already include permitted structural expansion.
+    for journey in journeys:
+        target_binding = bindings.require(journey["target_repository_id"])
+        child_expansion = _observed_child_expansion(
+            gateway, binding=target_binding, repository_id=journey["target_repository_id"],
+            side=journey["target_side"],
+        )
+        if child_expansion is not None:
+            journey["target_side"]["observed_child_expansion"] = child_expansion
 
     journeys.sort(key=lambda item: (item["transport_role"], item["field_path"], item["journey_id"]))
     gaps.sort(key=lambda item: (item["transport_role"], item["field_path"], item["side"], item["repository_id"], item["reason"]))
@@ -1157,13 +1376,10 @@ def build_interaction_lineage(
         "topology_id": str(topology.get("topology_id") or ""),
         "topology_fingerprint": _fingerprint(topology),
         "edge": {
-            "edge_id": str(edge.get("edge_id") or ""),
-            "protocol": edge.get("protocol"),
-            "method": edge.get("method"),
-            "matched_identity": edge.get("matched_identity"),
+            "edge_id": str(edge.get("edge_id") or ""), "protocol": edge.get("protocol"),
+            "method": edge.get("method"), "matched_identity": edge.get("matched_identity"),
             "match_classification": edge.get("match_classification"),
-            "claim_classification": edge.get("claim_classification"),
-            "confidence": edge.get("confidence"),
+            "claim_classification": edge.get("claim_classification"), "confidence": edge.get("confidence"),
             "source_repository_id": edge.get("source_repository_id"),
             "target_repository_id": edge.get("target_repository_id"),
         },
@@ -1181,3 +1397,4 @@ def build_interaction_lineage(
     }
     output["content_fingerprint"] = _fingerprint(output)
     return output
+

@@ -449,3 +449,43 @@ def test_prepare_missing_bindings_become_generic_repository_demands(monkeypatch)
     assert {call["observed_boundary"]["repository_id"] for call in gateway.calls} == {"caller", "service"}
     assert all("nexus" not in str(call).lower() for call in gateway.calls)
     assert {item["repository_id"] for item in result["bindings"]["repositories"]} == {"caller", "service"}
+
+
+
+def test_prepare_preserves_framework_composite_selected_repo_ids(monkeypatch) -> None:
+    before = _not_ready_with_requirement()
+    after = {
+        **before,
+        "status": "ready",
+        "repositories": [
+            {"repository_id": "caller", "status": "ready"},
+            {"repository_id": "service", "status": "ready"},
+        ],
+        "preparation_requirements": [],
+        "summary": {"repository_count": 2, "ready_repository_count": 2, "not_ready_repository_count": 0},
+    }
+    calls = iter([before, after])
+    seen_bindings = []
+    def fake_check(*args, **kwargs):
+        seen_bindings.append(kwargs["bindings"])
+        return next(calls)
+    monkeypatch.setattr(prepare_mod, "check_interaction_lineage", fake_check)
+    payload = _framework_result()
+    payload["final_readiness"]["knowledge_refs"][0]["selected_repo_ids"] = ["caller", "maven:g:a:1.2.3"]
+    result = prepare_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(),
+        readiness_gateway=ReadinessGateway(), preparation_gateway=FakePreparationGateway(payload),
+    )
+    assert result["status"] == "prepared"
+    pinned = {item["repository_id"]: item for item in result["bindings"]["repositories"]}
+    assert pinned["caller"]["selected_repo_ids"] == ["caller", "maven:g:a:1.2.3"]
+    assert seen_bindings[1].require("caller").query_repo_ids("caller") == ("caller", "maven:g:a:1.2.3")
+
+
+def test_binding_round_trip_keeps_composite_selected_repo_ids() -> None:
+    binding = AislBinding.from_payload({
+        "repository_id": "repo-a", "system_id": "system-a", "revision_id": "rev-a",
+        "selected_repo_ids": ["repo-a", "maven:g:a:1", "maven:g:a:1"],
+    })
+    assert binding.query_repo_ids("repo-a") == ("repo-a", "maven:g:a:1")
+    assert binding.to_dict()["selected_repo_ids"] == ["repo-a", "maven:g:a:1"]
