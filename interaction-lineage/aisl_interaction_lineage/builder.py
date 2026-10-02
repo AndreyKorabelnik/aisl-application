@@ -281,6 +281,193 @@ def _resolve_leaf_by_reverse_proof(
     return response, result, selected, "exact_reverse_path_to_topology_field"
 
 
+_NODE_PAGE_SIZE = 500
+_STRUCTURAL_NODE_KINDS = {"field", "derivation"}
+
+
+def _repository_node_catalog(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+) -> tuple[list[Mapping[str, Any]], bool]:
+    key = (str(binding.system_id), str(binding.revision_id), repository_id)
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+
+    items: list[Mapping[str, Any]] = []
+    page_token = ""
+    seen_tokens: set[str] = set()
+    complete = True
+    while True:
+        listing = gateway.list_repository_value_nodes(
+            binding,
+            repository_id=repository_id,
+            max_results=_NODE_PAGE_SIZE,
+            page_token=page_token,
+        )
+        result = _result(listing)
+        rows = result.get("items")
+        if not isinstance(rows, list):
+            complete = False
+            break
+        items.extend(item for item in rows if isinstance(item, Mapping))
+        next_token = str(result.get("next_token") or "")
+        truncated = bool(result.get("truncated"))
+        if not truncated:
+            break
+        if not next_token or next_token in seen_tokens:
+            complete = False
+            break
+        seen_tokens.add(next_token)
+        page_token = next_token
+
+    value = (items, complete)
+    cache[key] = value
+    return value
+
+
+def _operation_accepts_payload(
+    catalog: Sequence[Mapping[str, Any]],
+    *,
+    operation: str,
+    payload_identity: str,
+) -> bool:
+    return any(
+        str(item.get("operation") or "") == operation
+        and str(item.get("type_ref") or "") == payload_identity
+        and str(item.get("node_kind") or "") in {"parameter", "return_value"}
+        for item in catalog
+    )
+
+
+def _payload_scoped_structural_candidates(
+    catalog: Sequence[Mapping[str, Any]],
+    *,
+    repository_id: str,
+    payload_identity: str,
+    field_path: str,
+) -> list[Mapping[str, Any]]:
+    nested = "." in field_path
+    suffix = "." + field_path
+    candidates: list[Mapping[str, Any]] = []
+    for item in catalog:
+        if str(item.get("repo_id") or "") != repository_id:
+            continue
+        if str(item.get("node_kind") or "") not in _STRUCTURAL_NODE_KINDS:
+            continue
+        display_ref = str(item.get("display_ref") or "")
+        if display_ref != field_path and not (nested and display_ref.endswith(suffix)):
+            continue
+        operation = str(item.get("operation") or "")
+        if not operation or not _operation_accepts_payload(
+            catalog,
+            operation=operation,
+            payload_identity=payload_identity,
+        ):
+            continue
+        candidates.append(item)
+
+    # Multiple source occurrences of the same structural expression are equivalent
+    # for anchor selection. Keep one stable representative per semantic signature.
+    unique: dict[tuple[str, str, str, str], Mapping[str, Any]] = {}
+    for item in candidates:
+        signature = (
+            str(item.get("operation") or ""),
+            str(item.get("display_ref") or ""),
+            str(item.get("node_kind") or ""),
+            str(item.get("source_path") or ""),
+        )
+        current = unique.get(signature)
+        if current is None or str(item.get("value_node_id") or "") < str(current.get("value_node_id") or ""):
+            unique[signature] = item
+    return [unique[key] for key in sorted(unique)]
+
+
+def _target_published_fallback(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    payload_identity: str | None,
+    field_path: str,
+    direction: str,
+    requested_anchor: str,
+    attempted_anchors: list[str],
+    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+) -> dict[str, Any] | None:
+    payload = str(payload_identity or "").strip()
+    if direction != "forward" or not payload or not field_path:
+        return None
+    catalog, complete = _repository_node_catalog(
+        gateway,
+        binding=binding,
+        repository_id=repository_id,
+        cache=cache,
+    )
+    if not complete:
+        return None
+    candidates = _payload_scoped_structural_candidates(
+        catalog,
+        repository_id=repository_id,
+        payload_identity=payload,
+        field_path=field_path,
+    )
+    if len(candidates) == 1:
+        selected = candidates[0]
+        response, result = _run_selected(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            selected=selected,
+            direction=direction,
+        )
+        status = str(result.get("status") or "")
+        source = result.get("source")
+        if isinstance(source, Mapping) and not status.startswith("source_") and status != "unavailable":
+            attempted = [*attempted_anchors, str(selected.get("value_node_id") or "")]
+            return _resolved_side(
+                repository_id=repository_id,
+                binding=binding,
+                direction=direction,
+                requested_anchor=requested_anchor,
+                attempted_anchors=attempted,
+                response=response,
+                result=result,
+                selected=selected,
+                basis="published_payload_structural_candidate:unique_semantic_node",
+            )
+    if candidates:
+        return None
+
+    return {
+        "repository_id": repository_id,
+        "system_id": binding.system_id,
+        "revision_id": binding.revision_id,
+        "direction": direction,
+        "requested_anchor": requested_anchor,
+        "attempted_anchors": list(attempted_anchors),
+        "resolved_anchor": None,
+        "anchor_status": "terminal",
+        "anchor_selection_basis": "complete_published_value_node_scan:no_payload_scoped_field_specific_use",
+        "query": {
+            "result": {
+                "status": "resolved_terminal",
+                "paths": [],
+                "gaps": [],
+            }
+        },
+        "terminal_proof": {
+            "payload_identity": payload,
+            "field_path": field_path,
+            "repository_value_node_scan_complete": True,
+            "payload_scoped_structural_candidate_count": 0,
+        },
+    }
+
+
 def _resolved_side(
     *,
     repository_id: str,
@@ -322,6 +509,7 @@ def _resolve_side(
     payload_identity: str | None,
     source_ref: str,
     direction: str,
+    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] | None = None,
 ) -> dict[str, Any]:
     attempted: list[str] = []
     attempts: list[tuple[str, str]] = [(source_ref, "canonical_wire_display_ref")]
@@ -376,6 +564,21 @@ def _resolve_side(
                 selected=selected,
                 basis=f"{strategy}:{basis}",
             )
+
+    if side == "target":
+        fallback = _target_published_fallback(
+            gateway,
+            binding=binding,
+            repository_id=repository_id,
+            payload_identity=payload_identity,
+            field_path=field.field_path,
+            direction=direction,
+            requested_anchor=source_ref,
+            attempted_anchors=attempted,
+            cache=node_catalog_cache if node_catalog_cache is not None else {},
+        )
+        if fallback is not None:
+            return fallback
 
     leaf = _resolve_leaf_by_reverse_proof(
         gateway,
@@ -509,6 +712,7 @@ def build_interaction_lineage(
     journeys: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
     used_bindings: dict[str, Any] = {}
+    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] = {}
 
     for role in transport_roles:
         for field in boundary_fields(edge, transport_role=role):
@@ -529,6 +733,7 @@ def build_interaction_lineage(
                 payload_identity=field.source_payload_identity,
                 source_ref=source_ref,
                 direction="reverse",
+                node_catalog_cache=node_catalog_cache,
             )
             target_side = _resolve_side(
                 gateway,
@@ -541,6 +746,7 @@ def build_interaction_lineage(
                 payload_identity=field.target_payload_identity,
                 source_ref=source_ref,
                 direction="forward",
+                node_catalog_cache=node_catalog_cache,
             )
             child_expansion = _observed_child_expansion(
                 gateway,
@@ -562,7 +768,7 @@ def build_interaction_lineage(
                 gaps.append(_gap(field.source_repository_id, field, "crossing", "payload_identity_not_exactly_compatible"))
             if source_side["anchor_status"] != "resolved":
                 gaps.append(_gap(field.source_repository_id, field, "source", "source_local_anchor_unresolved"))
-            if target_side["anchor_status"] != "resolved":
+            if target_side["anchor_status"] == "unresolved":
                 gaps.append(_gap(field.target_repository_id, field, "target", "target_local_anchor_unresolved"))
 
             journey_identity = {
