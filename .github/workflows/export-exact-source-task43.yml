@@ -12,10 +12,10 @@ jobs:
   export:
     runs-on: ubuntu-latest
     env:
-      SOURCE_SHA: dd30fab1486778b490531d53291afdc4dee020d4
-      SOURCE_TREE: 8968aeca58804e402265066f2fe5ce8c23ac163d
-      ARCHIVE_NAME: aisl-application-source-main-dd30fab1.zip
-      ARTIFACT_NAME: aisl-application-source-main-dd30fab1
+      SOURCE_SHA: 61fc527de69820a4959db957bb62edeb7940c2ab
+      SOURCE_TREE: a2f3f7cf5f9f499a2bebbe684c771d5a2b252173
+      ARCHIVE_NAME: aisl-application-source-main-61fc527d.zip
+      ARTIFACT_NAME: aisl-application-source-main-61fc527d
     steps:
       - name: Check out exact source commit
         uses: actions/checkout@v4
