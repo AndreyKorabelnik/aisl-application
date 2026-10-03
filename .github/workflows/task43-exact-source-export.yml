@@ -11,25 +11,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 8a1f27fcf1bfdaf0cae45b52ca058b8a0978a548
+          ref: 2b96650253860f47e153f924e35bf81028ccf8cf
           fetch-depth: 0
       - name: Verify exact source identity
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "8a1f27fcf1bfdaf0cae45b52ca058b8a0978a548"
-          test "$(git rev-parse HEAD^{tree})" = "fc497fac984bd0e60138ce12e4ceadd1a502c239"
+          test "$(git rev-parse HEAD)" = "2b96650253860f47e153f924e35bf81028ccf8cf"
+          test "$(git rev-parse HEAD^{tree})" = "5fa3d09cc8ca1485ebedbbb84b401d7c908fb245"
           test -z "$(git status --porcelain)"
       - name: Create exact Git archive
         shell: bash
         run: |
           set -euo pipefail
-          git archive --format=zip 8a1f27fcf1bfdaf0cae45b52ca058b8a0978a548 -o aisl-application-source.zip
+          git archive --format=zip 2b96650253860f47e153f924e35bf81028ccf8cf -o aisl-application-source.zip
           sha256sum aisl-application-source.zip > source-archive.sha256
-          printf 'repository=AndreyKorabelnik/aisl-application\ncommit=8a1f27fcf1bfdaf0cae45b52ca058b8a0978a548\nroot_tree=fc497fac984bd0e60138ce12e4ceadd1a502c239\n' > source-identity.txt
+          printf 'repository=AndreyKorabelnik/aisl-application\ncommit=2b96650253860f47e153f924e35bf81028ccf8cf\nroot_tree=5fa3d09cc8ca1485ebedbbb84b401d7c908fb245\n' > source-identity.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: aisl-application-source-main-8a1f27f
+          name: aisl-application-source-main-2b96650
           path: |
             aisl-application-source.zip
             source-archive.sha256
