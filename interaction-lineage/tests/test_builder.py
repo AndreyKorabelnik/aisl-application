@@ -1500,3 +1500,44 @@ def test_target_semantic_projection_does_not_promote_concrete_collection_class()
     assert projection is not None
     assert projection["consumer_attribute"] == "result[].bankAcctRec.cardAcctId.custInfo.personInfo.birthday"
     assert all(not item["semantic_ref"].startswith("ArrayList.") for item in projection["chain"])
+
+
+def test_target_semantic_projection_uses_typed_catalog_node_for_ambiguous_collection_payload_suffix() -> None:
+    anchor = {"value_node_id": "anchor", "node_kind": "field", "display_ref": "clientInfo.identifications.documentSeries"}
+    person = {"value_node_id": "person", "node_kind": "field", "display_ref": "person.identityCard.idNum"}
+    customer = {"value_node_id": "customer", "node_kind": "field", "display_ref": "customer.personInfo.identityCard.idNum"}
+    wagons = {"value_node_id": "wagons-field", "node_kind": "field", "display_ref": "wagons.bankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"}
+    result = {"value_node_id": "result-field", "node_kind": "field", "display_ref": "result.bankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"}
+    typed_bank = {"value_node_id": "bank-field", "node_kind": "field", "display_ref": "bankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"}
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [
+            {"start": anchor, "steps": [{"target": person}, {"target": customer}, {"target": wagons}], "end": wagons},
+            {"start": anchor, "steps": [{"target": person}, {"target": customer}, {"target": result}], "end": result},
+        ]}},
+    }
+    catalog = [
+        anchor,
+        {**person, "occurrence_id": "person-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "person-object", "property_name": "identityCard.idNum"}}},
+        {"value_node_id": "person-object-node", "occurrence_id": "person-object", "node_kind": "local_value", "display_ref": "person", "type_ref": "PersonInfo", "payload_json": {"source_occurrence": {"declared_type": "PersonInfo"}}},
+        {**customer, "occurrence_id": "customer-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "customer-object", "property_name": "personInfo.identityCard.idNum"}}},
+        {"value_node_id": "customer-object-node", "occurrence_id": "customer-object", "node_kind": "local_value", "display_ref": "customer", "type_ref": "CustInfo", "payload_json": {"source_occurrence": {"declared_type": "CustInfo"}}},
+        {**wagons, "occurrence_id": "wagons-field-occ", "payload_json": {"source_occurrence": {"object_occurrence_id": "wagons-object", "property_name": "bankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"}}},
+        {"value_node_id": "wagons-object-node", "occurrence_id": "wagons-object", "node_kind": "local_value", "display_ref": "wagons", "type_ref": "List", "payload_json": {"source_occurrence": {"declared_type": "List"}}},
+        {**result, "occurrence_id": "result-field-occ", "payload_json": {"source_occurrence": {"object_occurrence_id": "result-object", "property_name": "bankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"}}},
+        {"value_node_id": "result-object-node", "occurrence_id": "result-object", "node_kind": "local_value", "display_ref": "result", "type_ref": "List", "payload_json": {"source_occurrence": {"declared_type": "List"}}},
+        {**typed_bank, "occurrence_id": "bank-field-occ", "payload_json": {"source_occurrence": {"object_occurrence_id": "bank-object", "property_name": "cardAcctId.custInfo.personInfo.identityCard.idNum"}}},
+        {"value_node_id": "bank-object-node", "occurrence_id": "bank-object", "node_kind": "local_value", "display_ref": "bankAcctRec", "type_ref": "BankAcctRec", "payload_json": {"source_occurrence": {"declared_type": "BankAcctRec"}}},
+    ]
+
+    projection = _target_semantic_projection(side, catalog=catalog)
+
+    assert projection is not None
+    assert projection["entry_consumer_attribute"] == "PersonInfo.identityCard.idNum"
+    assert projection["consumer_attribute"] == "BankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum"
+    assert [item["semantic_ref"] for item in projection["chain"]] == [
+        "PersonInfo.identityCard.idNum",
+        "CustInfo.personInfo.identityCard.idNum",
+        "BankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum",
+    ]
