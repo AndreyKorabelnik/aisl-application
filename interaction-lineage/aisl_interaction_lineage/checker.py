@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping, Sequence
 
 from .aisl import AislReadinessGateway
-from .builder import _material_source_origin_gap, _repository_node_catalog, _resolve_side
+from .builder import _external_origin_evidence, _material_source_origin_gap, _repository_node_catalog, _resolve_side
 from .contracts import BindingIndex
 from .topology import boundary_fields, select_edge, wire_display_ref
 
@@ -227,7 +227,7 @@ def check_interaction_lineage(
     repositories: dict[str, dict[str, Any]] = {}
     diagnostics: list[dict[str, Any]] = []
     preparation_requirements: list[dict[str, Any]] = []
-    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] = {}
+    node_catalog_cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]] = {}
 
     for repository_id in _repo_ids(edge, transport_roles):
         binding = bindings.find(repository_id)
@@ -381,18 +381,39 @@ def check_interaction_lineage(
                             selected_repo_ids=binding.query_repo_ids(repository_id),
                         )
                         if material_requirement is not None:
-                            preparation_requirements.append(material_requirement)
-                            row["status"] = "material_semantic_gap"
-                            diagnostics.append({
-                                "code": "source_external_origin_unresolved",
-                                "repository_id": repository_id,
-                                "edge_id": edge_id,
-                                "transport_role": field.transport_role,
-                                "field_path": field.field_path,
-                                "side": side,
-                                "blocking": True,
-                                "evidence": list(material_requirement.get("evidence") or ()),
-                            })
+                            external_evidence = _external_origin_evidence(
+                                gateway,
+                                binding=binding,
+                                repository_id=repository_id,
+                                material_gap=material_requirement,
+                                cache=node_catalog_cache,
+                            )
+                            if external_evidence is not None:
+                                row["external_origin_evidence"] = dict(external_evidence)
+                                diagnostics.append({
+                                    "code": "source_external_origin_semantically_covered",
+                                    "repository_id": repository_id,
+                                    "edge_id": edge_id,
+                                    "transport_role": field.transport_role,
+                                    "field_path": field.field_path,
+                                    "side": side,
+                                    "blocking": False,
+                                    "bridge_status": external_evidence.get("bridge_status"),
+                                    "segment_count": len(external_evidence.get("segments") or ()),
+                                })
+                            else:
+                                preparation_requirements.append(material_requirement)
+                                row["status"] = "material_semantic_gap"
+                                diagnostics.append({
+                                    "code": "source_external_origin_unresolved",
+                                    "repository_id": repository_id,
+                                    "edge_id": edge_id,
+                                    "transport_role": field.transport_role,
+                                    "field_path": field.field_path,
+                                    "side": side,
+                                    "blocking": True,
+                                    "evidence": list(material_requirement.get("evidence") or ()),
+                                })
 
     items = [repositories[key] for key in sorted(repositories)]
     ready = all(item.get("status") == "ready" for item in items) and bool(items)

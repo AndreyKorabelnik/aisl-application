@@ -717,3 +717,167 @@ def test_prepare_keeps_external_origin_blocked_without_mechanical_type_anchor(mo
     assert result["status"] == "blocked"
     assert prep.calls == []
     assert result["diagnostics"][0]["code"] == "external_source_owner_unresolved"
+
+
+def test_check_material_external_origin_is_ready_when_selected_external_repo_has_exact_typed_property_flow(monkeypatch) -> None:
+    def fake_resolve_side(
+        gateway, *, edge, field, side, binding, repository_id, interface_ids,
+        payload_identity, source_ref, direction, node_catalog_cache,
+    ):
+        if repository_id == "service" and side == "source" and field.field_path == "profile.id":
+            return {
+                "repository_id": repository_id,
+                "system_id": binding.system_id,
+                "revision_id": binding.revision_id,
+                "direction": direction,
+                "requested_anchor": source_ref,
+                "attempted_anchors": [source_ref],
+                "resolved_anchor": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                "anchor_status": "resolved",
+                "anchor_selection_basis": "test",
+                "query": {"result": {
+                    "status": "partial",
+                    "source": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                    "paths": [{
+                        "status": "partial",
+                        "start": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                        "end": {"value_node_id": "terminal-child", "display_ref": "converter.convert().id"},
+                        "steps": [],
+                    }],
+                    "gaps": [],
+                }},
+            }
+        return {
+            "repository_id": repository_id,
+            "system_id": binding.system_id,
+            "revision_id": binding.revision_id,
+            "direction": direction,
+            "requested_anchor": source_ref,
+            "attempted_anchors": [source_ref],
+            "resolved_anchor": {"value_node_id": f"{repository_id}:{source_ref}", "display_ref": source_ref},
+            "anchor_status": "resolved",
+            "anchor_selection_basis": "test",
+            "query": {"result": {
+                "status": "confirmed_complete",
+                "source": {"value_node_id": f"{repository_id}:{source_ref}", "display_ref": source_ref},
+                "paths": [],
+                "gaps": [],
+            }},
+        }
+
+    class ExternalEvidenceGateway(ReadinessGateway):
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id == "service":
+                items = [
+                    {
+                        "value_node_id": "terminal-child",
+                        "display_ref": "converter.convert().id",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_id": "child-occ",
+                            "occurrence_kind": "projected_object_field",
+                            "object_occurrence_id": "parent-occ",
+                        }},
+                    },
+                    {
+                        "value_node_id": "parent-node",
+                        "display_ref": "converter.convert()",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_id": "parent-occ",
+                            "occurrence_kind": "method_invocation",
+                            "resolution_status": "external_or_unresolved",
+                            "declared_type": "ExternalProfile",
+                            "method_name": "convert",
+                        }},
+                    },
+                ]
+            elif repository_id == "maven:g:a:1.2.3" and node_kind == "field" and operation is None:
+                items = [{
+                    "value_node_id": "external-target-id",
+                    "node_kind": "field",
+                    "operation": "Mapper.map",
+                    "display_ref": "mapped.id",
+                    "source_path": "Mapper.java",
+                    "payload_json": {"source_occurrence": {
+                        "occurrence_id": "mapped-id-occ",
+                        "occurrence_kind": "local_field",
+                        "property_name": "id",
+                        "operation": "Mapper.map",
+                    }},
+                }]
+            elif repository_id == "maven:g:a:1.2.3" and operation == "Mapper.map":
+                items = [
+                    {
+                        "value_node_id": "external-owner",
+                        "node_kind": "local_value",
+                        "operation": "Mapper.map",
+                        "display_ref": "mapped",
+                        "type_ref": "ExternalProfile",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_id": "mapped-occ",
+                            "occurrence_kind": "local_variable",
+                            "symbol": "mapped",
+                            "declared_type": "ExternalProfile",
+                            "operation": "Mapper.map",
+                        }},
+                    },
+                ]
+            else:
+                items = []
+            return {"result": {
+                "items": items,
+                "total_count": len(items),
+                "returned_count": len(items),
+                "truncated": False,
+            }}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str,
+            selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            if source == "external-target-id" and tuple(selected_repo_ids) == ("maven:g:a:1.2.3",):
+                target = {
+                    "value_node_id": "external-target-id", "repo_id": "maven:g:a:1.2.3",
+                    "display_ref": "mapped.id", "node_kind": "field", "source_path": "Mapper.java",
+                }
+                origin = {
+                    "value_node_id": "external-origin-id", "repo_id": "maven:g:a:1.2.3",
+                    "display_ref": "source.id", "node_kind": "field", "source_path": "Mapper.java",
+                }
+                return {"result": {
+                    "status": "partial", "source": target,
+                    "paths": [{
+                        "status": "partial", "hop_count": 1, "confidence": "confirmed",
+                        "start": target, "end": origin,
+                        "steps": [{"value_flow_edge_id": "edge-1", "source": origin, "target": target}],
+                    }],
+                    "gaps": [],
+                }}
+            return super().resolve_attribute_paths(
+                binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction,
+            )
+
+    composite_bindings = BindingIndex([
+        AislBinding("caller", "caller-system", "caller-rev"),
+        AislBinding(
+            "service", "service-system", "service-rev-2",
+            ("service", "maven:g:a:1.2.3"),
+        ),
+    ])
+    monkeypatch.setattr(checker_mod, "_resolve_side", fake_resolve_side)
+    result = check_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=composite_bindings,
+        gateway=ExternalEvidenceGateway(), transport_roles=("response",),
+    )
+    assert result["status"] == "ready"
+    service = next(item for item in result["repositories"] if item["repository_id"] == "service")
+    assert service["status"] == "ready"
+    assert service["external_origin_evidence"]["bridge_status"] == "cross_repository_link_not_observed"
+    assert service["external_origin_evidence"]["segments"][0]["origins"][0]["display_ref"] == "source.id"
+    assert not any(item.get("state") == "external_source_owner_unresolved" for item in result["preparation_requirements"])
+    assert any(
+        item.get("code") == "source_external_origin_semantically_covered" and item.get("blocking") is False
+        for item in result["diagnostics"]
+    )
