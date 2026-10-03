@@ -25,6 +25,10 @@ _GAP_LABELS_RU = {
         "источник атрибута выходит за текущую опубликованную область знаний; "
         "внешний owner не определён механически"
     ),
+    "source_external_origin_link_unproven": (
+        "внешний semantic evidence найден; точная связь этого evidence с локальным вызовом "
+        "между репозиториями не наблюдается"
+    ),
     "OBSERVED_TERMINAL_NO_USE": "дальнейшее использование атрибута не наблюдается",
 }
 
@@ -88,9 +92,51 @@ def _source_projection(side: Any) -> tuple[str, str]:
     )
 
 
+def _external_origin_segments(side: Any) -> list[Mapping[str, Any]]:
+    evidence = _mapping(_mapping(side).get("external_origin_evidence"))
+    return [item for item in _sequence(evidence.get("segments")) if isinstance(item, Mapping)]
+
+
+def _external_origin_projection(side: Any) -> str:
+    projected: list[str] = []
+    for segment in _external_origin_segments(side):
+        repository_id = str(segment.get("repository_id") or "").strip()
+        origins = [
+            _display_ref(item) for item in _sequence(segment.get("origins"))
+            if isinstance(item, Mapping)
+        ]
+        target = _display_ref(_mapping(segment.get("target")))
+        transformations = [
+            _display_ref(item) for item in _sequence(segment.get("transformations"))
+            if isinstance(item, Mapping)
+        ]
+        origin = _join_unique(origins, separator=" | OR | ")
+        transform = _join_unique(transformations, separator=" -> ")
+        if not repository_id or not origin or not target:
+            continue
+        path = f"{repository_id}: {origin}"
+        if transform:
+            path += f" --[{transform}]→ {target}"
+        elif origin != target:
+            path += f" → {target}"
+        projected.append(path)
+    return _join_unique(projected, separator=" | OR SEGMENT | ")
+
+
 def _producer_attribute(side: Any, start_attribute: str, crossing_attribute: str) -> str:
     if str(_mapping(side).get("anchor_status") or "") != "resolved":
         return ""
+    external_origins = [
+        _display_ref(origin)
+        for segment in _external_origin_segments(side)
+        for origin in _sequence(segment.get("origins"))
+        if isinstance(origin, Mapping)
+    ]
+    external_unique = _join_unique(external_origins, separator=" | OR | ")
+    if external_unique and " | OR | " not in external_unique:
+        return external_unique
+    if external_unique:
+        return crossing_attribute
     starts = [_display_ref(_mapping(path.get("end"))) for path in _paths(side)]
     unique = _join_unique(starts, separator=" | OR | ")
     if unique and " | OR | " not in unique:
@@ -215,8 +261,15 @@ def human_rows(lineage: Mapping[str, Any]) -> list[dict[str, str]]:
         elif not target_destination and not target_terminal:
             target_path += " → [unresolved target]"
 
+        external_projection = _external_origin_projection(source_side)
+        source_projection = f"{source_repository}: {source_path}"
+        if external_projection:
+            source_projection = (
+                f"{external_projection} "
+                f"~[cross-repository link not observed]~ {source_projection}"
+            )
         full_path = (
-            f"{source_repository}: {source_path} "
+            f"{source_projection} "
             f"== {transport} / {role} ==> "
             f"{target_repository}: {target_path}"
         )

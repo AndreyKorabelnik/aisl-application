@@ -285,14 +285,19 @@ _NODE_PAGE_SIZE = 500
 _STRUCTURAL_NODE_KINDS = {"field", "derivation"}
 
 
-def _repository_node_catalog(
+def _filtered_node_catalog(
     gateway: AislPathGateway,
     *,
     binding,
     repository_id: str,
-    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+    node_kind: str | None = None,
+    operation: str | None = None,
 ) -> tuple[list[Mapping[str, Any]], bool]:
-    key = (str(binding.system_id), str(binding.revision_id), repository_id)
+    key = (
+        str(binding.system_id), str(binding.revision_id), repository_id,
+        str(node_kind or ""), str(operation or ""),
+    )
     cached = cache.get(key)
     if cached is not None:
         return cached
@@ -305,6 +310,8 @@ def _repository_node_catalog(
         listing = gateway.list_repository_value_nodes(
             binding,
             repository_id=repository_id,
+            node_kind=node_kind,
+            operation=operation,
             max_results=_NODE_PAGE_SIZE,
             page_token=page_token,
         )
@@ -329,6 +336,18 @@ def _repository_node_catalog(
     return value
 
 
+def _repository_node_catalog(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+) -> tuple[list[Mapping[str, Any]], bool]:
+    return _filtered_node_catalog(
+        gateway, binding=binding, repository_id=repository_id, cache=cache,
+    )
+
+
 def _node_payload(item: Mapping[str, Any]) -> Mapping[str, Any]:
     value = item.get("payload_json")
     return value if isinstance(value, Mapping) else {}
@@ -337,6 +356,32 @@ def _node_payload(item: Mapping[str, Any]) -> Mapping[str, Any]:
 def _source_occurrence(item: Mapping[str, Any]) -> Mapping[str, Any]:
     value = _node_payload(item).get("source_occurrence")
     return value if isinstance(value, Mapping) else {}
+
+
+def _projected_property_name(
+    occurrence: Mapping[str, Any],
+    item: Mapping[str, Any],
+) -> str:
+    """Return the exact terminal property already present in published evidence.
+
+    ``projected_object_field`` records from older revisions do not always carry
+    ``property_name`` separately.  Their observed ``field_path``/``display_ref``
+    still contains the structural terminal.  Taking its final segment is a
+    deterministic projection of that published occurrence, not a source-name
+    guess.
+    """
+    direct = str(occurrence.get("property_name") or "").strip()
+    if direct:
+        return direct
+    observed_path = str(
+        occurrence.get("field_path") or item.get("display_ref") or ""
+    ).strip()
+    if "." not in observed_path:
+        return ""
+    terminal = observed_path.rsplit(".", 1)[-1].strip()
+    if not terminal or any(token in terminal for token in ("(", ")", "[", "]")):
+        return ""
+    return terminal
 
 
 def _material_source_origin_gap(
@@ -398,6 +443,7 @@ def _material_source_origin_gap(
         evidence.append({
             "terminal_value_node_id": terminal_id,
             "terminal_display_ref": str(terminal_item.get("display_ref") or end.get("display_ref") or ""),
+            "terminal_property_name": _projected_property_name(terminal_occurrence, terminal_item),
             "parent_occurrence_id": object_occurrence_id,
             "parent_display_ref": str(parent_items[0].get("display_ref") or parent_occurrence.get("field_path") or ""),
             "parent_declared_type": str(parent_occurrence.get("declared_type") or ""),
@@ -415,6 +461,216 @@ def _material_source_origin_gap(
     return {
         "reason": "source_external_origin_unresolved",
         "evidence": ordered,
+    }
+
+
+def _observed_type(value: Any) -> str:
+    """Return the mechanically observed declared type text without inventing ownership."""
+    return str(value or "").strip()
+
+
+def _external_origin_evidence(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    material_gap: Mapping[str, Any],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+) -> Mapping[str, Any] | None:
+    """Find a separate observed external semantic segment for a material source gap.
+
+    This deliberately does *not* create a cross-repository value-flow edge.  A
+    selected external repository may nevertheless contain an independently
+    observed mapping into the exact declared result type/property at which the
+    local reverse path stopped.  That segment is useful consumer knowledge when
+    it is grounded by all of the following public facts in the external repo:
+
+    * an exact typed local owner (for example ``rsc : RscIndividual``);
+    * the exact property on that same owner/operation (``rsc.birthDate``);
+    * an observed non-zero reverse value-flow path into that property.
+
+    The bridge from the local unresolved method result to this external segment
+    remains explicitly unproven and is reported as such by the caller.
+    """
+    external_repo_ids = [
+        value for value in binding.query_repo_ids(repository_id)
+        if value != repository_id
+    ]
+    evidence_rows = [
+        item for item in material_gap.get("evidence") or ()
+        if isinstance(item, Mapping)
+    ]
+    if not external_repo_ids or not evidence_rows:
+        return None
+
+    all_segments: list[dict[str, Any]] = []
+    covered_terminals: set[str] = set()
+
+    for evidence in evidence_rows:
+        terminal_id = str(evidence.get("terminal_value_node_id") or "")
+        target_type = _observed_type(evidence.get("parent_declared_type"))
+        property_name = str(evidence.get("terminal_property_name") or "").strip()
+        if not target_type or not property_name:
+            continue
+
+        terminal_segments: list[dict[str, Any]] = []
+        for external_repo_id in external_repo_ids:
+            # Property discovery is bounded to public field nodes.  Only the
+            # operation(s) containing an exact property candidate are expanded
+            # further to verify the owner's declared type.  This avoids scanning
+            # a whole large dependency catalog for every transport field.
+            field_catalog, fields_complete = _filtered_node_catalog(
+                gateway, binding=binding, repository_id=external_repo_id,
+                cache=cache, node_kind="field",
+            )
+            if not fields_complete:
+                continue
+            property_candidates = [
+                node for node in field_catalog
+                if str(_source_occurrence(node).get("property_name") or "").strip() == property_name
+                and "." in str(node.get("display_ref") or "")
+            ]
+
+            for target_node in property_candidates:
+                occurrence = _source_occurrence(target_node)
+                operation = str(target_node.get("operation") or occurrence.get("operation") or "").strip()
+                display_ref = str(target_node.get("display_ref") or "").strip()
+                if not operation:
+                    continue
+                owner_symbol = display_ref.split(".", 1)[0].strip()
+                operation_catalog, operation_complete = _filtered_node_catalog(
+                    gateway, binding=binding, repository_id=external_repo_id,
+                    cache=cache, operation=operation,
+                )
+                if not operation_complete:
+                    continue
+                owners: list[Mapping[str, Any]] = []
+                for node in operation_catalog:
+                    owner_occurrence = _source_occurrence(node)
+                    symbol = str(owner_occurrence.get("symbol") or "").strip()
+                    declared_type = _observed_type(
+                        node.get("type_ref") or owner_occurrence.get("declared_type")
+                    )
+                    if symbol != owner_symbol or declared_type != target_type:
+                        continue
+                    if str(owner_occurrence.get("occurrence_kind") or "") not in {
+                        "local_variable", "method_parameter", "field", "object_field",
+                    }:
+                        continue
+                    owners.append(node)
+                if len(owners) != 1:
+                    continue
+                value_node_id = str(target_node.get("value_node_id") or "").strip()
+                if not value_node_id:
+                    continue
+
+                query = gateway.resolve_attribute_paths(
+                    binding,
+                    source=value_node_id,
+                    selected_repo_ids=(external_repo_id,),
+                    direction="reverse",
+                )
+                result = _result(query)
+                paths = [
+                    path for path in result.get("paths") or ()
+                    if isinstance(path, Mapping)
+                    and int(path.get("hop_count") or 0) > 0
+                    and str(path.get("confidence") or "") in {"confirmed", "high", "probable"}
+                ]
+                if not paths:
+                    continue
+
+                origins: dict[str, dict[str, Any]] = {}
+                transformations: dict[str, dict[str, Any]] = {}
+                edge_ids: set[str] = set()
+                for path in paths:
+                    end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+                    end_id = str(end.get("value_node_id") or "")
+                    if end_id and end_id != value_node_id:
+                        origins[end_id] = {
+                            "value_node_id": end_id,
+                            "display_ref": str(end.get("display_ref") or ""),
+                            "node_kind": str(end.get("node_kind") or ""),
+                            "source_path": str(end.get("source_path") or ""),
+                        }
+                    for step in path.get("steps") or ():
+                        if not isinstance(step, Mapping):
+                            continue
+                        edge_id = str(step.get("value_flow_edge_id") or "")
+                        if edge_id:
+                            edge_ids.add(edge_id)
+                        for node_key in ("source", "target"):
+                            node = step.get(node_key)
+                            if not isinstance(node, Mapping) or str(node.get("node_kind") or "") != "derivation":
+                                continue
+                            node_id = str(node.get("value_node_id") or "")
+                            if node_id:
+                                transformations[node_id] = {
+                                    "value_node_id": node_id,
+                                    "display_ref": str(node.get("display_ref") or ""),
+                                    "source_path": str(node.get("source_path") or ""),
+                                }
+                if not origins:
+                    continue
+                # Prefer observed data fields over construction/literal terminals
+                # when the same reverse query exposes both.  This does not discard
+                # the path proof; it selects the material data-origin projection
+                # for the consumer-facing segment.
+                field_origins = {
+                    key: value for key, value in origins.items()
+                    if value.get("node_kind") == "field"
+                }
+                projected_origins = field_origins or origins
+
+                owner = owners[0]
+                terminal_segments.append({
+                    "repository_id": external_repo_id,
+                    "system_id": str(binding.system_id),
+                    "revision_id": str(binding.revision_id),
+                    "target_declared_type": target_type,
+                    "property_name": property_name,
+                    "owner": {
+                        "value_node_id": str(owner.get("value_node_id") or ""),
+                        "display_ref": str(owner.get("display_ref") or ""),
+                        "type_ref": _observed_type(owner.get("type_ref") or _source_occurrence(owner).get("declared_type")),
+                        "operation": operation,
+                    },
+                    "target": {
+                        "value_node_id": value_node_id,
+                        "display_ref": display_ref,
+                        "source_path": str(target_node.get("source_path") or ""),
+                    },
+                    "origins": [projected_origins[key] for key in sorted(projected_origins)],
+                    "transformations": [transformations[key] for key in sorted(transformations)],
+                    "value_flow_edge_ids": sorted(edge_ids),
+                    "path_status": str(result.get("status") or ""),
+                    "basis": "selected_external_repo_exact_typed_owner_property_with_observed_reverse_path",
+                })
+
+        if terminal_segments:
+            covered_terminals.add(terminal_id)
+            terminal_segments.sort(
+                key=lambda item: (
+                    item["repository_id"],
+                    item["target"]["value_node_id"],
+                    tuple(origin["value_node_id"] for origin in item["origins"]),
+                )
+            )
+            all_segments.extend(terminal_segments)
+
+    required_terminals = {
+        str(item.get("terminal_value_node_id") or "")
+        for item in evidence_rows
+        if str(item.get("terminal_value_node_id") or "")
+    }
+    if not required_terminals or covered_terminals != required_terminals:
+        return None
+
+    return {
+        "status": "semantically_covered",
+        "basis": "separate_selected_external_repository_evidence_segments",
+        "bridge_status": "cross_repository_link_not_observed",
+        "segments": all_segments,
     }
 
 
@@ -670,7 +926,7 @@ def _source_published_fallback(
     direction: str,
     requested_anchor: str,
     attempted_anchors: list[str],
-    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
 ) -> dict[str, Any] | None:
     payload = str(payload_identity or "").strip()
     if direction != "reverse" or not payload or not field_path:
@@ -819,7 +1075,7 @@ def _target_published_fallback(
     direction: str,
     requested_anchor: str,
     attempted_anchors: list[str],
-    cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
 ) -> dict[str, Any] | None:
     payload = str(payload_identity or "").strip()
     if direction != "forward" or not payload or not field_path:
@@ -964,7 +1220,7 @@ def _resolve_side(
     payload_identity: str | None,
     source_ref: str,
     direction: str,
-    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] | None = None,
+    node_catalog_cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]] | None = None,
 ) -> dict[str, Any]:
     attempted: list[str] = []
     attempts: list[tuple[str, str]] = [(source_ref, "canonical_wire_display_ref")]
@@ -1342,7 +1598,7 @@ def build_interaction_lineage(
     journeys: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
     used_bindings: dict[str, Any] = {}
-    node_catalog_cache: dict[tuple[str, str, str], tuple[list[Mapping[str, Any]], bool]] = {}
+    node_catalog_cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]] = {}
 
     def process(field: BoundaryField, *, structural_expansion: bool = False) -> dict[str, Any]:
         source_binding = bindings.require(field.source_repository_id)
@@ -1405,12 +1661,29 @@ def build_interaction_lineage(
                 catalog_complete=source_catalog_complete,
             )
             if material_gap is not None:
-                gap = _gap(
-                    field.source_repository_id, field, "source",
-                    str(material_gap["reason"]),
+                external_evidence = _external_origin_evidence(
+                    gateway,
+                    binding=source_binding,
+                    repository_id=field.source_repository_id,
+                    material_gap=material_gap,
+                    cache=node_catalog_cache,
                 )
-                gap["evidence"] = list(material_gap.get("evidence") or ())
-                gaps.append(gap)
+                if external_evidence is not None:
+                    source_side["external_origin_evidence"] = dict(external_evidence)
+                    gap = _gap(
+                        field.source_repository_id, field, "source",
+                        "source_external_origin_link_unproven",
+                    )
+                    gap["evidence"] = list(material_gap.get("evidence") or ())
+                    gap["external_origin_evidence"] = dict(external_evidence)
+                    gaps.append(gap)
+                else:
+                    gap = _gap(
+                        field.source_repository_id, field, "source",
+                        str(material_gap["reason"]),
+                    )
+                    gap["evidence"] = list(material_gap.get("evidence") or ())
+                    gaps.append(gap)
 
         identity = {
             "edge_id": edge_id,
@@ -1496,6 +1769,7 @@ def build_interaction_lineage(
             "partial_crossing_count": sum(1 for item in journeys if item["crossing"]["status"] != "resolved"),
             "source_local_anchor_gap_count": sum(1 for item in gaps if item["reason"] == "source_local_anchor_unresolved"),
             "source_material_semantic_gap_count": sum(1 for item in gaps if item["reason"] == "source_external_origin_unresolved"),
+            "source_external_origin_link_gap_count": sum(1 for item in gaps if item["reason"] == "source_external_origin_link_unproven"),
             "target_local_anchor_gap_count": sum(1 for item in gaps if item["reason"] == "target_local_anchor_unresolved"),
             "gap_count": len(gaps),
         },

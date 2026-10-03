@@ -433,3 +433,119 @@ def test_builder_queries_framework_composite_selected_repo_ids() -> None:
     build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=composite, gateway=gateway, transport_roles=("request",))
     assert ("caller", "maven:g:a:1.2.3") in gateway.selected
     assert ("service", "maven:g:b:4.5.6") in gateway.selected
+
+
+def test_builder_preserves_external_semantic_segment_without_inventing_cross_repo_edge(monkeypatch) -> None:
+    import aisl_interaction_lineage.builder as builder_mod
+    from aisl_interaction_lineage.human_csv import human_rows
+
+    def fake_resolve_side(
+        gateway, *, edge, field, side, binding, repository_id, interface_ids,
+        payload_identity, source_ref, direction, node_catalog_cache,
+    ):
+        if repository_id == "service" and side == "source" and field.field_path == "profile.id":
+            return {
+                "repository_id": repository_id,
+                "system_id": binding.system_id,
+                "revision_id": binding.revision_id,
+                "direction": direction,
+                "requested_anchor": source_ref,
+                "attempted_anchors": [source_ref],
+                "resolved_anchor": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                "anchor_status": "resolved",
+                "anchor_selection_basis": "test",
+                "query": {"result": {
+                    "status": "partial",
+                    "source": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                    "paths": [{
+                        "status": "partial",
+                        "start": {"value_node_id": "wire-profile-id", "display_ref": source_ref},
+                        "end": {"value_node_id": "terminal-child", "display_ref": "converter.convert().id"},
+                        "steps": [],
+                    }],
+                    "gaps": [],
+                }},
+            }
+        node = {"value_node_id": f"{repository_id}:{source_ref}", "display_ref": source_ref, "repo_id": repository_id}
+        return {
+            "repository_id": repository_id,
+            "system_id": binding.system_id,
+            "revision_id": binding.revision_id,
+            "direction": direction,
+            "requested_anchor": source_ref,
+            "attempted_anchors": [source_ref],
+            "resolved_anchor": node,
+            "anchor_status": "resolved",
+            "anchor_selection_basis": "test",
+            "query": {"result": {"status": "confirmed_complete", "source": node, "paths": [], "gaps": []}},
+        }
+
+    class ExternalSegmentGateway(FakeGateway):
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id == "service":
+                items = [
+                    {"value_node_id": "terminal-child", "display_ref": "converter.convert().id", "payload_json": {"source_occurrence": {
+                        "occurrence_id": "child-occ", "occurrence_kind": "projected_object_field",
+                        "object_occurrence_id": "parent-occ",
+                    }}},
+                    {"value_node_id": "parent-node", "display_ref": "converter.convert()", "payload_json": {"source_occurrence": {
+                        "occurrence_id": "parent-occ", "occurrence_kind": "method_invocation",
+                        "resolution_status": "external_or_unresolved", "declared_type": "ExternalProfile", "method_name": "convert",
+                    }}},
+                ]
+            elif repository_id == "maven:g:a:1.2.3" and node_kind == "field" and operation is None:
+                items = [{"value_node_id": "external-target-id", "node_kind": "field", "operation": "Mapper.map",
+                          "display_ref": "mapped.id", "source_path": "Mapper.java", "payload_json": {"source_occurrence": {
+                              "occurrence_id": "mapped-id-occ", "occurrence_kind": "local_field", "property_name": "id", "operation": "Mapper.map",
+                          }}}]
+            elif repository_id == "maven:g:a:1.2.3" and operation == "Mapper.map":
+                items = [{"value_node_id": "external-owner", "node_kind": "local_value", "operation": "Mapper.map",
+                          "display_ref": "mapped", "type_ref": "ExternalProfile", "payload_json": {"source_occurrence": {
+                              "occurrence_id": "mapped-occ", "occurrence_kind": "local_variable", "symbol": "mapped",
+                              "declared_type": "ExternalProfile", "operation": "Mapper.map",
+                          }}}]
+            else:
+                items = []
+            return {"result": {"items": items, "total_count": len(items), "returned_count": len(items), "truncated": False}}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str, selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            if source == "external-target-id" and tuple(selected_repo_ids) == ("maven:g:a:1.2.3",):
+                target = {"value_node_id": source, "repo_id": "maven:g:a:1.2.3", "display_ref": "mapped.id", "node_kind": "field", "source_path": "Mapper.java"}
+                origin = {"value_node_id": "external-origin-id", "repo_id": "maven:g:a:1.2.3", "display_ref": "source.id", "node_kind": "field", "source_path": "Mapper.java"}
+                derivation = {"value_node_id": "derive-id", "repo_id": "maven:g:a:1.2.3", "display_ref": "Mapper.mapId()", "node_kind": "derivation", "source_path": "Mapper.java"}
+                return {"result": {"status": "partial", "source": target, "paths": [{
+                    "status": "partial", "hop_count": 2, "confidence": "confirmed", "start": target, "end": origin,
+                    "steps": [
+                        {"value_flow_edge_id": "edge-2", "source": derivation, "target": target},
+                        {"value_flow_edge_id": "edge-1", "source": origin, "target": derivation},
+                    ],
+                }], "gaps": []}}
+            return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+    composite = BindingIndex([
+        AislBinding("caller", "caller-system", "caller-rev"),
+        AislBinding("service", "service-system", "service-rev-2", ("service", "maven:g:a:1.2.3")),
+    ])
+    monkeypatch.setattr(builder_mod, "_resolve_side", fake_resolve_side)
+    result = build_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=composite, gateway=ExternalSegmentGateway(),
+        transport_roles=("response",),
+    )
+    journey = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
+    evidence = journey["source_side"]["external_origin_evidence"]
+    assert evidence["status"] == "semantically_covered"
+    assert evidence["bridge_status"] == "cross_repository_link_not_observed"
+    assert evidence["segments"][0]["origins"][0]["display_ref"] == "source.id"
+    assert result["summary"]["source_material_semantic_gap_count"] == 0
+    assert result["summary"]["source_external_origin_link_gap_count"] == 1
+    assert not any(item["reason"] == "source_external_origin_unresolved" for item in result["gaps"])
+    row = next(item for item in human_rows(result) if item["crossing_attribute"] == "profile.id")
+    assert row["producer_attribute"] == "source.id"
+    assert "maven:g:a:1.2.3: source.id --[Mapper.mapId()]→ mapped.id" in row["full_attribute_path"]
+    assert "cross-repository link not observed" in row["full_attribute_path"]
+    assert "source_external_origin_link_unproven" in row["full_attribute_path"]
