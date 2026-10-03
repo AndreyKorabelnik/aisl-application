@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+import aisl_interaction_lineage.checker as checker_mod
 from aisl_interaction_lineage.checker import _external_client_boundary_requirement, check_interaction_lineage
 from aisl_interaction_lineage.contracts import AislBinding, BindingIndex
 import aisl_interaction_lineage.prepare as prepare_mod
@@ -489,3 +490,157 @@ def test_binding_round_trip_keeps_composite_selected_repo_ids() -> None:
     })
     assert binding.query_repo_ids("repo-a") == ("repo-a", "maven:g:a:1")
     assert binding.to_dict()["selected_repo_ids"] == ["repo-a", "maven:g:a:1"]
+
+
+def test_check_blocks_on_material_external_origin_without_guessing_owner(monkeypatch) -> None:
+    def fake_resolve_side(*_args, **kwargs):
+        repository_id = kwargs["repository_id"]
+        field = kwargs["field"]
+        side = kwargs["side"]
+        direction = kwargs["direction"]
+        binding = kwargs["binding"]
+        source_ref = kwargs["source_ref"]
+        if repository_id == "service" and side == "source" and field.field_path == "profile.id":
+            return {
+                "repository_id": repository_id,
+                "system_id": binding.system_id,
+                "revision_id": binding.revision_id,
+                "direction": direction,
+                "requested_anchor": source_ref,
+                "attempted_anchors": [source_ref],
+                "resolved_anchor": {"value_node_id": "source-node", "display_ref": source_ref},
+                "anchor_status": "resolved",
+                "anchor_selection_basis": "test",
+                "query": {"result": {
+                    "status": "partial",
+                    "source": {"value_node_id": "source-node", "display_ref": source_ref},
+                    "paths": [{
+                        "status": "partial",
+                        "start": {"value_node_id": "source-node", "display_ref": source_ref},
+                        "end": {"value_node_id": "terminal-child", "display_ref": "converter.convert().profile.id"},
+                        "steps": [],
+                    }],
+                    "gaps": [],
+                }},
+            }
+        return {
+            "repository_id": repository_id,
+            "system_id": binding.system_id,
+            "revision_id": binding.revision_id,
+            "direction": direction,
+            "requested_anchor": source_ref,
+            "attempted_anchors": [source_ref],
+            "resolved_anchor": {"value_node_id": f"{repository_id}:{source_ref}", "display_ref": source_ref},
+            "anchor_status": "resolved",
+            "anchor_selection_basis": "test",
+            "query": {"result": {
+                "status": "confirmed_complete",
+                "source": {"value_node_id": f"{repository_id}:{source_ref}", "display_ref": source_ref},
+                "paths": [],
+                "gaps": [],
+            }},
+        }
+
+    class MaterialGapGateway(ReadinessGateway):
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id != "service":
+                return super().list_repository_value_nodes(
+                    binding, repository_id=repository_id, node_kind=node_kind,
+                    operation=operation, max_results=max_results, page_token=page_token,
+                )
+            items = [
+                {
+                    "value_node_id": "terminal-child",
+                    "display_ref": "converter.convert().profile.id",
+                    "payload_json": {"source_occurrence": {
+                        "occurrence_id": "child-occ",
+                        "occurrence_kind": "projected_object_field",
+                        "object_occurrence_id": "parent-occ",
+                    }},
+                },
+                {
+                    "value_node_id": "parent-node",
+                    "display_ref": "converter.convert()",
+                    "payload_json": {"source_occurrence": {
+                        "occurrence_id": "parent-occ",
+                        "occurrence_kind": "method_invocation",
+                        "resolution_status": "external_or_unresolved",
+                        "declared_type": "ExternalProfile",
+                        "method_name": "convert",
+                    }},
+                },
+            ]
+            return {"result": {
+                "items": items,
+                "total_count": len(items),
+                "returned_count": len(items),
+                "truncated": False,
+            }}
+
+    monkeypatch.setattr(checker_mod, "_resolve_side", fake_resolve_side)
+    result = check_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=MaterialGapGateway(),
+    )
+    assert result["status"] == "not_ready"
+    service = next(item for item in result["repositories"] if item["repository_id"] == "service")
+    assert service["status"] == "material_semantic_gap"
+    requirement = next(
+        item for item in result["preparation_requirements"]
+        if item.get("state") == "external_source_owner_unresolved"
+    )
+    assert requirement["reason"] == "source_external_origin_unresolved"
+    assert requirement["evidence"][0]["parent_display_ref"] == "converter.convert()"
+    assert requirement["evidence"][0]["classification_basis"] == "published_projected_field_parent_external_method_result"
+    assert any(
+        item.get("code") == "source_external_origin_unresolved" and item.get("blocking") is True
+        for item in result["diagnostics"]
+    )
+
+
+def test_prepare_blocks_material_external_origin_until_owner_is_resolved(monkeypatch) -> None:
+    requirement = {
+        "state": "external_source_owner_unresolved",
+        "repository_id": "service",
+        "system_id": "service-system",
+        "revision_id": "service-rev",
+        "edge_id": EDGE_ID,
+        "transport_role": "response",
+        "field_path": "profile.id",
+        "side": "source",
+        "direction": "reverse",
+        "reason": "source_external_origin_unresolved",
+        "evidence": [{
+            "terminal_value_node_id": "terminal-child",
+            "parent_occurrence_id": "parent-occ",
+            "parent_display_ref": "converter.convert()",
+            "parent_declared_type": "ExternalProfile",
+            "parent_method_name": "convert",
+            "classification_basis": "published_projected_field_parent_external_method_result",
+        }],
+    }
+    before = {
+        "format": "interaction-lineage-readiness/v1",
+        "status": "not_ready",
+        "topology_id": "topology-test",
+        "edge_id": EDGE_ID,
+        "repositories": [
+            {"repository_id": "caller", "status": "ready"},
+            {"repository_id": "service", "status": "material_semantic_gap"},
+        ],
+        "preparation_requirements": [requirement],
+        "diagnostics": [],
+        "summary": {"repository_count": 2, "ready_repository_count": 1, "not_ready_repository_count": 1},
+    }
+    monkeypatch.setattr(prepare_mod, "check_interaction_lineage", lambda *args, **kwargs: before)
+    prep = FakePreparationGateway(_framework_result())
+    result = prepare_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(),
+        readiness_gateway=ReadinessGateway(), preparation_gateway=prep,
+    )
+    assert result["status"] == "blocked"
+    assert prep.calls == []
+    assert result["diagnostics"][0]["code"] == "external_source_owner_unresolved"
+    assert result["diagnostics"][0]["requirements"][0]["evidence"][0]["parent_display_ref"] == "converter.convert()"

@@ -154,8 +154,8 @@ def test_builder_uses_reverse_on_source_side_and_forward_on_target_side() -> Non
     assert response["source_repository_id"] == "service"
     assert response["source_side"]["direction"] == "reverse"
     assert response["target_side"]["direction"] == "forward"
-    assert any(call["repo"] == "service" and call["direction"] == "reverse" for call in gateway.calls)
-    assert any(call["repo"] == "caller" and call["direction"] == "forward" for call in gateway.calls)
+    assert any(call.get("repo") == "service" and call.get("direction") == "reverse" for call in gateway.calls)
+    assert any(call.get("repo") == "caller" and call.get("direction") == "forward" for call in gateway.calls)
 
 
 def test_ambiguous_display_ref_is_resolved_only_by_exact_topology_interface_id() -> None:

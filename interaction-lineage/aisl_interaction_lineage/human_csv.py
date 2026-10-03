@@ -21,6 +21,10 @@ _GAP_LABELS_RU = {
     "source_local_anchor_unresolved": "не удалось определить источник атрибута внутри producer",
     "target_local_anchor_unresolved": "не удалось определить дальнейшее использование атрибута в consumer",
     "payload_identity_not_exactly_compatible": "не удалось доказать точное соответствие transport payload",
+    "source_external_origin_unresolved": (
+        "источник атрибута выходит за текущую опубликованную область знаний; "
+        "внешний owner не определён механически"
+    ),
     "OBSERVED_TERMINAL_NO_USE": "дальнейшее использование атрибута не наблюдается",
 }
 

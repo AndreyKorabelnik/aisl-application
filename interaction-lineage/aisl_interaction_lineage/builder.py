@@ -334,6 +334,90 @@ def _node_payload(item: Mapping[str, Any]) -> Mapping[str, Any]:
     return value if isinstance(value, Mapping) else {}
 
 
+def _source_occurrence(item: Mapping[str, Any]) -> Mapping[str, Any]:
+    value = _node_payload(item).get("source_occurrence")
+    return value if isinstance(value, Mapping) else {}
+
+
+def _material_source_origin_gap(
+    side: Mapping[str, Any],
+    *,
+    catalog: Sequence[Mapping[str, Any]],
+    catalog_complete: bool,
+) -> Mapping[str, Any] | None:
+    """Classify only mechanically observed external source-origin loss.
+
+    A resolved transport/local anchor can still end in a partial reverse path.
+    That is not automatically a product gap: ordinary literals, locals, fields,
+    or deliberate structural terminals remain useful observed endpoints.  The
+    narrow material case handled here is a projected child whose exact object
+    occurrence is an external/unresolved method result.  Public value-node
+    payload already preserves both occurrence identities, so this classification
+    adds no source inference and does not guess an external owner/artifact.
+    """
+    if not catalog_complete or str(side.get("anchor_status") or "") != "resolved":
+        return None
+
+    result = _result(side.get("query") if isinstance(side.get("query"), Mapping) else {})
+    paths = [item for item in result.get("paths") or () if isinstance(item, Mapping)]
+    if not paths:
+        return None
+
+    by_value_node_id = {
+        str(item.get("value_node_id") or ""): item
+        for item in catalog
+        if str(item.get("value_node_id") or "")
+    }
+    by_occurrence_id: dict[str, list[Mapping[str, Any]]] = {}
+    for item in catalog:
+        occurrence_id = str(_source_occurrence(item).get("occurrence_id") or "")
+        if occurrence_id:
+            by_occurrence_id.setdefault(occurrence_id, []).append(item)
+
+    evidence: list[dict[str, Any]] = []
+    for path in paths:
+        end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+        terminal_id = str(end.get("value_node_id") or "")
+        terminal_item = by_value_node_id.get(terminal_id)
+        if terminal_item is None:
+            continue
+        terminal_occurrence = _source_occurrence(terminal_item)
+        if str(terminal_occurrence.get("occurrence_kind") or "") != "projected_object_field":
+            continue
+        object_occurrence_id = str(terminal_occurrence.get("object_occurrence_id") or "")
+        if not object_occurrence_id:
+            continue
+        parent_items = by_occurrence_id.get(object_occurrence_id, [])
+        if len(parent_items) != 1:
+            continue
+        parent_occurrence = _source_occurrence(parent_items[0])
+        if str(parent_occurrence.get("occurrence_kind") or "") != "method_invocation":
+            continue
+        if str(parent_occurrence.get("resolution_status") or "") != "external_or_unresolved":
+            continue
+        evidence.append({
+            "terminal_value_node_id": terminal_id,
+            "terminal_display_ref": str(terminal_item.get("display_ref") or end.get("display_ref") or ""),
+            "parent_occurrence_id": object_occurrence_id,
+            "parent_display_ref": str(parent_items[0].get("display_ref") or parent_occurrence.get("field_path") or ""),
+            "parent_declared_type": str(parent_occurrence.get("declared_type") or ""),
+            "parent_method_name": str(parent_occurrence.get("method_name") or ""),
+            "classification_basis": "published_projected_field_parent_external_method_result",
+        })
+
+    if not evidence:
+        return None
+    unique = {
+        (item["terminal_value_node_id"], item["parent_occurrence_id"]): item
+        for item in evidence
+    }
+    ordered = [unique[key] for key in sorted(unique)]
+    return {
+        "reason": "source_external_origin_unresolved",
+        "evidence": ordered,
+    }
+
+
 def _route_wire_candidates(
     catalog: Sequence[Mapping[str, Any]],
     *,
@@ -1308,6 +1392,26 @@ def build_interaction_lineage(
         if target_side["anchor_status"] == "unresolved":
             gaps.append(_gap(field.target_repository_id, field, "target", "target_local_anchor_unresolved"))
 
+        if source_side["anchor_status"] == "resolved" and not structural_expansion:
+            source_catalog, source_catalog_complete = _repository_node_catalog(
+                gateway,
+                binding=source_binding,
+                repository_id=field.source_repository_id,
+                cache=node_catalog_cache,
+            )
+            material_gap = _material_source_origin_gap(
+                source_side,
+                catalog=source_catalog,
+                catalog_complete=source_catalog_complete,
+            )
+            if material_gap is not None:
+                gap = _gap(
+                    field.source_repository_id, field, "source",
+                    str(material_gap["reason"]),
+                )
+                gap["evidence"] = list(material_gap.get("evidence") or ())
+                gaps.append(gap)
+
         identity = {
             "edge_id": edge_id,
             "transport_role": field.transport_role,
@@ -1391,6 +1495,7 @@ def build_interaction_lineage(
             "resolved_crossing_count": sum(1 for item in journeys if item["crossing"]["status"] == "resolved"),
             "partial_crossing_count": sum(1 for item in journeys if item["crossing"]["status"] != "resolved"),
             "source_local_anchor_gap_count": sum(1 for item in gaps if item["reason"] == "source_local_anchor_unresolved"),
+            "source_material_semantic_gap_count": sum(1 for item in gaps if item["reason"] == "source_external_origin_unresolved"),
             "target_local_anchor_gap_count": sum(1 for item in gaps if item["reason"] == "target_local_anchor_unresolved"),
             "gap_count": len(gaps),
         },
