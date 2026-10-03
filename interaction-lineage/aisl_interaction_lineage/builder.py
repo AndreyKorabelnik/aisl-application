@@ -137,6 +137,354 @@ def _iter_query_nodes(result: Mapping[str, Any]) -> Iterable[Mapping[str, Any]]:
                     yield value
 
 
+
+_COLLECTION_DECLARED_TYPES = {
+    "ArrayDeque",
+    "ArrayList",
+    "Collection",
+    "ConcurrentHashMap",
+    "CopyOnWriteArrayList",
+    "Deque",
+    "Entry",
+    "HashMap",
+    "HashSet",
+    "Iterable",
+    "LinkedHashMap",
+    "LinkedHashSet",
+    "LinkedList",
+    "List",
+    "Map",
+    "Optional",
+    "Queue",
+    "Set",
+    "Stream",
+    "TreeMap",
+    "TreeSet",
+}
+
+
+def _is_collection_declared_type(value: str) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return False
+    raw = text.split("<", 1)[0].strip()
+    simple = raw.rsplit(".", 1)[-1]
+    return simple in _COLLECTION_DECLARED_TYPES
+
+
+def _plain_field_path(value: str) -> bool:
+    text = str(value or "").strip()
+    if not text or text.startswith("new "):
+        return False
+    if any(marker in text for marker in ("(", ")", "\n", "\r", "?", ":", " ")):
+        return False
+    return all(part for part in text.split("."))
+
+
+def _lower_initial(value: str) -> str:
+    text = str(value or "")
+    return text[:1].lower() + text[1:] if text else text
+
+
+def _semantic_ref_parts(value: str) -> tuple[str, ...]:
+    parts: list[str] = []
+    for raw in str(value or "").split("."):
+        part = raw.strip()
+        if not part:
+            continue
+        if part.endswith("[]"):
+            part = part[:-2]
+        parts.append(_lower_initial(part))
+    return tuple(parts)
+
+
+def _target_semantic_projection(
+    side: Mapping[str, Any],
+    *,
+    catalog: Sequence[Mapping[str, Any]],
+) -> Mapping[str, Any] | None:
+    """Compose a human-facing semantic target chain from already-published paths.
+
+    Repository value-flow may expose dozens of technically distinct continuations
+    (handler calls, stream pipelines, return aliases) for the same nested data
+    shape.  This consumer projection preserves the mechanically observed semantic
+    nesting instead of flattening every terminal path into an OR-list.
+
+    No new value-flow edge is created: every milestone below is backed by a node
+    already present in at least one published target path and, where a type name
+    is rendered, by the exact declared type of that node's observed object.
+    """
+    if str(side.get("anchor_status") or "") != "resolved":
+        return None
+    query = side.get("query") if isinstance(side.get("query"), Mapping) else {}
+    result = _result(query)
+    paths = [item for item in result.get("paths") or () if isinstance(item, Mapping)]
+    if not paths:
+        return None
+
+    by_id = {
+        str(item.get("value_node_id") or ""): item
+        for item in catalog
+        if str(item.get("value_node_id") or "")
+    }
+    by_occurrence: dict[str, list[Mapping[str, Any]]] = {}
+    for item in catalog:
+        occurrence_id = str(item.get("occurrence_id") or "")
+        if occurrence_id:
+            by_occurrence.setdefault(occurrence_id, []).append(item)
+
+    def semantic_candidate(node: Mapping[str, Any]) -> dict[str, Any] | None:
+        node_id = str(node.get("value_node_id") or "")
+        catalog_node = by_id.get(node_id, node)
+        if str(catalog_node.get("node_kind") or node.get("node_kind") or "") != "field":
+            return None
+        display_ref = str(catalog_node.get("display_ref") or node.get("display_ref") or "").strip()
+        if not display_ref:
+            return None
+        occurrence = _source_occurrence(catalog_node)
+        object_occurrence_id = str(occurrence.get("object_occurrence_id") or "")
+        object_nodes = by_occurrence.get(object_occurrence_id, []) if object_occurrence_id else []
+        typed_object_nodes = [
+            item for item in object_nodes
+            if _observed_type(item.get("type_ref") or _source_occurrence(item).get("declared_type"))
+        ]
+        object_node = typed_object_nodes[0] if len(typed_object_nodes) == 1 else None
+        object_type = _observed_type(
+            occurrence.get("object_declared_type")
+            or (object_node.get("type_ref") if object_node is not None else "")
+            or (_source_occurrence(object_node).get("declared_type") if object_node is not None else "")
+        )
+        object_display = str(object_node.get("display_ref") or "").strip() if object_node is not None else ""
+        projected_tail = str(occurrence.get("projected_field_tail") or occurrence.get("property_name") or "").strip()
+
+        semantic_ref = ""
+        is_collection = _is_collection_declared_type(object_type)
+        if object_type and object_display and display_ref.startswith(object_display + "."):
+            suffix = display_ref[len(object_display) + 1 :]
+            if is_collection:
+                semantic_ref = f"{object_display}[].{suffix}"
+            else:
+                semantic_ref = f"{object_type}.{suffix}"
+        elif object_type and display_ref.startswith(f"new {object_type}."):
+            semantic_ref = display_ref[len("new ") :]
+        elif object_type and projected_tail and "." not in display_ref:
+            semantic_ref = f"{object_type}.{projected_tail}"
+        elif _plain_field_path(display_ref):
+            semantic_ref = display_ref
+
+        if not semantic_ref or not _plain_field_path(semantic_ref.replace("[]", "")):
+            return None
+        return {
+            "value_node_id": node_id,
+            "display_ref": display_ref,
+            "semantic_ref": semantic_ref,
+            "object_declared_type": object_type,
+            "collection": is_collection,
+            "operation": str(catalog_node.get("operation") or node.get("operation") or ""),
+            "source_path": str(catalog_node.get("source_path") or node.get("source_path") or ""),
+        }
+
+    path_candidates: list[list[dict[str, Any]]] = []
+    all_candidates: dict[tuple[str, str], dict[str, Any]] = {}
+    for path in paths:
+        nodes: list[Mapping[str, Any]] = []
+        start = path.get("start")
+        if isinstance(start, Mapping):
+            nodes.append(start)
+        for step in path.get("steps") or ():
+            if not isinstance(step, Mapping):
+                continue
+            target = step.get("target")
+            if isinstance(target, Mapping):
+                nodes.append(target)
+        end = path.get("end")
+        if isinstance(end, Mapping):
+            nodes.append(end)
+
+        semantic_nodes: list[dict[str, Any]] = []
+        seen_refs: set[str] = set()
+        for node in nodes:
+            candidate = semantic_candidate(node)
+            if candidate is None:
+                continue
+            ref = str(candidate["semantic_ref"])
+            if ref in seen_refs:
+                continue
+            seen_refs.add(ref)
+            semantic_nodes.append(candidate)
+            all_candidates[(ref, str(candidate.get("value_node_id") or ""))] = candidate
+        if semantic_nodes:
+            path_candidates.append(semantic_nodes)
+
+    if not path_candidates:
+        return None
+
+    anchor_ref = str((side.get("resolved_anchor") or {}).get("display_ref") or "").strip()
+    entry_refs: list[str] = []
+    entry_candidates: dict[str, dict[str, Any]] = {}
+    for candidates in path_candidates:
+        # Technical/local aliases immediately after the interaction boundary may
+        # be untyped (for example ``identifications.documentNumber``).  They must
+        # not prevent us from preserving a later, mechanically typed semantic
+        # consumer such as ``IdentityCard.idNum``.  Select the first *typed*
+        # non-collection field per observed path and require all such paths to
+        # agree on the same semantic entry point.
+        entry = next(
+            (
+                item for item in candidates
+                if str(item.get("display_ref") or "") != anchor_ref
+                and str(item.get("semantic_ref") or "") != anchor_ref
+                and str(item.get("object_declared_type") or "").strip()
+                and not bool(item.get("collection"))
+            ),
+            None,
+        )
+        if entry is None:
+            continue
+        ref = str(entry["semantic_ref"])
+        entry_refs.append(ref)
+        entry_candidates.setdefault(ref, entry)
+    unique_entry = sorted(set(entry_refs))
+    if len(unique_entry) != 1:
+        return None
+    consumer_ref = unique_entry[0]
+    consumer = entry_candidates[consumer_ref]
+
+    # Build the longest exact structural nesting ladder.  Collection/container
+    # aliases are excluded from the ladder so technical processing lists do not
+    # masquerade as domain nesting.
+    semantic_unique: dict[str, dict[str, Any]] = {}
+    for candidate in all_candidates.values():
+        ref = str(candidate["semantic_ref"])
+        current = semantic_unique.get(ref)
+        if current is None or (
+            bool(current.get("object_declared_type")) is False
+            and bool(candidate.get("object_declared_type")) is True
+        ):
+            semantic_unique[ref] = candidate
+
+    chain: list[dict[str, Any]] = [consumer]
+    current_ref = consumer_ref
+    current_parts = _semantic_ref_parts(current_ref)
+    while current_parts:
+        seen_chain = {str(item.get("semantic_ref") or "") for item in chain}
+        matches = []
+        for candidate in semantic_unique.values():
+            ref = str(candidate.get("semantic_ref") or "")
+            if bool(candidate.get("collection")) or ref in seen_chain:
+                continue
+            parts = _semantic_ref_parts(ref)
+            if len(parts) <= len(current_parts):
+                continue
+            if parts[-len(current_parts):] != current_parts:
+                continue
+            matches.append(candidate)
+        if not matches:
+            break
+        # Prefer the closest *observed* deeper suffix.  This permits projection
+        # to skip an unpublished intermediate presentation node (e.g. no typed
+        # CardAcctId node) without inventing a value-flow edge.
+        min_depth = min(len(_semantic_ref_parts(str(item.get("semantic_ref") or ""))) for item in matches)
+        matches = [
+            item for item in matches
+            if len(_semantic_ref_parts(str(item.get("semantic_ref") or ""))) == min_depth
+        ]
+        matches.sort(
+            key=lambda item: (
+                0 if str(item.get("object_declared_type") or "") else 1,
+                len(str(item.get("semantic_ref") or "")),
+                str(item.get("semantic_ref") or ""),
+            )
+        )
+        best = matches[0]
+        # If two different semantic refs have the same structural rank and the
+        # ranking cannot distinguish them mechanically, stop rather than guess.
+        best_key = (
+            0 if str(best.get("object_declared_type") or "") else 1,
+            len(str(best.get("semantic_ref") or "")),
+        )
+        tied = [
+            item for item in matches
+            if (
+                0 if str(item.get("object_declared_type") or "") else 1,
+                len(str(item.get("semantic_ref") or "")),
+            ) == best_key
+        ]
+        if len({str(item.get("semantic_ref") or "") for item in tied}) > 1:
+            break
+        chain.append(best)
+        current_ref = str(best["semantic_ref"])
+        current_parts = _semantic_ref_parts(current_ref)
+
+    deepest = chain[-1]
+    deepest_parts = _semantic_ref_parts(str(deepest.get("semantic_ref") or ""))
+    if len(deepest_parts) >= 2:
+        deepest_tail = deepest_parts[1:]
+        # Preserve an observed same-shape type transition (for example a proxy
+        # DTO mapping) only when exactly one typed alternative is present.
+        typed_alternatives = [
+            candidate for candidate in semantic_unique.values()
+            if not bool(candidate.get("collection"))
+            and candidate.get("object_declared_type")
+            and _semantic_ref_parts(str(candidate.get("semantic_ref") or ""))[1:] == deepest_tail
+            and len(_semantic_ref_parts(str(candidate.get("semantic_ref") or ""))) == len(deepest_parts)
+            and _semantic_ref_parts(str(candidate.get("semantic_ref") or ""))[0] != deepest_parts[0]
+        ]
+        alt_refs = sorted({str(item.get("semantic_ref") or "") for item in typed_alternatives})
+        if len(alt_refs) == 1:
+            chain.append(next(item for item in typed_alternatives if str(item.get("semantic_ref") or "") == alt_refs[0]))
+
+        collection_candidates = []
+        for candidate in semantic_unique.values():
+            if not bool(candidate.get("collection")):
+                continue
+            parts = _semantic_ref_parts(str(candidate.get("semantic_ref") or ""))
+            if len(parts) < len(deepest_parts):
+                continue
+            # Same-shape collection alias (bankAcctRecs[]....) or the closest
+            # deeper observed collection wrapper whose suffix is the semantic
+            # chain already proven above.
+            if len(parts) == len(deepest_parts):
+                if parts[1:] != deepest_tail:
+                    continue
+            elif parts[-len(deepest_parts):] != deepest_parts:
+                continue
+            collection_candidates.append(candidate)
+        if collection_candidates:
+            min_collection_depth = min(
+                len(_semantic_ref_parts(str(item.get("semantic_ref") or "")))
+                for item in collection_candidates
+            )
+            nearest = [
+                item for item in collection_candidates
+                if len(_semantic_ref_parts(str(item.get("semantic_ref") or ""))) == min_collection_depth
+            ]
+            collection_refs = sorted({str(item.get("semantic_ref") or "") for item in nearest})
+            if len(collection_refs) == 1:
+                chain.append(next(item for item in nearest if str(item.get("semantic_ref") or "") == collection_refs[0]))
+
+    rendered_chain: list[dict[str, Any]] = []
+    seen_semantic: set[str] = set()
+    for item in chain:
+        ref = str(item.get("semantic_ref") or "")
+        if not ref or ref in seen_semantic:
+            continue
+        seen_semantic.add(ref)
+        rendered_chain.append(dict(item))
+    # Do not replace the canonical consumer for a lone typed alias.  The
+    # projection is only material when published evidence proves an actual
+    # semantic nesting continuation beyond that entry point.
+    if len(rendered_chain) < 2:
+        return None
+    deepest_consumer_ref = str(rendered_chain[-1].get("semantic_ref") or "").strip()
+    return {
+        "consumer_attribute": deepest_consumer_ref or consumer_ref,
+        "entry_consumer_attribute": consumer_ref,
+        "chain": rendered_chain,
+        "basis": "published_target_paths_semantic_nesting_projection",
+    }
+
+
 def _query_proves_topology_field(result: Mapping[str, Any], field_path: str) -> bool:
     expected = str(field_path or "").strip()
     if not expected:
@@ -440,13 +788,23 @@ def _material_source_origin_gap(
             continue
         if str(parent_occurrence.get("resolution_status") or "") != "external_or_unresolved":
             continue
+        # ``external_or_unresolved`` is deliberately not an assertion that the
+        # invocation is external.  Without a mechanically observed result type
+        # there is no external-owner anchor to preserve or prepare.  Promoting
+        # such an untyped local return/projection stop to a MATERIAL_SEMANTIC_GAP
+        # would turn ordinary async/builder plumbing into a false external
+        # dependency requirement.  The underlying path remains partial and its
+        # published ``no_observed_incoming_value_flow`` gap stays visible.
+        parent_declared_type = str(parent_occurrence.get("declared_type") or "").strip()
+        if not parent_declared_type:
+            continue
         evidence.append({
             "terminal_value_node_id": terminal_id,
             "terminal_display_ref": str(terminal_item.get("display_ref") or end.get("display_ref") or ""),
             "terminal_property_name": _projected_property_name(terminal_occurrence, terminal_item),
             "parent_occurrence_id": object_occurrence_id,
             "parent_display_ref": str(parent_items[0].get("display_ref") or parent_occurrence.get("field_path") or ""),
-            "parent_declared_type": str(parent_occurrence.get("declared_type") or ""),
+            "parent_declared_type": parent_declared_type,
             "parent_method_name": str(parent_occurrence.get("method_name") or ""),
             "classification_basis": "published_projected_field_parent_external_method_result",
         })
@@ -469,6 +827,638 @@ def _observed_type(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _relative_external_property_path(evidence: Mapping[str, Any]) -> tuple[str, ...]:
+    """Return the observed projected property path below the unresolved parent.
+
+    The path is derived only from already-published display refs.  No source
+    syntax is reparsed here.  For example::
+
+        parent:   converter.convert()
+        terminal: converter.convert().identifications.individualIdentifications
+
+    becomes ``("identifications", "individualIdentifications")``.
+    """
+    terminal = str(evidence.get("terminal_display_ref") or "").strip()
+    parent = str(evidence.get("parent_display_ref") or "").strip()
+    if terminal and parent and terminal.startswith(parent + "."):
+        suffix = terminal[len(parent) + 1 :]
+        parts = tuple(part for part in suffix.split(".") if part)
+        if parts:
+            return parts
+    property_name = str(evidence.get("terminal_property_name") or "").strip()
+    return (property_name,) if property_name else ()
+
+
+
+def _node_declared_type(item: Mapping[str, Any]) -> str:
+    occurrence = _source_occurrence(item)
+    return _observed_type(item.get("type_ref") or occurrence.get("declared_type"))
+
+
+def _node_symbol(item: Mapping[str, Any]) -> str:
+    occurrence = _source_occurrence(item)
+    symbol = str(occurrence.get("symbol") or "").strip()
+    if symbol:
+        return symbol
+    display_ref = str(item.get("display_ref") or "").strip()
+    if display_ref and "." not in display_ref and "(" not in display_ref and "[" not in display_ref:
+        return display_ref
+    return ""
+
+
+def _local_external_continuations(
+    resolved_side: Mapping[str, Any] | None,
+    *,
+    catalog: Sequence[Mapping[str, Any]],
+    catalog_complete: bool,
+) -> list[dict[str, Any]]:
+    """Return typed local field terminals that materially consume external objects.
+
+    These are not guessed child fields.  They are exact endpoints of already
+    published reverse paths for the current consumer attribute.  A continuation
+    is retained only when the field root resolves to one unique typed local
+    value/parameter in the same operation.  This lets consumer composition ask
+    external evidence for the exact scalar property that the local code actually
+    consumes (for example ``birthDate.value`` on a ``RscBirthDate`` parameter).
+    """
+    if not resolved_side or not catalog_complete:
+        return []
+    query = resolved_side.get("query") if isinstance(resolved_side.get("query"), Mapping) else {}
+    result = _result(query)
+    paths = [item for item in result.get("paths") or () if isinstance(item, Mapping)]
+    if not paths:
+        return []
+
+    by_value_node_id = {
+        str(item.get("value_node_id") or ""): item
+        for item in catalog
+        if str(item.get("value_node_id") or "")
+    }
+    by_operation: dict[str, list[Mapping[str, Any]]] = {}
+    for item in catalog:
+        operation = str(item.get("operation") or _source_occurrence(item).get("operation") or "").strip()
+        if operation:
+            by_operation.setdefault(operation, []).append(item)
+
+    requirements: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for path in paths:
+        end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+        value_node_id = str(end.get("value_node_id") or "")
+        item = by_value_node_id.get(value_node_id)
+        if item is None or str(item.get("node_kind") or end.get("node_kind") or "") != "field":
+            continue
+        occurrence = _source_occurrence(item)
+        property_name = _projected_property_name(occurrence, item)
+        display_ref = str(item.get("display_ref") or end.get("display_ref") or "").strip()
+        operation = str(item.get("operation") or end.get("operation") or occurrence.get("operation") or "").strip()
+        if not property_name or not operation or "." not in display_ref:
+            continue
+        root_symbol, suffix = display_ref.split(".", 1)
+        root_symbol = root_symbol.strip()
+        relative_path = tuple(part for part in suffix.split(".") if part)
+        if not root_symbol or not relative_path or relative_path[-1] != property_name:
+            continue
+
+        owners: dict[str, Mapping[str, Any]] = {}
+        for candidate in by_operation.get(operation, ()):
+            if _node_symbol(candidate) != root_symbol:
+                continue
+            declared_type = _node_declared_type(candidate)
+            if not declared_type:
+                continue
+            if str(_source_occurrence(candidate).get("occurrence_kind") or "") not in {
+                "method_parameter", "local_variable", "field", "object_field",
+            }:
+                continue
+            candidate_id = str(candidate.get("value_node_id") or "")
+            if candidate_id:
+                owners[candidate_id] = candidate
+        if len(owners) != 1:
+            continue
+        owner = next(iter(owners.values()))
+        owner_type = _node_declared_type(owner)
+        if not owner_type:
+            continue
+        key = (owner_type, property_name, value_node_id)
+        requirements[key] = {
+            "local_value_node_id": value_node_id,
+            "local_display_ref": display_ref,
+            "local_operation": operation,
+            "owner_symbol": root_symbol,
+            "owner_declared_type": owner_type,
+            "property_name": property_name,
+            "relative_property_path": list(relative_path),
+            "path_confidence": str(path.get("confidence") or ""),
+            "path_hop_count": int(path.get("hop_count") or 0),
+        }
+    return [requirements[key] for key in sorted(requirements)]
+
+
+def _segment_composed_origins(
+    parent_segment: Mapping[str, Any],
+    *,
+    nested_origins: Mapping[str, Mapping[str, Any]],
+    parameter_symbols: set[str],
+) -> list[dict[str, Any]]:
+    """Project an exact callee-parameter child onto an observed caller object.
+
+    This is structural consumer composition, not a synthetic value-flow edge.
+    It is allowed only for a single observed parent origin and an exact resolved
+    callee method.  ``ucp.birthDate`` + method-parameter ``birthDate.value`` can
+    therefore be projected as ``ucp.birthDate.value`` while the repository
+    bridge remains explicitly unobserved elsewhere in the result.
+    """
+    parent_origins = [item for item in parent_segment.get("origins") or () if isinstance(item, Mapping)]
+    if len(parent_origins) != 1:
+        return []
+    parent_ref = str(parent_origins[0].get("display_ref") or "").strip()
+    if not parent_ref:
+        return []
+    composed: dict[str, dict[str, Any]] = {}
+    for origin in nested_origins.values():
+        display_ref = str(origin.get("display_ref") or "").strip()
+        if "." not in display_ref:
+            continue
+        root, suffix = display_ref.split(".", 1)
+        if root not in parameter_symbols or not suffix:
+            continue
+        projected = f"{parent_ref}.{suffix}"
+        composed[projected] = {
+            "display_ref": projected,
+            "source_value_node_id": str(parent_origins[0].get("value_node_id") or ""),
+            "nested_origin_value_node_id": str(origin.get("value_node_id") or ""),
+            "basis": "exact_resolved_callee_parameter_property_projection",
+        }
+    return [composed[key] for key in sorted(composed)]
+
+
+
+def _unresolved_callee_semantic_evidence(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    repository_id: str,
+    transformation: Mapping[str, Any],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+) -> Mapping[str, Any] | None:
+    """Return a separate method-body segment for one unresolved invocation.
+
+    This never asserts that the invocation calls the candidate method.  It is
+    exposed only when the selected external repository contains exactly one
+    observed method definition with the same method name and that definition
+    has a mechanically observed parameter -> method-body -> return path.  The
+    missing call binding remains explicit in ``bridge_status``.
+    """
+    if str(transformation.get("resolution_status") or "") == "resolved":
+        return None
+    method_name = str(transformation.get("method_name") or "").strip()
+    if not method_name:
+        return None
+    catalog, complete = _repository_node_catalog(
+        gateway, binding=binding, repository_id=repository_id, cache=cache,
+    )
+    if not complete:
+        return None
+
+    method_ids_by_operation: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    for node in catalog:
+        occurrence = _source_occurrence(node)
+        operation = str(node.get("operation") or occurrence.get("operation") or "").strip()
+        method_id = str(occurrence.get("method_id") or "").strip()
+        if not operation or not method_id or operation.rsplit(".", 1)[-1] != method_name:
+            continue
+        method_ids_by_operation.setdefault((operation, method_id), []).append(node)
+    if len(method_ids_by_operation) != 1:
+        return None
+    (operation, method_id), method_nodes = next(iter(method_ids_by_operation.items()))
+
+    return_nodes = [
+        node for node in method_nodes
+        if str(node.get("node_kind") or "") == "return_value"
+        and str(_source_occurrence(node).get("occurrence_kind") or "") == "method_return"
+    ]
+    parameters = [
+        node for node in method_nodes
+        if str(_source_occurrence(node).get("occurrence_kind") or "") == "method_parameter"
+    ]
+    parameter_ids = {str(node.get("value_node_id") or "") for node in parameters if str(node.get("value_node_id") or "")}
+    if len(return_nodes) != 1 or not parameter_ids:
+        return None
+    return_node = return_nodes[0]
+    return_id = str(return_node.get("value_node_id") or "")
+    if not return_id:
+        return None
+
+    query = gateway.resolve_attribute_paths(
+        binding,
+        source=return_id,
+        selected_repo_ids=(repository_id,),
+        direction="reverse",
+    )
+    result = _result(query)
+    paths = [
+        path for path in result.get("paths") or ()
+        if isinstance(path, Mapping)
+        and str((path.get("end") or {}).get("value_node_id") or "") in parameter_ids
+        and int(path.get("hop_count") or 0) > 0
+        and str(path.get("confidence") or "") in {"confirmed", "high", "probable"}
+    ]
+    if not paths:
+        return None
+    paths.sort(key=lambda path: (int(path.get("hop_count") or 0), str((path.get("end") or {}).get("value_node_id") or "")))
+    min_hops = int(paths[0].get("hop_count") or 0)
+    shortest = [path for path in paths if int(path.get("hop_count") or 0) == min_hops]
+    if len(shortest) != 1:
+        return None
+    path = shortest[0]
+
+    by_id = {
+        str(node.get("value_node_id") or ""): node
+        for node in method_nodes
+        if str(node.get("value_node_id") or "")
+    }
+    invocations: dict[str, dict[str, Any]] = {}
+    edge_ids: set[str] = set()
+    for step in path.get("steps") or ():
+        if not isinstance(step, Mapping):
+            continue
+        edge_id = str(step.get("value_flow_edge_id") or "")
+        if edge_id:
+            edge_ids.add(edge_id)
+        for node_key in ("source", "target"):
+            node = step.get(node_key)
+            if not isinstance(node, Mapping):
+                continue
+            node_id = str(node.get("value_node_id") or "")
+            catalog_node = by_id.get(node_id)
+            occurrence = _source_occurrence(catalog_node) if catalog_node is not None else {}
+            if str(occurrence.get("occurrence_kind") or "") != "method_invocation":
+                continue
+            display_ref = str(node.get("display_ref") or "").strip()
+            if not node_id or not display_ref:
+                continue
+            invocations[node_id] = {
+                "value_node_id": node_id,
+                "display_ref": display_ref,
+                "method_name": str(occurrence.get("method_name") or ""),
+                "source_path": str(node.get("source_path") or (catalog_node or {}).get("source_path") or ""),
+            }
+    if not invocations:
+        return None
+    end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+    return {
+        "operation": operation,
+        "method_id": method_id,
+        "method_name": method_name,
+        "origin": {
+            "value_node_id": str(end.get("value_node_id") or ""),
+            "display_ref": str(end.get("display_ref") or ""),
+        },
+        "transformations": [invocations[key] for key in sorted(invocations)],
+        "target": {
+            "value_node_id": return_id,
+            "display_ref": str(return_node.get("display_ref") or ""),
+        },
+        "value_flow_edge_ids": sorted(edge_ids),
+        "bridge_status": "invocation_to_unique_method_candidate_not_observed",
+        "basis": "unique_selected_repo_method_name_with_observed_parameter_to_return_path",
+    }
+
+
+def _external_scalar_continuation_segments(
+    gateway: AislPathGateway,
+    *,
+    binding,
+    external_repo_ids: Sequence[str],
+    direct_segments: Sequence[Mapping[str, Any]],
+    local_continuations: Sequence[Mapping[str, Any]],
+    cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+) -> list[dict[str, Any]]:
+    """Expand exact object mappings to scalar properties consumed locally.
+
+    Expansion is deliberately bounded.  It only follows a direct external
+    transformation whose invocation has an exact resolved ``callee_method_id``
+    and declared result type.  A local reverse-path endpoint must consume the
+    same declared type/property, and the external scalar target must live in the
+    exact callee method.  No schema-only child discovery or cross-repository
+    value-flow edge is introduced.
+    """
+    if not direct_segments or not local_continuations:
+        return []
+
+    continuation_by_type: dict[str, list[Mapping[str, Any]]] = {}
+    for item in local_continuations:
+        owner_type = _observed_type(item.get("owner_declared_type"))
+        if owner_type:
+            continuation_by_type.setdefault(owner_type, []).append(item)
+
+    nested_segments: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for parent_segment in direct_segments:
+        if int(parent_segment.get("semantic_depth") or 0) != 0:
+            continue
+        parent_target = parent_segment.get("target") if isinstance(parent_segment.get("target"), Mapping) else {}
+        parent_target_id = str(parent_target.get("value_node_id") or "")
+        parent_relative = [str(value) for value in parent_segment.get("relative_property_path") or () if str(value)]
+        for transformation in parent_segment.get("transformations") or ():
+            if not isinstance(transformation, Mapping):
+                continue
+            callee_method_id = str(transformation.get("callee_method_id") or "").strip()
+            result_type = _observed_type(transformation.get("type_ref"))
+            if (
+                not callee_method_id
+                or not result_type
+                or str(transformation.get("resolution_status") or "") != "resolved"
+            ):
+                continue
+            requirements = continuation_by_type.get(result_type, ())
+            if not requirements:
+                continue
+
+            for external_repo_id in external_repo_ids:
+                field_catalog, fields_complete = _filtered_node_catalog(
+                    gateway, binding=binding, repository_id=external_repo_id,
+                    cache=cache, node_kind="field",
+                )
+                if not fields_complete:
+                    continue
+                for requirement in requirements:
+                    property_name = str(requirement.get("property_name") or "").strip()
+                    if not property_name:
+                        continue
+                    target_candidates = [
+                        node for node in field_catalog
+                        if str(_source_occurrence(node).get("property_name") or "").strip() == property_name
+                        and str(_source_occurrence(node).get("method_id") or "").strip() == callee_method_id
+                        and "." in str(node.get("display_ref") or "")
+                    ]
+                    for target_node in target_candidates:
+                        operation = str(target_node.get("operation") or _source_occurrence(target_node).get("operation") or "").strip()
+                        if not operation:
+                            continue
+                        operation_catalog, operation_complete = _filtered_node_catalog(
+                            gateway, binding=binding, repository_id=external_repo_id,
+                            cache=cache, operation=operation,
+                        )
+                        if not operation_complete:
+                            continue
+                        method_catalog = [
+                            node for node in operation_catalog
+                            if str(_source_occurrence(node).get("method_id") or "").strip() == callee_method_id
+                        ]
+                        by_id = {
+                            str(node.get("value_node_id") or ""): node
+                            for node in method_catalog
+                            if str(node.get("value_node_id") or "")
+                        }
+                        display_ref = str(target_node.get("display_ref") or "").strip()
+                        owner_symbol = display_ref.split(".", 1)[0].strip()
+                        owners = [
+                            node for node in method_catalog
+                            if _node_symbol(node) == owner_symbol
+                            and _node_declared_type(node) == result_type
+                            and str(_source_occurrence(node).get("occurrence_kind") or "") in {
+                                "local_variable", "method_parameter", "field", "object_field",
+                            }
+                        ]
+                        unique_owners = {
+                            str(node.get("value_node_id") or ""): node for node in owners
+                            if str(node.get("value_node_id") or "")
+                        }
+                        if len(unique_owners) != 1:
+                            continue
+                        owner = next(iter(unique_owners.values()))
+                        parameters = [
+                            node for node in method_catalog
+                            if str(_source_occurrence(node).get("occurrence_kind") or "") == "method_parameter"
+                        ]
+                        parameter_symbols = {_node_symbol(node) for node in parameters if _node_symbol(node)}
+                        if not parameter_symbols:
+                            continue
+
+                        value_node_id = str(target_node.get("value_node_id") or "").strip()
+                        if not value_node_id:
+                            continue
+                        query = gateway.resolve_attribute_paths(
+                            binding,
+                            source=value_node_id,
+                            selected_repo_ids=(external_repo_id,),
+                            direction="reverse",
+                        )
+                        result = _result(query)
+                        paths = [
+                            path for path in result.get("paths") or ()
+                            if isinstance(path, Mapping)
+                            and int(path.get("hop_count") or 0) > 0
+                            and str(path.get("confidence") or "") in {"confirmed", "high", "probable"}
+                        ]
+                        if not paths:
+                            continue
+
+                        origins: dict[str, dict[str, Any]] = {}
+                        transformations: dict[str, dict[str, Any]] = {}
+                        edge_ids: set[str] = set()
+                        for path in paths:
+                            end = path.get("end") if isinstance(path.get("end"), Mapping) else {}
+                            end_id = str(end.get("value_node_id") or "")
+                            end_item = by_id.get(end_id)
+                            end_occurrence = _source_occurrence(end_item) if end_item is not None else {}
+                            end_ref = str(end.get("display_ref") or "").strip()
+                            end_root = end_ref.split(".", 1)[0].strip() if "." in end_ref else ""
+                            if (
+                                end_id
+                                and end_id != value_node_id
+                                and end_item is not None
+                                and str(end_item.get("node_kind") or end.get("node_kind") or "") == "field"
+                                and str(end_occurrence.get("property_name") or "").strip() == property_name
+                                and end_root in parameter_symbols
+                            ):
+                                origins[end_id] = {
+                                    "value_node_id": end_id,
+                                    "display_ref": end_ref,
+                                    "node_kind": str(end.get("node_kind") or end_item.get("node_kind") or ""),
+                                    "source_path": str(end.get("source_path") or end_item.get("source_path") or ""),
+                                }
+                            for step in path.get("steps") or ():
+                                if not isinstance(step, Mapping):
+                                    continue
+                                edge_id = str(step.get("value_flow_edge_id") or "")
+                                if edge_id:
+                                    edge_ids.add(edge_id)
+                                for node_key in ("source", "target"):
+                                    node = step.get(node_key)
+                                    if not isinstance(node, Mapping) or str(node.get("node_kind") or "") != "derivation":
+                                        continue
+                                    node_id = str(node.get("value_node_id") or "")
+                                    catalog_node = by_id.get(node_id)
+                                    occurrence = _source_occurrence(catalog_node) if catalog_node is not None else {}
+                                    if node_id:
+                                        transformations[node_id] = {
+                                            "value_node_id": node_id,
+                                            "display_ref": str(node.get("display_ref") or ""),
+                                            "source_path": str(node.get("source_path") or ""),
+                                            "type_ref": _node_declared_type(catalog_node) if catalog_node is not None else _observed_type(node.get("type_ref")),
+                                            "callee_method_id": str(occurrence.get("callee_method_id") or ""),
+                                            "resolution_status": str(occurrence.get("resolution_status") or ""),
+                                            "method_name": str(occurrence.get("method_name") or ""),
+                                        }
+                        if not origins:
+                            continue
+                        composed_origins = _segment_composed_origins(
+                            parent_segment,
+                            nested_origins=origins,
+                            parameter_symbols=parameter_symbols,
+                        )
+                        if not composed_origins:
+                            continue
+                        key = (external_repo_id, parent_target_id, value_node_id, str(requirement.get("local_value_node_id") or ""))
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        rendered_transformations: list[dict[str, Any]] = []
+                        for item in [transformations[key] for key in sorted(transformations)]:
+                            rendered = dict(item)
+                            supplemental = _unresolved_callee_semantic_evidence(
+                                gateway,
+                                binding=binding,
+                                repository_id=external_repo_id,
+                                transformation=item,
+                                cache=cache,
+                            )
+                            if supplemental is not None:
+                                rendered["unresolved_callee_semantic_evidence"] = dict(supplemental)
+                            rendered_transformations.append(rendered)
+                        nested_segments.append({
+                            "repository_id": external_repo_id,
+                            "system_id": str(binding.system_id),
+                            "revision_id": str(binding.revision_id),
+                            "target_declared_type": result_type,
+                            "root_declared_type": str(parent_segment.get("root_declared_type") or ""),
+                            "property_name": property_name,
+                            "relative_property_path": [*parent_relative, *[str(v) for v in requirement.get("relative_property_path") or () if str(v)]],
+                            "semantic_depth": 1,
+                            "parent_segment_target_value_node_id": parent_target_id,
+                            "parent_transformation_value_node_id": str(transformation.get("value_node_id") or ""),
+                            "parent_transformation_display_ref": str(transformation.get("display_ref") or ""),
+                            "callee_method_id": callee_method_id,
+                            "local_consumer": dict(requirement),
+                            "owner": {
+                                "value_node_id": str(owner.get("value_node_id") or ""),
+                                "display_ref": str(owner.get("display_ref") or ""),
+                                "type_ref": result_type,
+                                "operation": operation,
+                            },
+                            "target": {
+                                "value_node_id": value_node_id,
+                                "display_ref": display_ref,
+                                "source_path": str(target_node.get("source_path") or ""),
+                            },
+                            "origins": [origins[key] for key in sorted(origins)],
+                            "composed_origins": composed_origins,
+                            "transformations": rendered_transformations,
+                            "value_flow_edge_ids": sorted(edge_ids),
+                            "path_status": str(result.get("status") or ""),
+                            "basis": "exact_resolved_external_callee_scalar_property_consumed_by_local_path",
+                        })
+    nested_segments.sort(
+        key=lambda item: (
+            item["repository_id"],
+            item.get("parent_segment_target_value_node_id") or "",
+            item["target"]["value_node_id"],
+        )
+    )
+    return nested_segments
+
+
+
+def _source_semantic_projection(
+    side: Mapping[str, Any],
+    *,
+    external_evidence: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    """Project the exact local path that consumes the deepest external scalar.
+
+    Reverse source queries may expose several legitimate origins.  Once external
+    composition proves a deeper scalar and records the exact local consumer node,
+    prefer the reverse path that terminates at that node.  This is a projection
+    of already-published repository-local flow, not a new cross-repository edge.
+    """
+    segments = [
+        item for item in external_evidence.get("segments") or ()
+        if isinstance(item, Mapping) and isinstance(item.get("local_consumer"), Mapping)
+    ]
+    if not segments:
+        return None
+    max_depth = max(int(item.get("semantic_depth") or 0) for item in segments)
+    deepest = [item for item in segments if int(item.get("semantic_depth") or 0) == max_depth]
+    local_ids = {
+        str(item["local_consumer"].get("local_value_node_id") or "")
+        for item in deepest
+        if str(item["local_consumer"].get("local_value_node_id") or "")
+    }
+    if len(local_ids) != 1:
+        return None
+    local_id = next(iter(local_ids))
+
+    query = side.get("query") if isinstance(side.get("query"), Mapping) else {}
+    result = _result(query)
+    candidate_paths = [
+        path for path in result.get("paths") or ()
+        if isinstance(path, Mapping)
+        and str((path.get("end") or {}).get("value_node_id") or "") == local_id
+        and str(path.get("confidence") or "") in {"confirmed", "high", "probable"}
+    ]
+    if not candidate_paths:
+        return None
+    candidate_paths.sort(key=lambda path: (int(path.get("hop_count") or 0), str((path.get("end") or {}).get("display_ref") or "")))
+    shortest_hops = int(candidate_paths[0].get("hop_count") or 0)
+    shortest = [path for path in candidate_paths if int(path.get("hop_count") or 0) == shortest_hops]
+    if len(shortest) != 1:
+        return None
+    path = shortest[0]
+
+    refs: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    def append_node(node: Mapping[str, Any]) -> None:
+        kind = str(node.get("node_kind") or "")
+        if kind not in {"field", "derivation", "wire_field"}:
+            return
+        ref = str(node.get("display_ref") or "").strip()
+        if not ref or ref in seen:
+            return
+        seen.add(ref)
+        refs.append({
+            "value_node_id": str(node.get("value_node_id") or ""),
+            "display_ref": ref,
+            "node_kind": kind,
+            "operation": str(node.get("operation") or ""),
+            "source_path": str(node.get("source_path") or ""),
+        })
+
+    end = path.get("end")
+    if isinstance(end, Mapping):
+        append_node(end)
+    for step in reversed([item for item in path.get("steps") or () if isinstance(item, Mapping)]):
+        source = step.get("source")
+        target = step.get("target")
+        if isinstance(source, Mapping):
+            append_node(source)
+        if isinstance(target, Mapping):
+            append_node(target)
+    start = path.get("start")
+    if isinstance(start, Mapping):
+        append_node(start)
+
+    if len(refs) < 2:
+        return None
+    return {
+        "chain": refs,
+        "local_external_consumer_value_node_id": local_id,
+        "basis": "deepest_external_scalar_exact_local_reverse_path",
+    }
+
+
 def _external_origin_evidence(
     gateway: AislPathGateway,
     *,
@@ -476,20 +1466,26 @@ def _external_origin_evidence(
     repository_id: str,
     material_gap: Mapping[str, Any],
     cache: dict[tuple[str, ...], tuple[list[Mapping[str, Any]], bool]],
+    resolved_side: Mapping[str, Any] | None = None,
+    local_catalog: Sequence[Mapping[str, Any]] = (),
+    local_catalog_complete: bool = False,
 ) -> Mapping[str, Any] | None:
-    """Find a separate observed external semantic segment for a material source gap.
+    """Find separate observed external semantic segments for a source gap.
 
-    This deliberately does *not* create a cross-repository value-flow edge.  A
-    selected external repository may nevertheless contain an independently
-    observed mapping into the exact declared result type/property at which the
-    local reverse path stopped.  That segment is useful consumer knowledge when
-    it is grounded by all of the following public facts in the external repo:
+    No cross-repository value-flow edge is created.  Direct projected fields
+    are accepted only when the selected external repository contains the exact
+    declared result type/property and an observed non-zero reverse value-flow
+    path.
 
-    * an exact typed local owner (for example ``rsc : RscIndividual``);
-    * the exact property on that same owner/operation (``rsc.birthDate``);
-    * an observed non-zero reverse value-flow path into that property.
+    A nested projected field may have a different mechanically observed owner
+    type (for example a field inside a nested value object).  Such a field is
+    accepted only after its direct ancestor has already been proven on the
+    original result type *and* the nested field has an observed reverse path to
+    at least one of the exact same external origin value nodes.  This keeps the
+    composition evidence-based while avoiding the false requirement that every
+    nested field be owned directly by the top-level result type.
 
-    The bridge from the local unresolved method result to this external segment
+    The bridge from the local unresolved method result to the external segments
     remains explicitly unproven and is reported as such by the caller.
     """
     external_repo_ids = [
@@ -503,22 +1499,31 @@ def _external_origin_evidence(
     if not external_repo_ids or not evidence_rows:
         return None
 
+    evidence_rows.sort(key=lambda item: (len(_relative_external_property_path(item)), str(item.get("terminal_value_node_id") or "")))
     all_segments: list[dict[str, Any]] = []
     covered_terminals: set[str] = set()
+    direct_origin_ids_by_property: dict[str, set[str]] = {}
 
     for evidence in evidence_rows:
         terminal_id = str(evidence.get("terminal_value_node_id") or "")
-        target_type = _observed_type(evidence.get("parent_declared_type"))
+        root_target_type = _observed_type(evidence.get("parent_declared_type"))
         property_name = str(evidence.get("terminal_property_name") or "").strip()
-        if not target_type or not property_name:
+        relative_path = _relative_external_property_path(evidence)
+        if not root_target_type or not property_name or not relative_path:
+            continue
+
+        is_nested = len(relative_path) > 1
+        root_property = relative_path[0]
+        shared_ancestor_origins = direct_origin_ids_by_property.get(root_property, set()) if is_nested else set()
+        if is_nested and not shared_ancestor_origins:
             continue
 
         terminal_segments: list[dict[str, Any]] = []
+        terminal_origin_ids: set[str] = set()
         for external_repo_id in external_repo_ids:
             # Property discovery is bounded to public field nodes.  Only the
             # operation(s) containing an exact property candidate are expanded
-            # further to verify the owner's declared type.  This avoids scanning
-            # a whole large dependency catalog for every transport field.
+            # further to verify the owner's mechanically observed declared type.
             field_catalog, fields_complete = _filtered_node_catalog(
                 gateway, binding=binding, repository_id=external_repo_id,
                 cache=cache, node_kind="field",
@@ -551,7 +1556,9 @@ def _external_origin_evidence(
                     declared_type = _observed_type(
                         node.get("type_ref") or owner_occurrence.get("declared_type")
                     )
-                    if symbol != owner_symbol or declared_type != target_type:
+                    if symbol != owner_symbol or not declared_type:
+                        continue
+                    if not is_nested and declared_type != root_target_type:
                         continue
                     if str(owner_occurrence.get("occurrence_kind") or "") not in {
                         "local_variable", "method_parameter", "field", "object_field",
@@ -580,6 +1587,11 @@ def _external_origin_evidence(
                 if not paths:
                     continue
 
+                operation_by_id = {
+                    str(node.get("value_node_id") or ""): node
+                    for node in operation_catalog
+                    if str(node.get("value_node_id") or "")
+                }
                 origins: dict[str, dict[str, Any]] = {}
                 transformations: dict[str, dict[str, Any]] = {}
                 edge_ids: set[str] = set()
@@ -605,34 +1617,54 @@ def _external_origin_evidence(
                                 continue
                             node_id = str(node.get("value_node_id") or "")
                             if node_id:
+                                catalog_node = operation_by_id.get(node_id)
+                                derivation_occurrence = (
+                                    _source_occurrence(catalog_node) if catalog_node is not None else {}
+                                )
                                 transformations[node_id] = {
                                     "value_node_id": node_id,
                                     "display_ref": str(node.get("display_ref") or ""),
                                     "source_path": str(node.get("source_path") or ""),
+                                    "type_ref": (
+                                        _node_declared_type(catalog_node)
+                                        if catalog_node is not None else _observed_type(node.get("type_ref"))
+                                    ),
+                                    "callee_method_id": str(derivation_occurrence.get("callee_method_id") or ""),
+                                    "resolution_status": str(derivation_occurrence.get("resolution_status") or ""),
+                                    "method_name": str(derivation_occurrence.get("method_name") or ""),
                                 }
                 if not origins:
                     continue
                 # Prefer observed data fields over construction/literal terminals
-                # when the same reverse query exposes both.  This does not discard
-                # the path proof; it selects the material data-origin projection
-                # for the consumer-facing segment.
+                # when the same reverse query exposes both.  Nested composition
+                # also keys on these field origins, so a construction-only path
+                # cannot accidentally satisfy the shared-origin gate.
                 field_origins = {
                     key: value for key, value in origins.items()
                     if value.get("node_kind") == "field"
                 }
                 projected_origins = field_origins or origins
+                projected_origin_ids = set(projected_origins)
+                if is_nested and not (projected_origin_ids & shared_ancestor_origins):
+                    continue
 
                 owner = owners[0]
+                observed_owner_type = _observed_type(
+                    owner.get("type_ref") or _source_occurrence(owner).get("declared_type")
+                )
                 terminal_segments.append({
                     "repository_id": external_repo_id,
                     "system_id": str(binding.system_id),
                     "revision_id": str(binding.revision_id),
-                    "target_declared_type": target_type,
+                    "target_declared_type": observed_owner_type,
+                    "root_declared_type": root_target_type,
                     "property_name": property_name,
+                    "relative_property_path": list(relative_path),
+                    "semantic_depth": 0 if not is_nested else len(relative_path) - 1,
                     "owner": {
                         "value_node_id": str(owner.get("value_node_id") or ""),
                         "display_ref": str(owner.get("display_ref") or ""),
-                        "type_ref": _observed_type(owner.get("type_ref") or _source_occurrence(owner).get("declared_type")),
+                        "type_ref": observed_owner_type,
                         "operation": operation,
                     },
                     "target": {
@@ -644,11 +1676,18 @@ def _external_origin_evidence(
                     "transformations": [transformations[key] for key in sorted(transformations)],
                     "value_flow_edge_ids": sorted(edge_ids),
                     "path_status": str(result.get("status") or ""),
-                    "basis": "selected_external_repo_exact_typed_owner_property_with_observed_reverse_path",
+                    "basis": (
+                        "selected_external_repo_nested_property_shares_observed_origin_with_exact_typed_ancestor"
+                        if is_nested
+                        else "selected_external_repo_exact_typed_owner_property_with_observed_reverse_path"
+                    ),
                 })
+                terminal_origin_ids.update(projected_origin_ids)
 
         if terminal_segments:
             covered_terminals.add(terminal_id)
+            if not is_nested:
+                direct_origin_ids_by_property.setdefault(root_property, set()).update(terminal_origin_ids)
             terminal_segments.sort(
                 key=lambda item: (
                     item["repository_id"],
@@ -665,6 +1704,28 @@ def _external_origin_evidence(
     }
     if not required_terminals or covered_terminals != required_terminals:
         return None
+
+    local_continuations = _local_external_continuations(
+        resolved_side, catalog=local_catalog, catalog_complete=local_catalog_complete,
+    )
+    nested_segments = _external_scalar_continuation_segments(
+        gateway,
+        binding=binding,
+        external_repo_ids=external_repo_ids,
+        direct_segments=all_segments,
+        local_continuations=local_continuations,
+        cache=cache,
+    )
+    if nested_segments:
+        all_segments.extend(nested_segments)
+        all_segments.sort(
+            key=lambda item: (
+                item.get("repository_id") or "",
+                int(item.get("semantic_depth") or 0),
+                item.get("parent_segment_target_value_node_id") or "",
+                (item.get("target") or {}).get("value_node_id") or "",
+            )
+        )
 
     return {
         "status": "semantically_covered",
@@ -1667,9 +2728,17 @@ def build_interaction_lineage(
                     repository_id=field.source_repository_id,
                     material_gap=material_gap,
                     cache=node_catalog_cache,
+                    resolved_side=source_side,
+                    local_catalog=source_catalog,
+                    local_catalog_complete=source_catalog_complete,
                 )
                 if external_evidence is not None:
                     source_side["external_origin_evidence"] = dict(external_evidence)
+                    semantic_source = _source_semantic_projection(
+                        source_side, external_evidence=external_evidence,
+                    )
+                    if semantic_source is not None:
+                        source_side["semantic_projection"] = dict(semantic_source)
                     gap = _gap(
                         field.source_repository_id, field, "source",
                         "source_external_origin_link_unproven",
@@ -1739,6 +2808,16 @@ def build_interaction_lineage(
     # canonical journey rows above already include permitted structural expansion.
     for journey in journeys:
         target_binding = bindings.require(journey["target_repository_id"])
+        target_catalog, target_catalog_complete = _repository_node_catalog(
+            gateway, binding=target_binding, repository_id=journey["target_repository_id"],
+            cache=node_catalog_cache,
+        )
+        if target_catalog_complete:
+            semantic_projection = _target_semantic_projection(
+                journey["target_side"], catalog=target_catalog,
+            )
+            if semantic_projection is not None:
+                journey["target_side"]["semantic_projection"] = dict(semantic_projection)
         child_expansion = _observed_child_expansion(
             gateway, binding=target_binding, repository_id=journey["target_repository_id"],
             side=journey["target_side"],
