@@ -124,6 +124,39 @@ def _binding_updates(result: Mapping[str, Any]) -> dict[str, AislBinding]:
     return updates
 
 
+def _external_origin_observed_boundary(requirement: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Turn observed external-origin evidence into a generic Task42 boundary.
+
+    The Application must not guess Maven ownership.  It may, however, pass the
+    exact externally-declared type already published in AISL as a bounded Nexus
+    discovery anchor.  Framework/Task42 remains the owner of G:A discovery,
+    acquisition, analysis and publication.
+    """
+    if str(requirement.get("state") or "") != "external_source_owner_unresolved":
+        return None
+    anchors = sorted({
+        str(item.get("parent_declared_type") or "").strip()
+        for item in requirement.get("evidence") or ()
+        if isinstance(item, Mapping) and str(item.get("parent_declared_type") or "").strip()
+    })
+    if not anchors:
+        return None
+    terminal_ids = sorted({
+        str(item.get("terminal_value_node_id") or "").strip()
+        for item in requirement.get("evidence") or ()
+        if isinstance(item, Mapping) and str(item.get("terminal_value_node_id") or "").strip()
+    })
+    boundary: dict[str, Any] = {
+        "repository_id": str(requirement.get("repository_id") or "").strip(),
+        "system_id": str(requirement.get("system_id") or "").strip(),
+        "boundary_kind": "external_type",
+        "observed_anchors": anchors,
+    }
+    if len(terminal_ids) == 1:
+        boundary["terminal_value_node_id"] = terminal_ids[0]
+    return boundary
+
+
 def prepare_interaction_lineage(
     topology: Mapping[str, Any],
     *,
@@ -177,6 +210,7 @@ def prepare_interaction_lineage(
     unresolved_external = [
         item for item in requirements
         if str(item.get("state") or "") == "external_source_owner_unresolved"
+        and _external_origin_observed_boundary(item) is None
     ]
     if unresolved_external:
         return {
@@ -248,19 +282,33 @@ def prepare_interaction_lineage(
             ))
         else:
             journey_id = f"interaction-lineage:{edge_id}:repository:{repository_id}"
+        external_origin_boundary = _external_origin_observed_boundary(representative)
+        selector_context = {
+            **dict(representative.get("selector_context") or {}),
+            "topology_id": str(topology.get("topology_id") or ""),
+            "edge_id": edge_id,
+            "preparation_group_field_count": len(group),
+        }
+        if external_origin_boundary is not None:
+            # The attribute-path selector led us to this already-observed external
+            # type, but KCP must now own external-source discovery.  Leaving the
+            # selector in place would make KCP re-evaluate the same local terminal
+            # and never enter its Task42 Nexus routing branch.
+            selector_context.setdefault("repository_id", repository_id)
+            selector_context.setdefault("system_id", str(representative.get("system_id") or ""))
+            selector_context.pop("attribute_path", None)
         request = {
             "consumer_id": "interaction-lineage",
             "journey_id": journey_id,
             "required_capabilities": [_REQUIRED_CAPABILITY],
             "analysis_profile_id": _PROFILE_ID,
             "pinned_revision_context": _pinned_context(BindingIndex(list(current.values())), repository_ids),
-            "observed_boundary": dict(representative.get("observed_boundary") or {}),
-            "selector_context": {
-                **dict(representative.get("selector_context") or {}),
-                "topology_id": str(topology.get("topology_id") or ""),
-                "edge_id": edge_id,
-                "preparation_group_field_count": len(group),
-            },
+            "observed_boundary": (
+                external_origin_boundary
+                if external_origin_boundary is not None
+                else dict(representative.get("observed_boundary") or {})
+            ),
+            "selector_context": selector_context,
         }
         result = dict(preparation_gateway.run_preparation(request))
         framework_results.append({
