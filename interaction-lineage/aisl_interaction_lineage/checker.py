@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping, Sequence
 
 from .aisl import AislReadinessGateway
-from .builder import _resolve_side
+from .builder import _material_source_origin_gap, _repository_node_catalog, _resolve_side
 from .contracts import BindingIndex
 from .topology import boundary_fields, select_edge, wire_display_ref
 
@@ -159,6 +159,62 @@ def _external_client_boundary_requirement(
     }
 
 
+def _material_external_origin_requirement(
+    *,
+    resolved: Mapping[str, Any],
+    catalog: Sequence[Mapping[str, Any]],
+    catalog_complete: bool,
+    repository_id: str,
+    system_id: str,
+    revision_id: str,
+    edge_id: str,
+    transport_role: str,
+    field_path: str,
+    side: str,
+    direction: str,
+    selected_repo_ids: Sequence[str] | None = None,
+) -> dict[str, Any] | None:
+    """Expose a material external-origin gap without guessing its source owner.
+
+    The builder already classifies the narrow observed case where a resolved
+    producer attribute terminates at a projected child of an external/unresolved
+    method result.  Readiness must not call that state READY, but it also must not
+    invent Maven/Git ownership from a class or method name.
+    """
+    material_gap = _material_source_origin_gap(
+        resolved, catalog=catalog, catalog_complete=catalog_complete,
+    )
+    if material_gap is None:
+        return None
+    anchor = resolved.get("resolved_anchor")
+    source_id = str(anchor.get("value_node_id") or "") if isinstance(anchor, Mapping) else ""
+    return {
+        "state": "external_source_owner_unresolved",
+        "repository_id": repository_id,
+        "system_id": system_id,
+        "revision_id": revision_id,
+        "edge_id": edge_id,
+        "transport_role": transport_role,
+        "field_path": field_path,
+        "side": side,
+        "direction": direction,
+        "reason": str(material_gap.get("reason") or "source_external_origin_unresolved"),
+        "evidence": list(material_gap.get("evidence") or ()),
+        "selector_context": {
+            "repository_id": repository_id,
+            "system_id": system_id,
+            "attribute_path": {
+                "repository_id": repository_id,
+                "system_id": system_id,
+                "revision_id": revision_id,
+                "source": source_id,
+                "selected_repo_ids": list(selected_repo_ids or (repository_id,)),
+                "direction": direction,
+            },
+        },
+    }
+
+
 def check_interaction_lineage(
     topology: Mapping[str, Any],
     *,
@@ -305,6 +361,38 @@ def check_interaction_lineage(
                             })
                         elif row.get("status") == "ready":
                             row["status"] = "preparable_external_boundary"
+                    elif side == "source":
+                        catalog, catalog_complete = _repository_node_catalog(
+                            gateway, binding=binding, repository_id=repository_id,
+                            cache=node_catalog_cache,
+                        )
+                        material_requirement = _material_external_origin_requirement(
+                            resolved=resolved,
+                            catalog=catalog,
+                            catalog_complete=catalog_complete,
+                            repository_id=repository_id,
+                            system_id=binding.system_id,
+                            revision_id=binding.revision_id,
+                            edge_id=edge_id,
+                            transport_role=field.transport_role,
+                            field_path=field.field_path,
+                            side=side,
+                            direction=direction,
+                            selected_repo_ids=binding.query_repo_ids(repository_id),
+                        )
+                        if material_requirement is not None:
+                            preparation_requirements.append(material_requirement)
+                            row["status"] = "material_semantic_gap"
+                            diagnostics.append({
+                                "code": "source_external_origin_unresolved",
+                                "repository_id": repository_id,
+                                "edge_id": edge_id,
+                                "transport_role": field.transport_role,
+                                "field_path": field.field_path,
+                                "side": side,
+                                "blocking": True,
+                                "evidence": list(material_requirement.get("evidence") or ()),
+                            })
 
     items = [repositories[key] for key in sorted(repositories)]
     ready = all(item.get("status") == "ready" for item in items) and bool(items)

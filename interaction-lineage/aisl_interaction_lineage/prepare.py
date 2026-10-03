@@ -174,6 +174,27 @@ def prepare_interaction_lineage(
             "observed_boundary": {"repository_id": repository_id, "system_id": system_id},
             "selector_context": {"repository_id": repository_id, "system_id": system_id},
         })
+    unresolved_external = [
+        item for item in requirements
+        if str(item.get("state") or "") == "external_source_owner_unresolved"
+    ]
+    if unresolved_external:
+        return {
+            "format": PREPARATION_FORMAT, "status": "blocked",
+            "topology_id": str(topology.get("topology_id") or ""), "edge_id": edge_id,
+            "framework_preparations": [],
+            "bindings": {"schema_version": BINDINGS_SCHEMA_VERSION, "repositories": [
+                binding.to_dict() for repository_id in repository_ids if (binding := bindings.find(repository_id)) is not None
+            ]},
+            "readiness_before": before, "readiness_after": before,
+            "diagnostics": [{
+                "code": "external_source_owner_unresolved",
+                "message": "material external source origin is observed, but its exact source owner is not mechanically resolved",
+                "requirements": unresolved_external,
+            }],
+            "summary": {"framework_invocation_count": 0, "prepared_group_count": 0},
+        }
+
     ambiguous = [item for item in requirements if str(item.get("state") or "") == "ambiguous"]
     if ambiguous:
         return {
