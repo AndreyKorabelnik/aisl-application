@@ -1,0 +1,38 @@
+name: Task43 exact source export
+on:
+  push:
+    branches:
+      - automation/task43-app-exact-source-export-20261003
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 52c6202806e6f43ddb83da5829ffaca52488bbbf
+          fetch-depth: 0
+      - name: Verify exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "52c6202806e6f43ddb83da5829ffaca52488bbbf"
+          test "$(git rev-parse HEAD^{tree})" = "686cc115fd6820a31be4ca43e76c4b61ea7dc9c8"
+          test -z "$(git status --porcelain)"
+      - name: Create exact Git archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git archive --format=zip 52c6202806e6f43ddb83da5829ffaca52488bbbf -o aisl-application-source.zip
+          sha256sum aisl-application-source.zip > source-archive.sha256
+          printf 'repository=AndreyKorabelnik/aisl-application\ncommit=52c6202806e6f43ddb83da5829ffaca52488bbbf\nroot_tree=686cc115fd6820a31be4ca43e76c4b61ea7dc9c8\n' > source-identity.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aisl-application-source-main-52c6202
+          path: |
+            aisl-application-source.zip
+            source-archive.sha256
+            source-identity.txt
+          if-no-files-found: error
+          retention-days: 1
