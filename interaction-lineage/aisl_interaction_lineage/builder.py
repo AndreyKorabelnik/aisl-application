@@ -198,6 +198,20 @@ def _semantic_ref_parts(value: str) -> tuple[str, ...]:
     return tuple(parts)
 
 
+def _common_suffix_parts(values: Sequence[tuple[str, ...]]) -> tuple[str, ...]:
+    if not values:
+        return ()
+    shortest = min(len(value) for value in values)
+    common = 0
+    for size in range(1, shortest + 1):
+        suffix = values[0][-size:]
+        if all(value[-size:] == suffix for value in values[1:]):
+            common = size
+        else:
+            break
+    return values[0][-common:] if common else ()
+
+
 def _target_semantic_projection(
     side: Mapping[str, Any],
     *,
@@ -441,7 +455,7 @@ def _target_semantic_projection(
             parts = _semantic_ref_parts(str(candidate.get("semantic_ref") or ""))
             if len(parts) < len(deepest_parts):
                 continue
-            # Same-shape collection alias (bankAcctRecs[]....) or the closest
+            # Same-shape collection alias (records[]....) or the closest
             # deeper observed collection wrapper whose suffix is the semantic
             # chain already proven above.
             if len(parts) == len(deepest_parts):
@@ -462,6 +476,34 @@ def _target_semantic_projection(
             collection_refs = sorted({str(item.get("semantic_ref") or "") for item in nearest})
             if len(collection_refs) == 1:
                 chain.append(next(item for item in nearest if str(item.get("semantic_ref") or "") == collection_refs[0]))
+            elif collection_refs:
+                # Several local collection variables may carry the same nested
+                # payload under different aliases. Choosing
+                # one variable would be arbitrary, but stopping before their
+                # common payload would discard already-published semantic
+                # knowledge.  Use the common structural suffix only when the
+                # repository catalog independently contains exactly one typed,
+                # non-collection field with that exact semantic shape.
+                common_suffix = _common_suffix_parts([
+                    _semantic_ref_parts(ref) for ref in collection_refs
+                ])
+                if (
+                    len(common_suffix) > len(deepest_parts)
+                    and common_suffix[-len(deepest_parts):] == deepest_parts
+                ):
+                    typed_catalog_matches: dict[str, dict[str, Any]] = {}
+                    for raw_node in catalog:
+                        candidate = semantic_candidate(raw_node)
+                        if candidate is None or bool(candidate.get("collection")):
+                            continue
+                        if not str(candidate.get("object_declared_type") or "").strip():
+                            continue
+                        ref = str(candidate.get("semantic_ref") or "")
+                        if _semantic_ref_parts(ref) != common_suffix:
+                            continue
+                        typed_catalog_matches.setdefault(ref, candidate)
+                    if len(typed_catalog_matches) == 1:
+                        chain.append(next(iter(typed_catalog_matches.values())))
 
     rendered_chain: list[dict[str, Any]] = []
     seen_semantic: set[str] = set()
@@ -879,7 +921,7 @@ def _local_external_continuations(
     is retained only when the field root resolves to one unique typed local
     value/parameter in the same operation.  This lets consumer composition ask
     external evidence for the exact scalar property that the local code actually
-    consumes (for example ``birthDate.value`` on a ``RscBirthDate`` parameter).
+    consumes (for example ``details.id`` on an ``ExternalDetails`` parameter).
     """
     if not resolved_side or not catalog_complete:
         return []
@@ -964,8 +1006,8 @@ def _segment_composed_origins(
 
     This is structural consumer composition, not a synthetic value-flow edge.
     It is allowed only for a single observed parent origin and an exact resolved
-    callee method.  ``ucp.birthDate`` + method-parameter ``birthDate.value`` can
-    therefore be projected as ``ucp.birthDate.value`` while the repository
+    callee method.  ``mapped.details`` + method-parameter ``details.id`` can
+    therefore be projected as ``mapped.details.id`` while the repository
     bridge remains explicitly unobserved elsewhere in the result.
     """
     parent_origins = [item for item in parent_segment.get("origins") or () if isinstance(item, Mapping)]
