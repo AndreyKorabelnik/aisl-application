@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 
 import pytest
 
-from aisl_interaction_lineage.builder import build_interaction_lineage
+from aisl_interaction_lineage.builder import _target_semantic_projection, build_interaction_lineage
 from aisl_interaction_lineage.contracts import AislBinding, BindingIndex
 from aisl_interaction_lineage.topology import boundary_fields, select_edge, wire_display_ref
 
@@ -549,3 +549,954 @@ def test_builder_preserves_external_semantic_segment_without_inventing_cross_rep
     assert "maven:g:a:1.2.3: source.id --[Mapper.mapId()]→ mapped.id" in row["full_attribute_path"]
     assert "cross-repository link not observed" in row["full_attribute_path"]
     assert "source_external_origin_link_unproven" in row["full_attribute_path"]
+
+
+def test_external_origin_evidence_accepts_nested_owner_only_with_shared_observed_origin() -> None:
+    from aisl_interaction_lineage.builder import _external_origin_evidence
+
+    class NestedExternalGateway(FakeGateway):
+        def __init__(self, *, nested_origin_id: str = "external-origin-items") -> None:
+            super().__init__()
+            self.nested_origin_id = nested_origin_id
+
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id != "maven:g:a:1.2.3":
+                return {"result": {"items": [], "total_count": 0, "returned_count": 0, "truncated": False}}
+            if node_kind == "field" and operation is None:
+                items = [
+                    {
+                        "value_node_id": "external-target-items",
+                        "node_kind": "field",
+                        "operation": "Mapper.map",
+                        "display_ref": "mapped.items",
+                        "source_path": "Mapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_id": "mapped-items-occ",
+                            "occurrence_kind": "local_field",
+                            "property_name": "items",
+                            "operation": "Mapper.map",
+                        }},
+                    },
+                    {
+                        "value_node_id": "external-target-nested-id",
+                        "node_kind": "field",
+                        "operation": "Mapper.mapItems",
+                        "display_ref": "nested.id",
+                        "source_path": "Mapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_id": "nested-id-occ",
+                            "occurrence_kind": "local_field",
+                            "property_name": "id",
+                            "operation": "Mapper.mapItems",
+                        }},
+                    },
+                ]
+            elif operation == "Mapper.map":
+                items = [{
+                    "value_node_id": "external-owner",
+                    "node_kind": "local_value",
+                    "operation": "Mapper.map",
+                    "display_ref": "mapped",
+                    "type_ref": "ExternalProfile",
+                    "payload_json": {"source_occurrence": {
+                        "occurrence_id": "mapped-occ",
+                        "occurrence_kind": "local_variable",
+                        "symbol": "mapped",
+                        "declared_type": "ExternalProfile",
+                        "operation": "Mapper.map",
+                    }},
+                }]
+            elif operation == "Mapper.mapItems":
+                items = [{
+                    "value_node_id": "nested-owner",
+                    "node_kind": "local_value",
+                    "operation": "Mapper.mapItems",
+                    "display_ref": "nested",
+                    "type_ref": "NestedItems",
+                    "payload_json": {"source_occurrence": {
+                        "occurrence_id": "nested-occ",
+                        "occurrence_kind": "local_variable",
+                        "symbol": "nested",
+                        "declared_type": "NestedItems",
+                        "operation": "Mapper.mapItems",
+                    }},
+                }]
+            else:
+                items = []
+            return {"result": {
+                "items": items,
+                "total_count": len(items),
+                "returned_count": len(items),
+                "truncated": False,
+            }}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str,
+            selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            if source not in {"external-target-items", "external-target-nested-id"}:
+                return super().resolve_attribute_paths(
+                    binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction,
+                )
+            origin_id = (
+                "external-origin-items"
+                if source == "external-target-items"
+                else self.nested_origin_id
+            )
+            target_ref = "mapped.items" if source == "external-target-items" else "nested.id"
+            target = {
+                "value_node_id": source,
+                "repo_id": "maven:g:a:1.2.3",
+                "display_ref": target_ref,
+                "node_kind": "field",
+                "source_path": "Mapper.java",
+            }
+            origin = {
+                "value_node_id": origin_id,
+                "repo_id": "maven:g:a:1.2.3",
+                "display_ref": "source.items",
+                "node_kind": "field",
+                "source_path": "Mapper.java",
+            }
+            return {"result": {
+                "status": "partial",
+                "source": target,
+                "paths": [{
+                    "status": "partial",
+                    "hop_count": 1,
+                    "confidence": "confirmed",
+                    "start": target,
+                    "end": origin,
+                    "steps": [{"value_flow_edge_id": f"edge-{source}", "source": origin, "target": target}],
+                }],
+                "gaps": [],
+            }}
+
+    material_gap = {
+        "reason": "source_external_origin_unresolved",
+        "evidence": [
+            {
+                "terminal_value_node_id": "terminal-items",
+                "terminal_display_ref": "converter.convert().items",
+                "terminal_property_name": "items",
+                "parent_display_ref": "converter.convert()",
+                "parent_declared_type": "ExternalProfile",
+            },
+            {
+                "terminal_value_node_id": "terminal-nested-id",
+                "terminal_display_ref": "converter.convert().items.id",
+                "terminal_property_name": "id",
+                "parent_display_ref": "converter.convert()",
+                "parent_declared_type": "ExternalProfile",
+            },
+        ],
+    }
+    binding = AislBinding(
+        "service", "service-system", "service-rev",
+        ("service", "maven:g:a:1.2.3"),
+    )
+
+    evidence = _external_origin_evidence(
+        NestedExternalGateway(), binding=binding, repository_id="service",
+        material_gap=material_gap, cache={},
+    )
+    assert evidence is not None
+    nested = next(item for item in evidence["segments"] if item["property_name"] == "id")
+    assert nested["root_declared_type"] == "ExternalProfile"
+    assert nested["target_declared_type"] == "NestedItems"
+    assert nested["relative_property_path"] == ["items", "id"]
+    assert nested["basis"] == (
+        "selected_external_repo_nested_property_shares_observed_origin_with_exact_typed_ancestor"
+    )
+
+
+def test_external_origin_evidence_rejects_nested_owner_when_origin_differs_from_ancestor() -> None:
+    from aisl_interaction_lineage.builder import _external_origin_evidence
+
+    # Reuse the positive fixture implementation from the neighboring test by
+    # expressing the same public contract with a deliberately different nested
+    # origin.  The direct ancestor remains proven, but the nested field must not
+    # be composed merely because its property name exists in the external repo.
+    class DivergentNestedGateway(FakeGateway):
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id != "maven:g:a:1.2.3":
+                items = []
+            elif node_kind == "field" and operation is None:
+                items = [
+                    {
+                        "value_node_id": "target-items", "node_kind": "field",
+                        "operation": "Mapper.map", "display_ref": "mapped.items",
+                        "payload_json": {"source_occurrence": {
+                            "property_name": "items", "occurrence_kind": "local_field",
+                        }},
+                    },
+                    {
+                        "value_node_id": "target-nested-id", "node_kind": "field",
+                        "operation": "Mapper.mapItems", "display_ref": "nested.id",
+                        "payload_json": {"source_occurrence": {
+                            "property_name": "id", "occurrence_kind": "local_field",
+                        }},
+                    },
+                ]
+            elif operation == "Mapper.map":
+                items = [{
+                    "value_node_id": "owner-root", "node_kind": "local_value",
+                    "operation": operation, "display_ref": "mapped", "type_ref": "ExternalProfile",
+                    "payload_json": {"source_occurrence": {
+                        "symbol": "mapped", "declared_type": "ExternalProfile",
+                        "occurrence_kind": "local_variable",
+                    }},
+                }]
+            elif operation == "Mapper.mapItems":
+                items = [{
+                    "value_node_id": "owner-nested", "node_kind": "local_value",
+                    "operation": operation, "display_ref": "nested", "type_ref": "NestedItems",
+                    "payload_json": {"source_occurrence": {
+                        "symbol": "nested", "declared_type": "NestedItems",
+                        "occurrence_kind": "local_variable",
+                    }},
+                }]
+            else:
+                items = []
+            return {"result": {
+                "items": items, "total_count": len(items),
+                "returned_count": len(items), "truncated": False,
+            }}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str,
+            selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            origin_id = "origin-items" if source == "target-items" else "different-origin"
+            target = {"value_node_id": source, "display_ref": source, "node_kind": "field"}
+            origin = {"value_node_id": origin_id, "display_ref": origin_id, "node_kind": "field"}
+            return {"result": {
+                "status": "partial", "source": target,
+                "paths": [{
+                    "status": "partial", "hop_count": 1, "confidence": "confirmed",
+                    "start": target, "end": origin,
+                    "steps": [{"value_flow_edge_id": f"edge-{source}", "source": origin, "target": target}],
+                }],
+                "gaps": [],
+            }}
+
+    material_gap = {"evidence": [
+        {
+            "terminal_value_node_id": "terminal-items",
+            "terminal_display_ref": "converter.convert().items",
+            "terminal_property_name": "items",
+            "parent_display_ref": "converter.convert()",
+            "parent_declared_type": "ExternalProfile",
+        },
+        {
+            "terminal_value_node_id": "terminal-nested-id",
+            "terminal_display_ref": "converter.convert().items.id",
+            "terminal_property_name": "id",
+            "parent_display_ref": "converter.convert()",
+            "parent_declared_type": "ExternalProfile",
+        },
+    ]}
+    binding = AislBinding(
+        "service", "service-system", "service-rev",
+        ("service", "maven:g:a:1.2.3"),
+    )
+    assert _external_origin_evidence(
+        DivergentNestedGateway(), binding=binding, repository_id="service",
+        material_gap=material_gap, cache={},
+    ) is None
+
+
+def test_material_source_origin_gap_does_not_promote_untyped_external_or_unresolved_parent() -> None:
+    from aisl_interaction_lineage.builder import _material_source_origin_gap
+
+    side = {
+        "anchor_status": "resolved",
+        "query": {"result": {
+            "status": "partial",
+            "paths": [{
+                "status": "partial",
+                "end": {
+                    "value_node_id": "terminal-status",
+                    "display_ref": "future.handle().status",
+                },
+                "steps": [{
+                    "flow_kind": "field_mapping",
+                    "source_edge_kind": "method_return_field_projection",
+                    "source": {"value_node_id": "terminal-status", "display_ref": "future.handle().status"},
+                    "target": {"value_node_id": "return-status", "display_ref": "Service.execute.return.status"},
+                }],
+            }],
+            "gaps": [{"reason": "no_observed_incoming_value_flow"}],
+        }},
+    }
+    catalog = [
+        {
+            "value_node_id": "terminal-status",
+            "display_ref": "future.handle().status",
+            "payload_json": {"source_occurrence": {
+                "occurrence_id": "terminal-occ",
+                "occurrence_kind": "projected_object_field",
+                "object_occurrence_id": "parent-occ",
+                "field_path": "future.handle().status",
+            }},
+        },
+        {
+            "value_node_id": "parent-call",
+            "display_ref": "future.handle()",
+            "payload_json": {"source_occurrence": {
+                "occurrence_id": "parent-occ",
+                "occurrence_kind": "method_invocation",
+                "resolution_status": "external_or_unresolved",
+                "declared_type": "",
+                "method_name": "handle",
+            }},
+        },
+    ]
+
+    assert _material_source_origin_gap(
+        side, catalog=catalog, catalog_complete=True,
+    ) is None
+
+
+def test_external_origin_evidence_expands_exact_scalar_consumed_from_resolved_callee() -> None:
+    from aisl_interaction_lineage.builder import _external_origin_evidence
+    from aisl_interaction_lineage.human_csv import human_rows
+
+    class ScalarContinuationGateway(FakeGateway):
+        def __init__(self, *, direct_resolution_status: str = "resolved") -> None:
+            super().__init__()
+            self.direct_resolution_status = direct_resolution_status
+
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id != "maven:g:a:1.2.3":
+                items: list[Mapping[str, Any]] = []
+            elif node_kind == "field" and operation is None:
+                items = [
+                    {
+                        "value_node_id": "external-target-details",
+                        "node_kind": "field",
+                        "operation": "Mapper.map",
+                        "display_ref": "mapped.details",
+                        "source_path": "Mapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_field",
+                            "property_name": "details",
+                            "operation": "Mapper.map",
+                        }},
+                    },
+                    {
+                        "value_node_id": "external-target-details-id",
+                        "node_kind": "field",
+                        "operation": "FromMapper.mapDetails",
+                        "display_ref": "mappedDetails.id",
+                        "source_path": "FromMapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_field",
+                            "property_name": "id",
+                            "method_id": "method-map-details",
+                            "operation": "FromMapper.mapDetails",
+                        }},
+                    },
+                ]
+            elif operation == "Mapper.map":
+                items = [
+                    {
+                        "value_node_id": "external-owner-profile",
+                        "node_kind": "local_value",
+                        "operation": operation,
+                        "display_ref": "mapped",
+                        "type_ref": "ExternalProfile",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_variable",
+                            "symbol": "mapped",
+                            "declared_type": "ExternalProfile",
+                            "operation": operation,
+                        }},
+                    },
+                    {
+                        "value_node_id": "derive-details",
+                        "node_kind": "derivation",
+                        "operation": operation,
+                        "display_ref": "Mapper.mapDetails()",
+                        "type_ref": "ExternalDetails",
+                        "source_path": "Mapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "method_invocation",
+                            "declared_type": "ExternalDetails",
+                            "callee_method_id": "method-map-details",
+                            "method_name": "mapDetails",
+                            "resolution_status": self.direct_resolution_status,
+                            "operation": operation,
+                        }},
+                    },
+                ]
+            elif operation == "FromMapper.mapDetails":
+                items = [
+                    {
+                        "value_node_id": "mapped-details",
+                        "node_kind": "local_value",
+                        "operation": operation,
+                        "display_ref": "mappedDetails",
+                        "type_ref": "ExternalDetails",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_variable",
+                            "symbol": "mappedDetails",
+                            "declared_type": "ExternalDetails",
+                            "method_id": "method-map-details",
+                            "operation": operation,
+                        }},
+                    },
+                    {
+                        "value_node_id": "details-param",
+                        "node_kind": "local_value",
+                        "operation": operation,
+                        "display_ref": "details",
+                        "type_ref": "Details",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "method_parameter",
+                            "symbol": "details",
+                            "declared_type": "Details",
+                            "method_id": "method-map-details",
+                            "operation": operation,
+                        }},
+                    },
+                    {
+                        "value_node_id": "external-origin-details-id",
+                        "node_kind": "field",
+                        "operation": operation,
+                        "display_ref": "details.id",
+                        "source_path": "FromMapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_field",
+                            "property_name": "id",
+                            "method_id": "method-map-details",
+                            "operation": operation,
+                        }},
+                    },
+                    {
+                        "value_node_id": "external-target-details-id",
+                        "node_kind": "field",
+                        "operation": operation,
+                        "display_ref": "mappedDetails.id",
+                        "source_path": "FromMapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "local_field",
+                            "property_name": "id",
+                            "method_id": "method-map-details",
+                            "operation": operation,
+                        }},
+                    },
+                    {
+                        "value_node_id": "derive-id",
+                        "node_kind": "derivation",
+                        "operation": operation,
+                        "display_ref": "FromMapper.mapId()",
+                        "source_path": "FromMapper.java",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "method_invocation",
+                            "method_id": "method-map-details",
+                            "operation": operation,
+                        }},
+                    },
+                ]
+            else:
+                items = []
+            return {"result": {
+                "items": items,
+                "total_count": len(items),
+                "returned_count": len(items),
+                "truncated": False,
+            }}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str,
+            selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            if source == "external-target-details":
+                target = {
+                    "value_node_id": source, "display_ref": "mapped.details",
+                    "node_kind": "field", "source_path": "Mapper.java",
+                }
+                origin = {
+                    "value_node_id": "external-origin-details", "display_ref": "source.details",
+                    "node_kind": "field", "source_path": "Mapper.java",
+                }
+                derivation = {
+                    "value_node_id": "derive-details", "display_ref": "Mapper.mapDetails()",
+                    "node_kind": "derivation", "source_path": "Mapper.java",
+                }
+                return {"result": {
+                    "status": "partial", "source": target,
+                    "paths": [{
+                        "status": "partial", "hop_count": 2, "confidence": "confirmed",
+                        "start": target, "end": origin,
+                        "steps": [
+                            {"value_flow_edge_id": "edge-details-2", "source": derivation, "target": target},
+                            {"value_flow_edge_id": "edge-details-1", "source": origin, "target": derivation},
+                        ],
+                    }], "gaps": [],
+                }}
+            if source == "external-target-details-id":
+                target = {
+                    "value_node_id": source, "display_ref": "mappedDetails.id",
+                    "node_kind": "field", "source_path": "FromMapper.java",
+                }
+                origin = {
+                    "value_node_id": "external-origin-details-id", "display_ref": "details.id",
+                    "node_kind": "field", "source_path": "FromMapper.java",
+                }
+                derivation = {
+                    "value_node_id": "derive-id", "display_ref": "FromMapper.mapId()",
+                    "node_kind": "derivation", "source_path": "FromMapper.java",
+                }
+                return {"result": {
+                    "status": "partial", "source": target,
+                    "paths": [{
+                        "status": "partial", "hop_count": 2, "confidence": "confirmed",
+                        "start": target, "end": origin,
+                        "steps": [
+                            {"value_flow_edge_id": "edge-id-2", "source": derivation, "target": target},
+                            {"value_flow_edge_id": "edge-id-1", "source": origin, "target": derivation},
+                        ],
+                    }], "gaps": [],
+                }}
+            return super().resolve_attribute_paths(
+                binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction,
+            )
+
+    binding = AislBinding(
+        "service", "service-system", "service-rev",
+        ("service", "maven:g:a:1.2.3"),
+    )
+    material_gap = {"evidence": [{
+        "terminal_value_node_id": "terminal-details",
+        "terminal_display_ref": "converter.convert().details",
+        "terminal_property_name": "details",
+        "parent_display_ref": "converter.convert()",
+        "parent_declared_type": "ExternalProfile",
+    }]}
+    local_side = {"query": {"result": {"paths": [{
+        "confidence": "confirmed", "hop_count": 2,
+        "end": {
+            "value_node_id": "local-details-id", "display_ref": "details.id", "node_kind": "field",
+            "operation": "LocalMapper.consume",
+        },
+    }]}}}
+    local_catalog = [
+        {
+            "value_node_id": "local-details-id", "node_kind": "field",
+            "operation": "LocalMapper.consume", "display_ref": "details.id",
+            "payload_json": {"source_occurrence": {
+                "occurrence_kind": "local_field", "property_name": "id", "operation": "LocalMapper.consume",
+            }},
+        },
+        {
+            "value_node_id": "local-details-param", "node_kind": "local_value",
+            "operation": "LocalMapper.consume", "display_ref": "details", "type_ref": "ExternalDetails",
+            "payload_json": {"source_occurrence": {
+                "occurrence_kind": "method_parameter", "symbol": "details",
+                "declared_type": "ExternalDetails", "operation": "LocalMapper.consume",
+            }},
+        },
+    ]
+
+    evidence = _external_origin_evidence(
+        ScalarContinuationGateway(), binding=binding, repository_id="service",
+        material_gap=material_gap, cache={}, resolved_side=local_side,
+        local_catalog=local_catalog, local_catalog_complete=True,
+    )
+    assert evidence is not None
+    assert len(evidence["segments"]) == 2
+    nested = next(segment for segment in evidence["segments"] if segment["semantic_depth"] == 1)
+    assert nested["property_name"] == "id"
+    assert nested["target_declared_type"] == "ExternalDetails"
+    assert nested["origins"][0]["display_ref"] == "details.id"
+    assert nested["composed_origins"] == [{
+        "display_ref": "source.details.id",
+        "source_value_node_id": "external-origin-details",
+        "nested_origin_value_node_id": "external-origin-details-id",
+        "basis": "exact_resolved_callee_parameter_property_projection",
+    }]
+    assert nested["parent_transformation_display_ref"] == "Mapper.mapDetails()"
+
+    source_side = {
+        "anchor_status": "resolved",
+        "query": {"result": {"paths": [{
+            "end": {"display_ref": "details.id"}, "steps": [],
+        }]}},
+        "external_origin_evidence": evidence,
+    }
+    lineage = {
+        "format": "interaction-attribute-lineage/v1",
+        "edge": {"protocol": "http", "method": "POST", "matched_identity": "/example"},
+        "journeys": [{
+            "transport_role": "response", "field_path": "profile.details.id",
+            "source_repository_id": "service", "target_repository_id": "caller",
+            "source_side": source_side,
+            "target_side": {"anchor_status": "terminal", "query": {"result": {"paths": []}}},
+        }],
+        "gaps": [],
+    }
+    row = human_rows(lineage)[0]
+    assert row["producer_attribute"] == "source.details.id"
+    assert "source.details.id --[FromMapper.mapId()]→ mappedDetails.id" in row["full_attribute_path"]
+    assert "inside Mapper.mapDetails()" in row["full_attribute_path"]
+
+
+def test_external_origin_evidence_does_not_expand_scalar_without_exact_resolved_callee() -> None:
+    # Reuse the positive test's public behavior indirectly: a direct mapper
+    # invocation that is not mechanically resolved may still prove the object
+    # property, but it must not authorize projection of child scalar fields.
+    from aisl_interaction_lineage.builder import _external_origin_evidence
+
+    class Gateway(FakeGateway):
+        def list_repository_value_nodes(
+            self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+            operation: str | None = None, max_results: int = 500, page_token: str = "",
+        ) -> Mapping[str, Any]:
+            if repository_id == "maven:g:a:1.2.3" and node_kind == "field" and operation is None:
+                items = [{
+                    "value_node_id": "target-details", "node_kind": "field",
+                    "operation": "Mapper.map", "display_ref": "mapped.details",
+                    "payload_json": {"source_occurrence": {
+                        "property_name": "details", "occurrence_kind": "local_field",
+                    }},
+                }]
+            elif repository_id == "maven:g:a:1.2.3" and operation == "Mapper.map":
+                items = [
+                    {
+                        "value_node_id": "owner", "node_kind": "local_value",
+                        "operation": operation, "display_ref": "mapped", "type_ref": "ExternalProfile",
+                        "payload_json": {"source_occurrence": {
+                            "symbol": "mapped", "declared_type": "ExternalProfile",
+                            "occurrence_kind": "local_variable",
+                        }},
+                    },
+                    {
+                        "value_node_id": "derive", "node_kind": "derivation",
+                        "operation": operation, "display_ref": "Mapper.mapDetails()", "type_ref": "ExternalDetails",
+                        "payload_json": {"source_occurrence": {
+                            "occurrence_kind": "method_invocation", "declared_type": "ExternalDetails",
+                            "method_name": "mapDetails", "resolution_status": "external_or_unresolved",
+                        }},
+                    },
+                ]
+            else:
+                items = []
+            return {"result": {"items": items, "total_count": len(items), "returned_count": len(items), "truncated": False}}
+
+        def resolve_attribute_paths(
+            self, binding: AislBinding, *, source: str,
+            selected_repo_ids: Sequence[str], direction: str,
+        ) -> Mapping[str, Any]:
+            if source == "target-details":
+                target = {"value_node_id": source, "display_ref": "mapped.details", "node_kind": "field"}
+                origin = {"value_node_id": "origin-details", "display_ref": "source.details", "node_kind": "field"}
+                derive = {"value_node_id": "derive", "display_ref": "Mapper.mapDetails()", "node_kind": "derivation"}
+                return {"result": {"status": "partial", "source": target, "paths": [{
+                    "hop_count": 2, "confidence": "confirmed", "start": target, "end": origin,
+                    "steps": [
+                        {"value_flow_edge_id": "e2", "source": derive, "target": target},
+                        {"value_flow_edge_id": "e1", "source": origin, "target": derive},
+                    ],
+                }], "gaps": []}}
+            return super().resolve_attribute_paths(binding, source=source, selected_repo_ids=selected_repo_ids, direction=direction)
+
+    binding = AislBinding("service", "system", "rev", ("service", "maven:g:a:1.2.3"))
+    evidence = _external_origin_evidence(
+        Gateway(), binding=binding, repository_id="service",
+        material_gap={"evidence": [{
+            "terminal_value_node_id": "terminal-details",
+            "terminal_display_ref": "converter.convert().details",
+            "terminal_property_name": "details",
+            "parent_display_ref": "converter.convert()",
+            "parent_declared_type": "ExternalProfile",
+        }]},
+        cache={},
+        resolved_side={"query": {"result": {"paths": [{
+            "confidence": "confirmed", "hop_count": 1,
+            "end": {"value_node_id": "local-id", "display_ref": "details.id", "node_kind": "field", "operation": "Local.consume"},
+        }]}}},
+        local_catalog=[
+            {"value_node_id": "local-id", "node_kind": "field", "operation": "Local.consume", "display_ref": "details.id",
+             "payload_json": {"source_occurrence": {"property_name": "id", "occurrence_kind": "local_field"}}},
+            {"value_node_id": "local-owner", "node_kind": "local_value", "operation": "Local.consume", "display_ref": "details", "type_ref": "ExternalDetails",
+             "payload_json": {"source_occurrence": {"symbol": "details", "declared_type": "ExternalDetails", "occurrence_kind": "method_parameter"}}},
+        ],
+        local_catalog_complete=True,
+    )
+    assert evidence is not None
+    assert len(evidence["segments"]) == 1
+    assert evidence["segments"][0]["semantic_depth"] == 0
+
+
+
+def test_target_semantic_projection_preserves_proven_nested_consumer_chain() -> None:
+    anchor = {
+        "value_node_id": "anchor",
+        "node_kind": "field",
+        "display_ref": "payload.date",
+        "operation": "Boundary.consume",
+    }
+    person = {
+        "value_node_id": "person-birthday",
+        "node_kind": "field",
+        "display_ref": "person.birthday",
+        "operation": "Mapper.toPerson",
+    }
+    customer = {
+        "value_node_id": "customer-birthday",
+        "node_kind": "field",
+        "display_ref": "customer.personInfo.birthday",
+        "operation": "Handler.fill",
+    }
+    account = {
+        "value_node_id": "account-birthday",
+        "node_kind": "field",
+        "display_ref": "account.custInfo.personInfo.birthday",
+        "operation": "Handler.fill",
+    }
+    bank = {
+        "value_node_id": "bank-birthday",
+        "node_kind": "field",
+        "display_ref": "bank.cardAcctId.custInfo.personInfo.birthday",
+        "operation": "Response.map",
+    }
+    rows = {
+        "value_node_id": "rows-birthday",
+        "node_kind": "field",
+        "display_ref": "rows.cardAcctId.custInfo.personInfo.birthday",
+        "operation": "Response.collect",
+    }
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [{
+            "start": anchor,
+            "steps": [
+                {"target": person},
+                {"target": customer},
+                {"target": account},
+                {"target": bank},
+                {"target": rows},
+            ],
+            "end": rows,
+        }]}},
+    }
+    catalog = [
+        anchor,
+        {
+            **person,
+            "occurrence_id": "person-field-occ",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "person-object", "property_name": "birthday"}},
+        },
+        {
+            "value_node_id": "person-object-node", "occurrence_id": "person-object", "node_kind": "local_value",
+            "display_ref": "person", "type_ref": "PersonInfo",
+            "payload_json": {"source_occurrence": {"declared_type": "PersonInfo"}},
+        },
+        {
+            **customer,
+            "occurrence_id": "customer-field-occ",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "customer-object", "property_name": "personInfo.birthday"}},
+        },
+        {
+            "value_node_id": "customer-object-node", "occurrence_id": "customer-object", "node_kind": "local_value",
+            "display_ref": "customer", "type_ref": "CustInfo",
+            "payload_json": {"source_occurrence": {"declared_type": "CustInfo"}},
+        },
+        {
+            **account,
+            "occurrence_id": "account-field-occ",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "account-object", "property_name": "custInfo.personInfo.birthday"}},
+        },
+        {
+            "value_node_id": "account-object-node", "occurrence_id": "account-object", "node_kind": "local_value",
+            "display_ref": "account", "type_ref": "CardAcctId",
+            "payload_json": {"source_occurrence": {"declared_type": "CardAcctId"}},
+        },
+        {
+            **bank,
+            "occurrence_id": "bank-field-occ",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "bank-object", "property_name": "cardAcctId.custInfo.personInfo.birthday"}},
+        },
+        {
+            "value_node_id": "bank-object-node", "occurrence_id": "bank-object", "node_kind": "local_value",
+            "display_ref": "bank", "type_ref": "BankAcctRec",
+            "payload_json": {"source_occurrence": {"declared_type": "BankAcctRec"}},
+        },
+        {
+            **rows,
+            "occurrence_id": "rows-field-occ",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "rows-object", "property_name": "cardAcctId.custInfo.personInfo.birthday"}},
+        },
+        {
+            "value_node_id": "rows-object-node", "occurrence_id": "rows-object", "node_kind": "local_value",
+            "display_ref": "rows", "type_ref": "List",
+            "payload_json": {"source_occurrence": {"declared_type": "List"}},
+        },
+    ]
+
+    projection = _target_semantic_projection(side, catalog=catalog)
+
+    assert projection is not None
+    assert projection["entry_consumer_attribute"] == "PersonInfo.birthday"
+    assert projection["consumer_attribute"] == "rows[].cardAcctId.custInfo.personInfo.birthday"
+    assert [item["semantic_ref"] for item in projection["chain"]] == [
+        "PersonInfo.birthday",
+        "CustInfo.personInfo.birthday",
+        "CardAcctId.custInfo.personInfo.birthday",
+        "BankAcctRec.cardAcctId.custInfo.personInfo.birthday",
+        "rows[].cardAcctId.custInfo.personInfo.birthday",
+    ]
+
+
+def test_target_semantic_projection_fails_closed_when_first_consumer_is_ambiguous() -> None:
+    anchor = {"value_node_id": "anchor", "node_kind": "field", "display_ref": "payload.date"}
+    one = {"value_node_id": "one", "node_kind": "field", "display_ref": "one.birthday"}
+    two = {"value_node_id": "two", "node_kind": "field", "display_ref": "two.birthday"}
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [
+            {"start": anchor, "steps": [{"target": one}], "end": one},
+            {"start": anchor, "steps": [{"target": two}], "end": two},
+        ]}},
+    }
+    catalog = [
+        anchor,
+        {
+            **one, "occurrence_id": "one-field",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "one-object", "property_name": "birthday"}},
+        },
+        {
+            "value_node_id": "one-object-node", "occurrence_id": "one-object", "node_kind": "local_value",
+            "display_ref": "one", "type_ref": "PersonInfo",
+            "payload_json": {"source_occurrence": {"declared_type": "PersonInfo"}},
+        },
+        {
+            **two, "occurrence_id": "two-field",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "two-object", "property_name": "birthday"}},
+        },
+        {
+            "value_node_id": "two-object-node", "occurrence_id": "two-object", "node_kind": "local_value",
+            "display_ref": "two", "type_ref": "OtherInfo",
+            "payload_json": {"source_occurrence": {"declared_type": "OtherInfo"}},
+        },
+    ]
+
+    assert _target_semantic_projection(side, catalog=catalog) is None
+
+
+
+def test_target_semantic_projection_does_not_replace_boundary_for_untyped_first_consumer() -> None:
+    anchor = {"value_node_id": "anchor", "node_kind": "field", "display_ref": "payload.id"}
+    first = {"value_node_id": "first", "node_kind": "field", "display_ref": "parameters.id"}
+    typed = {"value_node_id": "typed", "node_kind": "field", "display_ref": "request.id"}
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [{
+            "start": anchor,
+            "steps": [{"target": first}, {"target": typed}],
+            "end": typed,
+        }]}},
+    }
+    catalog = [
+        anchor,
+        {
+            **first,
+            "occurrence_id": "first-field",
+            "payload_json": {"source_occurrence": {"property_name": "id"}},
+        },
+        {
+            **typed,
+            "occurrence_id": "typed-field",
+            "payload_json": {"source_occurrence": {"object_occurrence_id": "typed-object", "property_name": "id"}},
+        },
+        {
+            "value_node_id": "typed-object-node", "occurrence_id": "typed-object", "node_kind": "local_value",
+            "display_ref": "request", "type_ref": "RequestDto",
+            "payload_json": {"source_occurrence": {"declared_type": "RequestDto"}},
+        },
+    ]
+    assert _target_semantic_projection(side, catalog=catalog) is None
+
+
+
+def test_target_semantic_projection_skips_untyped_alias_and_missing_intermediate_level() -> None:
+    anchor = {"value_node_id": "anchor", "node_kind": "field", "display_ref": "clientInfo.identifications.documentSeries"}
+    alias = {"value_node_id": "alias", "node_kind": "field", "display_ref": "identifications.documentSeries"}
+    person = {"value_node_id": "person", "node_kind": "field", "display_ref": "person.identityCard.idNum"}
+    customer = {"value_node_id": "customer", "node_kind": "field", "display_ref": "customer.personInfo.identityCard.idNum"}
+    bank = {"value_node_id": "bank", "node_kind": "field", "display_ref": "bank.cardAcctId.custInfo.personInfo.identityCard.idNum"}
+    rows = {"value_node_id": "rows", "node_kind": "field", "display_ref": "rows.cardAcctId.custInfo.personInfo.identityCard.idNum"}
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [{
+            "start": anchor,
+            "steps": [{"target": alias}, {"target": person}, {"target": customer}, {"target": bank}, {"target": rows}],
+            "end": rows,
+        }]}},
+    }
+    catalog = [
+        anchor,
+        {**alias, "occurrence_id": "alias-field", "payload_json": {"source_occurrence": {"property_name": "documentSeries"}}},
+        {**person, "occurrence_id": "person-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "person-object", "property_name": "identityCard.idNum"}}},
+        {"value_node_id": "person-object-node", "occurrence_id": "person-object", "node_kind": "local_value", "display_ref": "person", "type_ref": "PersonInfo", "payload_json": {"source_occurrence": {"declared_type": "PersonInfo"}}},
+        {**customer, "occurrence_id": "customer-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "customer-object", "property_name": "personInfo.identityCard.idNum"}}},
+        {"value_node_id": "customer-object-node", "occurrence_id": "customer-object", "node_kind": "local_value", "display_ref": "customer", "type_ref": "CustInfo", "payload_json": {"source_occurrence": {"declared_type": "CustInfo"}}},
+        {**bank, "occurrence_id": "bank-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "bank-object", "property_name": "cardAcctId.custInfo.personInfo.identityCard.idNum"}}},
+        {"value_node_id": "bank-object-node", "occurrence_id": "bank-object", "node_kind": "local_value", "display_ref": "bank", "type_ref": "BankAcctRec", "payload_json": {"source_occurrence": {"declared_type": "BankAcctRec"}}},
+        {**rows, "occurrence_id": "rows-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "rows-object", "property_name": "cardAcctId.custInfo.personInfo.identityCard.idNum"}}},
+        {"value_node_id": "rows-object-node", "occurrence_id": "rows-object", "node_kind": "local_value", "display_ref": "rows", "type_ref": "List", "payload_json": {"source_occurrence": {"declared_type": "List"}}},
+    ]
+    projection = _target_semantic_projection(side, catalog=catalog)
+    assert projection is not None
+    assert projection["entry_consumer_attribute"] == "PersonInfo.identityCard.idNum"
+    assert projection["consumer_attribute"] == "rows[].cardAcctId.custInfo.personInfo.identityCard.idNum"
+    assert [item["semantic_ref"] for item in projection["chain"]] == [
+        "PersonInfo.identityCard.idNum",
+        "CustInfo.personInfo.identityCard.idNum",
+        "BankAcctRec.cardAcctId.custInfo.personInfo.identityCard.idNum",
+        "rows[].cardAcctId.custInfo.personInfo.identityCard.idNum",
+    ]
+
+
+def test_target_semantic_projection_does_not_promote_concrete_collection_class() -> None:
+    anchor = {"value_node_id": "anchor", "node_kind": "field", "display_ref": "clientInfo.birthDate"}
+    person = {"value_node_id": "person", "node_kind": "field", "display_ref": "person.birthday"}
+    customer = {"value_node_id": "customer", "node_kind": "field", "display_ref": "customer.personInfo.birthday"}
+    array_list = {"value_node_id": "array", "node_kind": "field", "display_ref": "result.bankAcctRec.cardAcctId.custInfo.personInfo.birthday"}
+    side = {
+        "anchor_status": "resolved",
+        "resolved_anchor": anchor,
+        "query": {"result": {"paths": [{
+            "start": anchor,
+            "steps": [{"target": person}, {"target": customer}, {"target": array_list}],
+            "end": array_list,
+        }]}},
+    }
+    catalog = [
+        anchor,
+        {**person, "occurrence_id": "person-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "person-object", "property_name": "birthday"}}},
+        {"value_node_id": "person-object-node", "occurrence_id": "person-object", "node_kind": "local_value", "display_ref": "person", "type_ref": "PersonInfo", "payload_json": {"source_occurrence": {"declared_type": "PersonInfo"}}},
+        {**customer, "occurrence_id": "customer-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "customer-object", "property_name": "personInfo.birthday"}}},
+        {"value_node_id": "customer-object-node", "occurrence_id": "customer-object", "node_kind": "local_value", "display_ref": "customer", "type_ref": "CustInfo", "payload_json": {"source_occurrence": {"declared_type": "CustInfo"}}},
+        {**array_list, "occurrence_id": "array-field", "payload_json": {"source_occurrence": {"object_occurrence_id": "array-object", "property_name": "bankAcctRec.cardAcctId.custInfo.personInfo.birthday"}}},
+        {"value_node_id": "array-object-node", "occurrence_id": "array-object", "node_kind": "local_value", "display_ref": "result", "type_ref": "ArrayList", "payload_json": {"source_occurrence": {"declared_type": "ArrayList"}}},
+    ]
+    projection = _target_semantic_projection(side, catalog=catalog)
+    assert projection is not None
+    assert projection["consumer_attribute"] == "result[].bankAcctRec.cardAcctId.custInfo.personInfo.birthday"
+    assert all(not item["semantic_ref"].startswith("ArrayList.") for item in projection["chain"])

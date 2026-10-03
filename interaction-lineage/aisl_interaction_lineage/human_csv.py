@@ -92,22 +92,88 @@ def _source_projection(side: Any) -> tuple[str, str]:
     )
 
 
+def _source_semantic_chain(side: Any) -> list[str]:
+    projection = _mapping(_mapping(side).get("semantic_projection"))
+    return [
+        str(_mapping(item).get("display_ref") or "").strip()
+        for item in _sequence(projection.get("chain"))
+        if isinstance(item, Mapping) and str(_mapping(item).get("display_ref") or "").strip()
+    ]
+
+
 def _external_origin_segments(side: Any) -> list[Mapping[str, Any]]:
     evidence = _mapping(_mapping(side).get("external_origin_evidence"))
     return [item for item in _sequence(evidence.get("segments")) if isinstance(item, Mapping)]
 
 
+def _external_transformation_label(item: Mapping[str, Any]) -> str:
+    base = _display_ref(item)
+    supplemental = _mapping(item.get("unresolved_callee_semantic_evidence"))
+    if not supplemental:
+        return base
+    observed = _join_unique(
+        (_display_ref(value) for value in _sequence(supplemental.get("transformations")) if isinstance(value, Mapping)),
+        separator=" → ",
+    )
+    operation = str(supplemental.get("operation") or supplemental.get("method_name") or "").strip()
+    if not observed:
+        return base
+    qualifier = f"unique observed {operation}; call link not observed" if operation else "unique observed method body; call link not observed"
+    if base:
+        return f"{base} ~[{qualifier}]~ {observed}"
+    return f"[{qualifier}] {observed}"
+
+
 def _external_origin_projection(side: Any) -> str:
+    segments = _external_origin_segments(side)
+    direct_by_target = {
+        _display_ref(_mapping(segment.get("target"))): segment
+        for segment in segments
+        if int(segment.get("semantic_depth") or 0) == 0
+        and _display_ref(_mapping(segment.get("target")))
+    }
+    direct_by_target_id = {
+        str(_mapping(segment.get("target")).get("value_node_id") or ""): segment
+        for segment in segments
+        if int(segment.get("semantic_depth") or 0) == 0
+        and str(_mapping(segment.get("target")).get("value_node_id") or "")
+    }
+    expanded_parent_ids = {
+        str(segment.get("parent_segment_target_value_node_id") or "")
+        for segment in segments
+        if int(segment.get("semantic_depth") or 0) > 0
+        and str(segment.get("parent_segment_target_value_node_id") or "")
+    }
+
     projected: list[str] = []
-    for segment in _external_origin_segments(side):
+    ordered = sorted(
+        segments,
+        key=lambda item: (
+            -int(item.get("semantic_depth") or 0),
+            str(item.get("repository_id") or ""),
+            _display_ref(_mapping(item.get("target"))),
+        ),
+    )
+    for segment in ordered:
+        semantic_depth = int(segment.get("semantic_depth") or 0)
+        target_mapping = _mapping(segment.get("target"))
+        target_id = str(target_mapping.get("value_node_id") or "")
+        if semantic_depth == 0 and target_id in expanded_parent_ids:
+            # The nested segment is a strictly richer projection of this exact
+            # observed parent mapping.  Render the richer branch once rather
+            # than duplicating its shallower prefix.
+            continue
+
         repository_id = str(segment.get("repository_id") or "").strip()
-        origins = [
-            _display_ref(item) for item in _sequence(segment.get("origins"))
-            if isinstance(item, Mapping)
-        ]
-        target = _display_ref(_mapping(segment.get("target")))
+        origin_items = (
+            _sequence(segment.get("composed_origins"))
+            if semantic_depth > 0 and _sequence(segment.get("composed_origins"))
+            else _sequence(segment.get("origins"))
+        )
+        origins = [_display_ref(item) for item in origin_items if isinstance(item, Mapping)]
+        target = _display_ref(target_mapping)
         transformations = [
-            _display_ref(item) for item in _sequence(segment.get("transformations"))
+            _external_transformation_label(item) for item in _sequence(segment.get("transformations"))
             if isinstance(item, Mapping)
         ]
         origin = _join_unique(origins, separator=" | OR | ")
@@ -119,6 +185,17 @@ def _external_origin_projection(side: Any) -> str:
             path += f" --[{transform}]→ {target}"
         elif origin != target:
             path += f" → {target}"
+
+        if semantic_depth > 0:
+            parent_id = str(segment.get("parent_segment_target_value_node_id") or "")
+            parent = direct_by_target_id.get(parent_id)
+            parent_target = _display_ref(_mapping(parent.get("target"))) if parent else ""
+            parent_transform = str(segment.get("parent_transformation_display_ref") or "").strip()
+            if parent_target:
+                if parent_transform:
+                    path += f" ~[inside {parent_transform}]→ {parent_target}"
+                else:
+                    path += f" ~[inside observed parent mapping]→ {parent_target}"
         projected.append(path)
     return _join_unique(projected, separator=" | OR SEGMENT | ")
 
@@ -126,9 +203,32 @@ def _external_origin_projection(side: Any) -> str:
 def _producer_attribute(side: Any, start_attribute: str, crossing_attribute: str) -> str:
     if str(_mapping(side).get("anchor_status") or "") != "resolved":
         return ""
+    segments = _external_origin_segments(side)
+    deepest_composed_depth = max(
+        (
+            int(segment.get("semantic_depth") or 0)
+            for segment in segments
+            if _sequence(segment.get("composed_origins"))
+        ),
+        default=-1,
+    )
+    if deepest_composed_depth >= 0:
+        composed_origins = [
+            _display_ref(origin)
+            for segment in segments
+            if int(segment.get("semantic_depth") or 0) == deepest_composed_depth
+            for origin in _sequence(segment.get("composed_origins"))
+            if isinstance(origin, Mapping)
+        ]
+        composed_unique = _join_unique(composed_origins, separator=" | OR | ")
+        if composed_unique and " | OR | " not in composed_unique:
+            return composed_unique
+        if composed_unique:
+            return crossing_attribute
+
     external_origins = [
         _display_ref(origin)
-        for segment in _external_origin_segments(side)
+        for segment in segments
         for origin in _sequence(segment.get("origins"))
         if isinstance(origin, Mapping)
     ]
@@ -147,9 +247,20 @@ def _producer_attribute(side: Any, start_attribute: str, crossing_attribute: str
 
 
 def _consumer_attribute(side: Any) -> str:
-    """Return the first mechanically proven local attribute after the crossing."""
+    """Return the deepest mechanically proven semantic consumer after the crossing."""
     if str(_mapping(side).get("anchor_status") or "") != "resolved":
         return ""
+    semantic = _mapping(_mapping(side).get("semantic_projection"))
+    semantic_chain = [
+        str(_mapping(item).get("semantic_ref") or "").strip()
+        for item in _sequence(semantic.get("chain"))
+        if isinstance(item, Mapping) and str(_mapping(item).get("semantic_ref") or "").strip()
+    ]
+    if semantic_chain:
+        return semantic_chain[-1]
+    consumer = str(semantic.get("consumer_attribute") or "").strip()
+    if consumer:
+        return consumer
     anchor = _display_ref(_mapping(_mapping(side).get("resolved_anchor")))
     if anchor:
         return anchor
@@ -172,7 +283,17 @@ def _human_gap(reasons: Iterable[str]) -> str:
 
 
 def _target_projection(side: Any) -> tuple[str, str]:
-    """Project forward AISL paths into boundary -> local destination direction."""
+    """Project forward AISL paths into boundary -> semantic local destination."""
+    semantic = _mapping(_mapping(side).get("semantic_projection"))
+    semantic_refs = [
+        str(_mapping(item).get("semantic_ref") or "").strip()
+        for item in _sequence(semantic.get("chain"))
+        if isinstance(item, Mapping)
+    ]
+    semantic_path = _join_unique(semantic_refs, separator=" → ")
+    if semantic_path:
+        return "", semantic_path
+
     paths = _paths(side)
     if not paths:
         anchor = _mapping(_mapping(side).get("resolved_anchor"))
@@ -246,11 +367,17 @@ def human_rows(lineage: Mapping[str, Any]) -> list[dict[str, str]]:
         machine_gap = _join_unique(reasons)
         gap = _human_gap(reasons)
 
-        source_path = start_attribute or "[unresolved source]"
-        if source_transformation:
-            source_path += f" --[{source_transformation}]→ {crossing_attribute}"
-        elif source_path != crossing_attribute:
-            source_path += f" → {crossing_attribute}"
+        semantic_source_chain = _source_semantic_chain(source_side)
+        if semantic_source_chain:
+            source_path = " → ".join(semantic_source_chain)
+            if semantic_source_chain[-1] != crossing_attribute:
+                source_path += f" → {crossing_attribute}"
+        else:
+            source_path = start_attribute or "[unresolved source]"
+            if source_transformation:
+                source_path += f" --[{source_transformation}]→ {crossing_attribute}"
+            elif source_path != crossing_attribute:
+                source_path += f" → {crossing_attribute}"
 
         target_path = crossing_attribute
         target_terminal = str(target_side.get("anchor_status") or "") == "terminal"

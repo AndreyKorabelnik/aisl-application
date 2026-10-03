@@ -387,6 +387,9 @@ def check_interaction_lineage(
                                 repository_id=repository_id,
                                 material_gap=material_requirement,
                                 cache=node_catalog_cache,
+                                resolved_side=resolved,
+                                local_catalog=catalog,
+                                local_catalog_complete=catalog_complete,
                             )
                             if external_evidence is not None:
                                 row["external_origin_evidence"] = dict(external_evidence)

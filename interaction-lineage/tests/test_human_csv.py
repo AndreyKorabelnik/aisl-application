@@ -122,3 +122,30 @@ def test_csv_cli_writes_semicolon_utf8_human_projection(tmp_path) -> None:
     assert len(rows) == 1
     assert rows[0]["crossing_attribute"] == "ucpID"
     assert list(rows[0]) == list(HUMAN_CSV_COLUMNS)
+
+
+
+def test_human_rows_use_semantic_consumer_projection_instead_of_terminal_or_list() -> None:
+    value = lineage()
+    target = value["journeys"][0]["target_side"]
+    target["semantic_projection"] = {
+        "consumer_attribute": "bankAcctRecs[].cardAcctId.custInfo.personInfo.birthday",
+        "entry_consumer_attribute": "PersonInfo.birthday",
+        "chain": [
+            {"semantic_ref": "PersonInfo.birthday"},
+            {"semantic_ref": "CustInfo.personInfo.birthday"},
+            {"semantic_ref": "CardAcctId.custInfo.personInfo.birthday"},
+            {"semantic_ref": "BankAcctRec.cardAcctId.custInfo.personInfo.birthday"},
+            {"semantic_ref": "bankAcctRecs[].cardAcctId.custInfo.personInfo.birthday"},
+        ],
+    }
+
+    row = human_rows(value)[0]
+
+    assert row["consumer_attribute"] == "bankAcctRecs[].cardAcctId.custInfo.personInfo.birthday"
+    assert row["full_attribute_path"].endswith(
+        "provider: ucpID → PersonInfo.birthday → CustInfo.personInfo.birthday → "
+        "CardAcctId.custInfo.personInfo.birthday → BankAcctRec.cardAcctId.custInfo.personInfo.birthday → "
+        "bankAcctRecs[].cardAcctId.custInfo.personInfo.birthday"
+    )
+    assert " | OR | " not in row["full_attribute_path"]
