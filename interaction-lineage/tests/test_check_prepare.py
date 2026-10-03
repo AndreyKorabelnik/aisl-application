@@ -600,7 +600,7 @@ def test_check_blocks_on_material_external_origin_without_guessing_owner(monkeyp
     )
 
 
-def test_prepare_blocks_material_external_origin_until_owner_is_resolved(monkeypatch) -> None:
+def test_prepare_delegates_material_external_origin_to_framework_without_guessing_owner(monkeypatch) -> None:
     requirement = {
         "state": "external_source_owner_unresolved",
         "repository_id": "service",
@@ -634,6 +634,80 @@ def test_prepare_blocks_material_external_origin_until_owner_is_resolved(monkeyp
         "diagnostics": [],
         "summary": {"repository_count": 2, "ready_repository_count": 1, "not_ready_repository_count": 1},
     }
+    after = {
+        **before,
+        "status": "ready",
+        "repositories": [
+            {"repository_id": "caller", "status": "ready"},
+            {"repository_id": "service", "status": "ready"},
+        ],
+        "preparation_requirements": [],
+        "summary": {"repository_count": 2, "ready_repository_count": 2, "not_ready_repository_count": 0},
+    }
+    calls = iter([before, after])
+    monkeypatch.setattr(prepare_mod, "check_interaction_lineage", lambda *args, **kwargs: next(calls))
+    framework_result = _framework_result("prepared")
+    framework_result["final_readiness"]["state"] = "ready"
+    framework_result["final_readiness"]["knowledge_refs"] = [{
+        "repository_id": "service",
+        "system_id": "service-system",
+        "revision_id": "service-rev-2",
+        "selected_repo_ids": ["service", "maven:g:a:1.2.3"],
+    }]
+    prep = FakePreparationGateway(framework_result)
+    result = prepare_interaction_lineage(
+        topology(), edge_id=EDGE_ID, bindings=bindings(),
+        readiness_gateway=ReadinessGateway(), preparation_gateway=prep,
+    )
+    assert result["status"] == "prepared"
+    assert len(prep.calls) == 1
+    request = prep.calls[0]
+    assert request["observed_boundary"] == {
+        "repository_id": "service",
+        "system_id": "service-system",
+        "boundary_kind": "external_type",
+        "observed_anchors": ["ExternalProfile"],
+        "terminal_value_node_id": "terminal-child",
+    }
+    assert "attribute_path" not in request["selector_context"]
+    assert request["selector_context"]["repository_id"] == "service"
+    assert "maven" not in str(request).lower()
+    pinned = {item["repository_id"]: item for item in result["bindings"]["repositories"]}
+    assert pinned["service"]["revision_id"] == "service-rev-2"
+    assert pinned["service"]["selected_repo_ids"] == ["service", "maven:g:a:1.2.3"]
+
+
+def test_prepare_keeps_external_origin_blocked_without_mechanical_type_anchor(monkeypatch) -> None:
+    before = {
+        "format": "interaction-lineage-readiness/v1",
+        "status": "not_ready",
+        "topology_id": "topology-test",
+        "edge_id": EDGE_ID,
+        "repositories": [
+            {"repository_id": "caller", "status": "ready"},
+            {"repository_id": "service", "status": "material_semantic_gap"},
+        ],
+        "preparation_requirements": [{
+            "state": "external_source_owner_unresolved",
+            "repository_id": "service",
+            "system_id": "service-system",
+            "revision_id": "service-rev",
+            "edge_id": EDGE_ID,
+            "transport_role": "response",
+            "field_path": "profile.id",
+            "side": "source",
+            "direction": "reverse",
+            "reason": "source_external_origin_unresolved",
+            "evidence": [{
+                "terminal_value_node_id": "terminal-child",
+                "parent_occurrence_id": "parent-occ",
+                "parent_display_ref": "converter.convert()",
+                "parent_declared_type": "",
+            }],
+        }],
+        "diagnostics": [],
+        "summary": {"repository_count": 2, "ready_repository_count": 1, "not_ready_repository_count": 1},
+    }
     monkeypatch.setattr(prepare_mod, "check_interaction_lineage", lambda *args, **kwargs: before)
     prep = FakePreparationGateway(_framework_result())
     result = prepare_interaction_lineage(
@@ -643,4 +717,3 @@ def test_prepare_blocks_material_external_origin_until_owner_is_resolved(monkeyp
     assert result["status"] == "blocked"
     assert prep.calls == []
     assert result["diagnostics"][0]["code"] == "external_source_owner_unresolved"
-    assert result["diagnostics"][0]["requirements"][0]["evidence"][0]["parent_display_ref"] == "converter.convert()"
