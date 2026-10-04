@@ -86,34 +86,30 @@ def _operation_owner(item: Mapping[str, Any]) -> str:
     return str(item.get("operation") or "").split(".", 1)[0]
 
 
-def _bean_accessors(payload_identity: str, field_path: str) -> set[str]:
-    leaf = str(field_path or "").split(".")[-1]
-    if not leaf:
-        return set()
-    suffix = leaf[0].upper() + leaf[1:]
-    return {f"{payload_identity}.get{suffix}", f"{payload_identity}.is{suffix}"}
-
-
 def _anchor_candidate_by_payload_owner(
     result: Mapping[str, Any],
     *,
     repository_id: str,
     payload_identity: str | None,
-    field_path: str,
-    direction: str,
 ) -> Mapping[str, Any] | None:
+    """Resolve only a unique exact published payload owner.
+
+    Do not synthesize JavaBean accessor names from the topology field.  A
+    consumer may use the exact owner/operation facts published by AISL, but it
+    must not turn language naming conventions into deterministic source facts.
+    Multiple candidates under the same payload owner therefore remain
+    ambiguous unless another exact topology/published-evidence rule resolves
+    them.
+    """
     payload = str(payload_identity or "").strip()
     if not payload:
         return None
-    matches = [item for item in _candidate_rows(result, repository_id=repository_id) if _operation_owner(item) == payload]
-    if len(matches) == 1:
-        return matches[0]
-    if direction == "forward" and matches:
-        accessors = _bean_accessors(payload, field_path)
-        getter_matches = [item for item in matches if str(item.get("operation") or "") in accessors]
-        if len(getter_matches) == 1:
-            return getter_matches[0]
-    return None
+    matches = [
+        item
+        for item in _candidate_rows(result, repository_id=repository_id)
+        if _operation_owner(item) == payload
+    ]
+    return matches[0] if len(matches) == 1 else None
 
 
 def _iter_query_nodes(result: Mapping[str, Any]) -> Iterable[Mapping[str, Any]]:
@@ -595,10 +591,8 @@ def _attempt_ref(
             result,
             repository_id=repository_id,
             payload_identity=payload_identity,
-            field_path=field_path,
-            direction=direction,
         )
-        basis = "exact_payload_owner_accessor"
+        basis = "exact_payload_owner"
     if selected is None:
         return response, result, None, "ambiguous_exact_anchor"
     second, second_result = _run_selected(

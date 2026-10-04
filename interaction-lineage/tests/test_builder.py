@@ -4,7 +4,11 @@ from typing import Any, Mapping, Sequence
 
 import pytest
 
-from aisl_interaction_lineage.builder import _target_semantic_projection, build_interaction_lineage
+from aisl_interaction_lineage.builder import (
+    _anchor_candidate_by_payload_owner,
+    _target_semantic_projection,
+    build_interaction_lineage,
+)
 from aisl_interaction_lineage.contracts import AislBinding, BindingIndex
 from aisl_interaction_lineage.topology import boundary_fields, select_edge, wire_display_ref
 
@@ -124,6 +128,52 @@ def bindings() -> BindingIndex:
         AislBinding("caller", "caller-system", "caller-rev"),
         AislBinding("service", "service-system", "service-rev"),
     ])
+
+
+
+
+def test_payload_owner_resolution_does_not_infer_java_bean_accessor() -> None:
+    result = {
+        "source_candidates": [
+            {
+                "repo_id": "service",
+                "operation": "ResponseDto.getId",
+                "value_node_id": "getter-id",
+            },
+            {
+                "repo_id": "service",
+                "operation": "ResponseDto.other",
+                "value_node_id": "other-id",
+            },
+        ]
+    }
+
+    assert _anchor_candidate_by_payload_owner(
+        result, repository_id="service", payload_identity="ResponseDto"
+    ) is None
+
+
+def test_payload_owner_resolution_accepts_only_unique_exact_owner() -> None:
+    result = {
+        "source_candidates": [
+            {
+                "repo_id": "service",
+                "operation": "ResponseDto.getId",
+                "value_node_id": "getter-id",
+            },
+            {
+                "repo_id": "other",
+                "operation": "ResponseDto.other",
+                "value_node_id": "other-id",
+            },
+        ]
+    }
+
+    selected = _anchor_candidate_by_payload_owner(
+        result, repository_id="service", payload_identity="ResponseDto"
+    )
+    assert selected is not None
+    assert selected["value_node_id"] == "getter-id"
 
 
 def test_select_edge_is_exact_and_does_not_merge_operations() -> None:
