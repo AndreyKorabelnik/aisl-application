@@ -3,14 +3,19 @@
 Consumer-owned deterministic composition of one `repository-topology/v4` edge with
 repository-local lineage from exact pinned AISL revisions.
 
-MVP invariant:
+Architecture invariant:
 
-- `build` reads Repository Topology and the public AISL Knowledge API only;
+- `build` reads Repository Topology and exact pinned public AISL revisions only;
 - `build` never reads source repositories and never invokes analysis;
 - topology owns the repository/transport edge;
-- AISL owns repository-local direct value flow and bounded path traversal;
-- the application does not rediscover topology, parse code, infer renames, or create a
-  second lineage engine;
+- each AISL revision owns repository-local observed/derived knowledge for one primary
+  analyzed source, plus mechanically required dependency evidence for that revision;
+- Interaction Lineage owns only the task-specific composition across those independent
+  pinned revisions;
+- revision discovery/binding is an upstream responsibility. `build` and `check` never
+  infer `system_id` or `revision_id` from repository names;
+- the application does not rediscover topology, parse code, infer renames, synthesize
+  language-specific accessor facts, or create a second lineage engine;
 - ambiguity and missing evidence remain typed gaps.
 
 ## Bindings
@@ -31,6 +36,12 @@ MVP invariant:
 ```
 
 `revision_id` must be an exact immutable revision, never `active` or `latest`.
+
+`selected_repo_ids`, when present, are revision-internal evidence scope only (for example
+a mechanically prepared Maven/source dependency needed to understand the primary
+repository revision). They are not a mechanism for combining independent system
+revisions. Cross-revision composition is performed by this application over separate
+explicit bindings.
 
 ## Check
 
@@ -62,18 +73,21 @@ interaction-lineage build \
 
 The output contract is `interaction-attribute-lineage/v1`.
 
-## Prepare
+## Prepare (transitional lifecycle)
 
-`prepare` is the only source-reading mode. It does not implement Git acquisition or a
-second producer pipeline. It reuses the existing Knowledge Control Plane source registry
-and freshness path:
+`prepare` is retained only because the current accepted production journey still needs a
+generic Framework/KCP preparation entry point before exact pinned bindings exist. It is
+**not** the target ownership boundary for Interaction Lineage.
+
+The target lifecycle is:
+
+`Unified AISL Discovery / generic preparation -> exact pinned bindings -> check -> build`.
+
+Until that upstream discovery/preparation path is available for this journey, `prepare`
+continues to reuse the existing Knowledge Control Plane source registry and freshness
+path rather than implementing Git/Nexus/source analysis locally:
 
 `registered remote Git -> resolve current HEAD -> immutable commit snapshot -> pinned checkout -> Runner -> AISL publication bundle`.
-
-The publication bundle is imported by the existing canonical `knowledge-api import`
-command. For this MVP, `prepare` therefore runs in an environment where that admin CLI
-is configured for the same AISL Server storage that `--aisl-base-url` exposes. A remote
-HTTP bundle-import API is deliberately not invented by this application.
 
 ```bash
 interaction-lineage prepare \
@@ -84,17 +98,19 @@ interaction-lineage prepare \
   --output preparation.json
 ```
 
-Repository source identity is resolved only from exact KCP
-`metadata.analysis_repository_id`; names/similarity are not used. Repositories prepared
-without a pre-existing AISL binding use the topology `repository_id` as the stable AISL
-`system_id`. The preparation output embeds exact `interaction-lineage-aisl-bindings/v1`
-bindings and can be passed directly back as `--bindings preparation.json` to `check` or
-`build`.
+The historical bootstrap rule that assigns `system_id = repository_id` when no binding
+exists remains a **transitional compatibility behavior only**. It must be removed when
+Unified AISL Discovery supplies the exact repository -> system/revision binding; new
+consumer logic must not depend on that naming equality.
 
-The first MVP recipe prepares only the already-existing `attribute-lineage` Knowledge
-Product (`repository-value-flow`, `workspace.attribute-path-resolver`). SQL and
-persistence enrichment stay outside this first `/cpcGet` acceptance and are reconsidered
-only after the mandatory STOP/REASSESS.
+For already pinned revisions, preparation may still request mechanically required
+external package/source evidence (for example Nexus/Maven dependencies) through the
+generic Framework path. Such dependencies remain evidence of the primary revision; they
+do not become independent system revisions or application-owned source knowledge.
+
+The preparation output embeds exact `interaction-lineage-aisl-bindings/v1` bindings and
+can be passed to `check` or `build`. Interaction Lineage itself owns no Git/Nexus client,
+source parser, repository discovery heuristic, or publication implementation.
 
 ## Human CSV
 
@@ -126,11 +142,12 @@ full_attribute_path
 
 `producer_attribute` is the normalized local origin before the transport crossing when
 one is mechanically resolved. `crossing_attribute` is the exact topology transport
-field. `consumer_attribute` is the first mechanically resolved local attribute after the
-crossing, not the final downstream destination. An unresolved producer/consumer anchor
-is left empty and described in `gap`. Human `gap` values are rendered in Russian while
+field. `consumer_attribute` is the deepest mechanically proven meaningful semantic
+consumer available from the published target-side evidence; it is not limited to the
+first technical node after the crossing. An unresolved producer/consumer anchor is left
+empty and described in `gap`. Human `gap` values are rendered in Russian while
 `full_attribute_path` intentionally keeps the original machine gap code for audit and
 cross-reference with the canonical JSON. Detailed operations, transformations, branch
-provenance and anchor-selection evidence remain in the JSON and are intentionally not
-duplicated as separate human CSV columns.
+provenance, confidence and anchor-selection evidence remain in the canonical JSON and
+are intentionally not duplicated as separate human CSV columns.
 
