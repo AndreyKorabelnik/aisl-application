@@ -25,6 +25,15 @@ TABLE_COLUMNS = (
     "provenance_json",
 )
 
+LINK_COLUMNS = (
+    "source_table",
+    "relationship",
+    "target_table",
+    "source_identity",
+    "target_identity",
+    "physical_join_status",
+)
+
 RELATIONSHIP_COLUMNS = (
     "source_type_fqcn",
     "source_replica_relation",
@@ -75,3 +84,18 @@ def write_tables_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> N
 
 def write_relationships_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> None:
     _write_csv(rows, RELATIONSHIP_COLUMNS, output)
+
+
+def write_links_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> None:
+    projected = [
+        {
+            "source_table": row.get("source_replica_relation"),
+            "relationship": row.get("relationship_field"),
+            "target_table": row.get("target_replica_relation"),
+            "source_identity": row.get("source_key_columns") or [],
+            "target_identity": row.get("target_key_columns") or [],
+            "physical_join_status": row.get("physical_join_status"),
+        }
+        for row in rows
+    ]
+    _write_csv(projected, LINK_COLUMNS, output)

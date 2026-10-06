@@ -57,6 +57,9 @@ relationships alone do not prove a physical database foreign key, therefore
 - structured JSON `ucp-tsa-replica-er/v1`;
 - `tables.csv` with replica relations and mapped UCP identity keys;
 - `relationships.csv` with UCP relationships projected onto exact replica tables;
+- `replica-table-links.csv`, a compact human-facing projection with `source_table`,
+  `relationship`, `target_table`, source/target mapped identities and
+  `physical_join_status`;
 - Mermaid flowchart for visual inspection. The chart deliberately does not assert
   ER cardinality or physical FK conditions that are not published.
 
@@ -72,7 +75,22 @@ ucp-tsa-replica-er build \
   --output-json replica-model.json \
   --tables-csv replica-tables.csv \
   --relationships-csv replica-relationships.csv \
+  --links-csv replica-table-links.csv \
   --output-mermaid replica-model.mmd
+```
+
+All output arguments are optional independently. At least one output must be
+requested. For example, to generate only the compact table-link CSV:
+
+```bash
+ucp-tsa-replica-er build \
+  --aisl-base-url http://aisl-server:8080 \
+  --ucp-system ucp-data-model \
+  --ucp-revision <exact-ucp-revision> \
+  --tsa-system ucp-tsa-v4 \
+  --tsa-revision <exact-tsa-revision> \
+  --root-object com.sbt.bm.ucp.retail.model.individual.Individual \
+  --links-csv replica-table-links.csv
 ```
 
 To emit only the outgoing UCP object closure from one or more roots, repeat
