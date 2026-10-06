@@ -9,7 +9,7 @@ from pathlib import Path
 from .builder import build_replica_model, mermaid_flowchart
 from .contracts import RevisionBinding
 from .gateway import KnowledgeApiGateway
-from .output import write_relationships_csv, write_tables_csv
+from .output import write_links_csv, write_relationships_csv, write_tables_csv
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -21,11 +21,25 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--tsa-system", required=True)
     build.add_argument("--tsa-revision", required=True)
     build.add_argument("--root-object", action="append", default=[])
-    build.add_argument("--output-json", required=True)
-    build.add_argument("--tables-csv", required=True)
-    build.add_argument("--relationships-csv", required=True)
-    build.add_argument("--output-mermaid", required=True)
+    build.add_argument("--output-json")
+    build.add_argument("--tables-csv")
+    build.add_argument("--relationships-csv")
+    build.add_argument("--links-csv")
+    build.add_argument("--output-mermaid")
     args = parser.parse_args(argv)
+
+    outputs = (
+        args.output_json,
+        args.tables_csv,
+        args.relationships_csv,
+        args.links_csv,
+        args.output_mermaid,
+    )
+    if not any(outputs):
+        build.error(
+            "at least one output must be requested: --output-json, --tables-csv, "
+            "--relationships-csv, --links-csv, or --output-mermaid"
+        )
 
     gateway = None
     try:
@@ -39,13 +53,23 @@ def main(argv: list[str] | None = None) -> int:
             tsa_mappings=gateway.load_tsa_mappings(tsa),
             root_objects=tuple(args.root_object),
         )
-        Path(args.output_json).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        write_tables_csv(payload["tables"], args.tables_csv)
-        write_relationships_csv(payload["relationships"], args.relationships_csv)
-        Path(args.output_mermaid).write_text(mermaid_flowchart(payload), encoding="utf-8")
+        if args.output_json:
+            path = Path(args.output_json)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        if args.tables_csv:
+            write_tables_csv(payload["tables"], args.tables_csv)
+        if args.relationships_csv:
+            write_relationships_csv(payload["relationships"], args.relationships_csv)
+        if args.links_csv:
+            write_links_csv(payload["relationships"], args.links_csv)
+        if args.output_mermaid:
+            path = Path(args.output_mermaid)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(mermaid_flowchart(payload), encoding="utf-8")
         return 0 if payload["tables"] else 2
     except Exception as exc:
         print(f"ucp-tsa-replica-er build failed: {type(exc).__name__}: {exc}", file=sys.stderr)

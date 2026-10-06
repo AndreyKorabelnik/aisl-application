@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from aisl_ucp_tsa_replica_er import cli
 
 
@@ -35,23 +37,75 @@ def test_cli_writes_all_outputs(monkeypatch, tmp_path: Path) -> None:
             "physical_constraint_gap": "database_primary_key_constraint_not_published",
             "provenance": {},
         }],
-        "relationships": [],
+        "relationships": [{
+            "source_replica_relation": "replica_x",
+            "source_key_columns": ["id"],
+            "relationship_field": "country",
+            "target_replica_relation": "replica_country",
+            "target_key_columns": ["code"],
+            "physical_join_status": "not_observed",
+        }],
     })
     monkeypatch.setattr(cli, "mermaid_flowchart", lambda payload: "flowchart LR\n")
 
     out_json = tmp_path / "model.json"
     tables = tmp_path / "tables.csv"
     rels = tmp_path / "relationships.csv"
+    links = tmp_path / "links.csv"
     mermaid = tmp_path / "model.mmd"
     rc = cli.main([
         "build", "--aisl-base-url", "http://aisl",
         "--ucp-system", "ucp", "--ucp-revision", "rev-u",
         "--tsa-system", "tsa", "--tsa-revision", "rev-t",
         "--output-json", str(out_json), "--tables-csv", str(tables),
-        "--relationships-csv", str(rels), "--output-mermaid", str(mermaid),
+        "--relationships-csv", str(rels), "--links-csv", str(links),
+        "--output-mermaid", str(mermaid),
     ])
     assert rc == 0
     assert json.loads(out_json.read_text(encoding="utf-8"))["schema_version"] == "ucp-tsa-replica-er/v1"
     assert "replica_x" in tables.read_text(encoding="utf-8")
     assert rels.read_text(encoding="utf-8").startswith("source_type_fqcn,")
+    assert links.read_text(encoding="utf-8").splitlines() == [
+        "source_table,relationship,target_table,source_identity,target_identity,physical_join_status",
+        "replica_x,country,replica_country,id,code,not_observed",
+    ]
     assert mermaid.read_text(encoding="utf-8") == "flowchart LR\n"
+
+
+def test_cli_can_write_only_links_csv(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    monkeypatch.setattr(cli, "build_replica_model", lambda **kwargs: {
+        "tables": [{"replica_relation": "replica_x"}],
+        "relationships": [{
+            "source_replica_relation": "replica_x",
+            "source_key_columns": ["id"],
+            "relationship_field": "birthDate",
+            "target_replica_relation": "replica_birthdate",
+            "target_key_columns": ["id"],
+            "physical_join_status": "not_observed",
+        }],
+    })
+
+    links = tmp_path / "nested" / "links.csv"
+    rc = cli.main([
+        "build", "--aisl-base-url", "http://aisl",
+        "--ucp-system", "ucp", "--ucp-revision", "rev-u",
+        "--tsa-system", "tsa", "--tsa-revision", "rev-t",
+        "--links-csv", str(links),
+    ])
+    assert rc == 0
+    assert links.read_text(encoding="utf-8").splitlines()[1] == (
+        "replica_x,birthDate,replica_birthdate,id,id,not_observed"
+    )
+    assert sorted(path.name for path in tmp_path.rglob("*") if path.is_file()) == ["links.csv"]
+
+
+def test_cli_requires_at_least_one_output(monkeypatch) -> None:
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    with pytest.raises(SystemExit) as exc:
+        cli.main([
+            "build", "--aisl-base-url", "http://aisl",
+            "--ucp-system", "ucp", "--ucp-revision", "rev-u",
+            "--tsa-system", "tsa", "--tsa-revision", "rev-t",
+        ])
+    assert exc.value.code == 2
