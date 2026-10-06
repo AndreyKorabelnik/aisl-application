@@ -25,13 +25,22 @@ TABLE_COLUMNS = (
     "provenance_json",
 )
 
+KEY_COLUMNS = (
+    "table",
+    "logical_pk",
+    "key_kind",
+    "logical_pk_status",
+    "physical_pk_status",
+    "gap",
+)
+
 LINK_COLUMNS = (
     "source_table",
     "relationship",
     "target_table",
-    "source_identity",
-    "target_identity",
-    "physical_join_status",
+    "target_logical_pk",
+    "logical_link_status",
+    "physical_fk_status",
 )
 
 RELATIONSHIP_COLUMNS = (
@@ -86,15 +95,41 @@ def write_relationships_csv(rows: Sequence[Mapping[str, Any]], output: str | Pat
     _write_csv(rows, RELATIONSHIP_COLUMNS, output)
 
 
+def _compact_status(value: Any, confirmed_value: str) -> str:
+    text = str(value or "").strip()
+    if text == confirmed_value:
+        return "confirmed"
+    return text
+
+
+def write_keys_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> None:
+    projected = [
+        {
+            "table": row.get("replica_relation"),
+            "logical_pk": row.get("key_replica_columns") or [],
+            "key_kind": row.get("key_kind"),
+            "logical_pk_status": _compact_status(
+                row.get("key_status"), "confirmed_declared_identity_mapped"
+            ),
+            "physical_pk_status": row.get("physical_constraint_status"),
+            "gap": row.get("key_gap"),
+        }
+        for row in rows
+    ]
+    _write_csv(projected, KEY_COLUMNS, output)
+
+
 def write_links_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> None:
     projected = [
         {
             "source_table": row.get("source_replica_relation"),
             "relationship": row.get("relationship_field"),
             "target_table": row.get("target_replica_relation"),
-            "source_identity": row.get("source_key_columns") or [],
-            "target_identity": row.get("target_key_columns") or [],
-            "physical_join_status": row.get("physical_join_status"),
+            "target_logical_pk": row.get("target_key_columns") or [],
+            "logical_link_status": _compact_status(
+                row.get("status"), "confirmed_ucp_relationship_projected_to_replicas"
+            ),
+            "physical_fk_status": row.get("physical_join_status"),
         }
         for row in rows
     ]

@@ -9,7 +9,7 @@ from pathlib import Path
 from .builder import build_replica_model, mermaid_flowchart
 from .contracts import RevisionBinding
 from .gateway import KnowledgeApiGateway
-from .output import write_links_csv, write_relationships_csv, write_tables_csv
+from .output import write_keys_csv, write_links_csv, write_relationships_csv, write_tables_csv
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -24,6 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--output-json")
     build.add_argument("--tables-csv")
     build.add_argument("--relationships-csv")
+    build.add_argument("--keys-csv")
     build.add_argument("--links-csv")
     build.add_argument("--output-mermaid")
     args = parser.parse_args(argv)
@@ -32,13 +33,14 @@ def main(argv: list[str] | None = None) -> int:
         args.output_json,
         args.tables_csv,
         args.relationships_csv,
+        args.keys_csv,
         args.links_csv,
         args.output_mermaid,
     )
     if not any(outputs):
         build.error(
             "at least one output must be requested: --output-json, --tables-csv, "
-            "--relationships-csv, --links-csv, or --output-mermaid"
+            "--relationships-csv, --keys-csv, --links-csv, or --output-mermaid"
         )
 
     gateway = None
@@ -64,6 +66,8 @@ def main(argv: list[str] | None = None) -> int:
             write_tables_csv(payload["tables"], args.tables_csv)
         if args.relationships_csv:
             write_relationships_csv(payload["relationships"], args.relationships_csv)
+        if args.keys_csv:
+            write_keys_csv(payload["tables"], args.keys_csv)
         if args.links_csv:
             write_links_csv(payload["relationships"], args.links_csv)
         if args.output_mermaid:

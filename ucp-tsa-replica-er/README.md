@@ -57,11 +57,38 @@ relationships alone do not prove a physical database foreign key, therefore
 - structured JSON `ucp-tsa-replica-er/v1`;
 - `tables.csv` with replica relations and mapped UCP identity keys;
 - `relationships.csv` with UCP relationships projected onto exact replica tables;
-- `replica-table-links.csv`, a compact human-facing projection with `source_table`,
-  `relationship`, `target_table`, source/target mapped identities and
-  `physical_join_status`;
+- `replica-table-keys.csv`, a compact human-facing projection with one row per
+  replica table and its mechanically mapped UCP logical primary key;
+- `replica-table-links.csv`, a compact human-facing projection with logical
+  relationship edges, target logical PK and a separate physical-FK status;
 - Mermaid flowchart for visual inspection. The chart deliberately does not assert
   ER cardinality or physical FK conditions that are not published.
+
+### Compact ER projections
+
+`replica-table-keys.csv` contains one row per mapped replica table:
+
+- `table` — TSA replica relation;
+- `logical_pk` — replica column(s) mechanically mapped from the UCP-declared identity;
+- `key_kind` — the UCP identity annotation kind (`entity_id`, `dictionary_code`, ...);
+- `logical_pk_status` — `confirmed` when the declared identity maps exactly, otherwise the explicit gap status;
+- `physical_pk_status` — physical database PK constraint status (`not_observed` in the accepted revisions);
+- `gap` — explicit logical-key mapping gap when present.
+
+`replica-table-links.csv` deliberately does **not** repeat the source table's identity.
+Its columns are `source_table`, `relationship`, `target_table`,
+`target_logical_pk`, `logical_link_status`, and `physical_fk_status`. The
+`relationship` is the resolved UCP field/type relationship. `target_logical_pk` is
+the target table's mechanically mapped UCP identity; it is **not** a claim that
+the source table's PK joins to it. A self-link such as
+`ContactFlagType.group -> ContactFlagType` is therefore a valid logical
+self-reference, while `physical_fk_status=not_observed` continues to state that
+no physical database FK/JOIN condition was independently published.
+
+`--root-object` selects the transitive outgoing UCP type closure, not just the
+root replica table. Therefore `--root-object ...Individual` legitimately includes
+Address, PhoneNumber, dictionaries, their referenced types, and other reachable
+replica tables.
 
 ## CLI
 
@@ -75,6 +102,7 @@ ucp-tsa-replica-er build \
   --output-json replica-model.json \
   --tables-csv replica-tables.csv \
   --relationships-csv replica-relationships.csv \
+  --keys-csv replica-table-keys.csv \
   --links-csv replica-table-links.csv \
   --output-mermaid replica-model.mmd
 ```
