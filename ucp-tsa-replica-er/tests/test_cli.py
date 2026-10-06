@@ -43,6 +43,7 @@ def test_cli_writes_all_outputs(monkeypatch, tmp_path: Path) -> None:
             "relationship_field": "country",
             "target_replica_relation": "replica_country",
             "target_key_columns": ["code"],
+            "status": "confirmed_ucp_relationship_projected_to_replicas",
             "physical_join_status": "not_observed",
         }],
     })
@@ -51,6 +52,7 @@ def test_cli_writes_all_outputs(monkeypatch, tmp_path: Path) -> None:
     out_json = tmp_path / "model.json"
     tables = tmp_path / "tables.csv"
     rels = tmp_path / "relationships.csv"
+    keys = tmp_path / "keys.csv"
     links = tmp_path / "links.csv"
     mermaid = tmp_path / "model.mmd"
     rc = cli.main([
@@ -58,16 +60,20 @@ def test_cli_writes_all_outputs(monkeypatch, tmp_path: Path) -> None:
         "--ucp-system", "ucp", "--ucp-revision", "rev-u",
         "--tsa-system", "tsa", "--tsa-revision", "rev-t",
         "--output-json", str(out_json), "--tables-csv", str(tables),
-        "--relationships-csv", str(rels), "--links-csv", str(links),
-        "--output-mermaid", str(mermaid),
+        "--relationships-csv", str(rels), "--keys-csv", str(keys),
+        "--links-csv", str(links), "--output-mermaid", str(mermaid),
     ])
     assert rc == 0
     assert json.loads(out_json.read_text(encoding="utf-8"))["schema_version"] == "ucp-tsa-replica-er/v1"
     assert "replica_x" in tables.read_text(encoding="utf-8")
     assert rels.read_text(encoding="utf-8").startswith("source_type_fqcn,")
+    assert keys.read_text(encoding="utf-8").splitlines() == [
+        "table,logical_pk,key_kind,logical_pk_status,physical_pk_status,gap",
+        "replica_x,id,entity_id,confirmed,not_observed,",
+    ]
     assert links.read_text(encoding="utf-8").splitlines() == [
-        "source_table,relationship,target_table,source_identity,target_identity,physical_join_status",
-        "replica_x,country,replica_country,id,code,not_observed",
+        "source_table,relationship,target_table,target_logical_pk,logical_link_status,physical_fk_status",
+        "replica_x,country,replica_country,code,confirmed,not_observed",
     ]
     assert mermaid.read_text(encoding="utf-8") == "flowchart LR\n"
 
@@ -82,6 +88,7 @@ def test_cli_can_write_only_links_csv(monkeypatch, tmp_path: Path) -> None:
             "relationship_field": "birthDate",
             "target_replica_relation": "replica_birthdate",
             "target_key_columns": ["id"],
+            "status": "confirmed_ucp_relationship_projected_to_replicas",
             "physical_join_status": "not_observed",
         }],
     })
@@ -95,9 +102,37 @@ def test_cli_can_write_only_links_csv(monkeypatch, tmp_path: Path) -> None:
     ])
     assert rc == 0
     assert links.read_text(encoding="utf-8").splitlines()[1] == (
-        "replica_x,birthDate,replica_birthdate,id,id,not_observed"
+        "replica_x,birthDate,replica_birthdate,id,confirmed,not_observed"
     )
     assert sorted(path.name for path in tmp_path.rglob("*") if path.is_file()) == ["links.csv"]
+
+
+def test_cli_can_write_only_keys_csv(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    monkeypatch.setattr(cli, "build_replica_model", lambda **kwargs: {
+        "tables": [{
+            "replica_relation": "replica_country",
+            "key_replica_columns": ["code"],
+            "key_kind": "dictionary_code",
+            "key_status": "confirmed_declared_identity_mapped",
+            "key_gap": "",
+            "physical_constraint_status": "not_observed",
+        }],
+        "relationships": [],
+    })
+
+    keys = tmp_path / "nested" / "keys.csv"
+    rc = cli.main([
+        "build", "--aisl-base-url", "http://aisl",
+        "--ucp-system", "ucp", "--ucp-revision", "rev-u",
+        "--tsa-system", "tsa", "--tsa-revision", "rev-t",
+        "--keys-csv", str(keys),
+    ])
+    assert rc == 0
+    assert keys.read_text(encoding="utf-8").splitlines()[1] == (
+        "replica_country,code,dictionary_code,confirmed,not_observed,"
+    )
+    assert sorted(path.name for path in tmp_path.rglob("*") if path.is_file()) == ["keys.csv"]
 
 
 def test_cli_requires_at_least_one_output(monkeypatch) -> None:
