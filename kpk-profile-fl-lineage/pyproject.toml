@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aisl-kpk-profile-fl-lineage"
-version = "0.1.0a1"
-description = "Bounded exact UCP semantic-path bridge from KPK evidence to Profile FL lineage"
+version = "0.1.0a2"
+description = "Bounded exact Task43 KPK egress to UCP to Profile FL lineage bridge"
 requires-python = ">=3.10"
 dependencies = [
   "aisl-data-model-datamart-lineage==0.1.0a1",

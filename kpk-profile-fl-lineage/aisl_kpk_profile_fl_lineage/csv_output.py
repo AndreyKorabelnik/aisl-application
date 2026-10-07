@@ -5,7 +5,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 CSV_COLUMNS = (
+    "kpk_service",
+    "kpk_interaction",
     "kpk_attribute",
+    "kpk_output_root",
+    "cpc_crossing_attribute",
+    "interaction_consumer_attribute",
     "kpk_evidence_classification",
     "ucp_semantic_path",
     "ucp_endpoint_key",
@@ -16,8 +21,10 @@ CSV_COLUMNS = (
     "profile_fl_column",
     "join_status",
     "gap",
+    "kpk_interaction_gap",
     "full_attribute_path",
     "left_provenance_json",
+    "kpk_interaction_provenance_json",
     "right_provenance_json",
 )
 
