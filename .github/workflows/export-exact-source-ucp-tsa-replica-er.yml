@@ -49,3 +49,5 @@ jobs:
           path: |
             /tmp/${{ env.ARCHIVE_NAME }}
             /tmp/source-identity.txt
+
+# retrigger exact source export for 2026-10-07 continuation
