@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aisl-kpk-profile-fl-lineage"
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Bounded exact Task43 KPK egress to UCP to Profile FL lineage bridge"
 requires-python = ">=3.10"
 dependencies = [

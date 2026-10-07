@@ -67,12 +67,15 @@ def _profile_branch_proven(row: Mapping[str, Any]) -> bool:
 def consumer_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
     """Render one common-UCP-origin view with two independent downstream branches.
 
-    A row is retained when at least one branch is mechanically proven:
-    UCP -> final KPK egress, or UCP -> TSA -> Profile FL.  Partial KPK crossings
-    without a final KPK attribute are diagnostic evidence and do not create a
-    duplicate consumer row when the same UCP/Profile branch is already known.
+    A row is retained when at least one downstream branch is mechanically proven:
+    UCP -> final KPK egress, or UCP -> TSA -> Profile FL.  When final KPK egress
+    is not proven but an exact KPK crossing is observed, preserve that crossing
+    on rows backed by a proven Profile FL branch.  If a final KPK egress exists
+    for the same UCP endpoint, partial crossings remain diagnostic-only so they
+    cannot duplicate the proven KPK branch.
     """
     kpk_by_endpoint: dict[str, dict[tuple[str, str, str, str], Mapping[str, Any]]] = defaultdict(dict)
+    kpk_crossings_by_endpoint: dict[str, dict[tuple[str, str, str], Mapping[str, Any]]] = defaultdict(dict)
     profile_by_endpoint: dict[str, dict[tuple[str, str, str, str], Mapping[str, Any]]] = defaultdict(dict)
 
     for raw in rows:
@@ -81,14 +84,22 @@ def consumer_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
         if not endpoint:
             continue
         kpk_attribute = _text(row.get("kpk_attribute"))
+        kpk_crossing = _text(row.get("cpc_crossing_attribute"))
         if kpk_attribute:
             key = (
                 _ucp_service(row),
                 _text(row.get("kpk_service")),
-                _text(row.get("cpc_crossing_attribute")),
+                kpk_crossing,
                 kpk_attribute,
             )
             kpk_by_endpoint[endpoint].setdefault(key, row)
+        elif kpk_crossing:
+            key = (
+                _ucp_service(row),
+                _text(row.get("kpk_service")),
+                kpk_crossing,
+            )
+            kpk_crossings_by_endpoint[endpoint].setdefault(key, row)
         if _profile_branch_proven(row):
             key = (
                 _text(row.get("tsa_replica_relation")),
@@ -99,9 +110,11 @@ def consumer_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
             profile_by_endpoint[endpoint].setdefault(key, row)
 
     rendered: list[dict[str, str]] = []
-    for endpoint in sorted(set(kpk_by_endpoint) | set(profile_by_endpoint)):
+    for endpoint in sorted(set(kpk_by_endpoint) | set(kpk_crossings_by_endpoint) | set(profile_by_endpoint)):
         ucp_type, ucp_attribute = _ucp_identity(endpoint)
-        kpk_rows = list(kpk_by_endpoint.get(endpoint, {}).values())
+        proven_kpk_rows = list(kpk_by_endpoint.get(endpoint, {}).values())
+        observed_kpk_rows = list(kpk_crossings_by_endpoint.get(endpoint, {}).values())
+        kpk_rows = proven_kpk_rows or observed_kpk_rows
         profile_rows = list(profile_by_endpoint.get(endpoint, {}).values())
 
         def base() -> dict[str, str]:
@@ -133,7 +146,10 @@ def consumer_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
                         "tsa_replica_column": _text(profile.get("tsa_replica_column")),
                         "profile_fl_relation": _text(profile.get("profile_fl_relation")),
                         "profile_fl_column": _text(profile.get("profile_fl_column")),
-                        "kpk_branch_status": "proven",
+                        "kpk_branch_status": (
+                            "proven" if _text(kpk.get("kpk_attribute"))
+                            else "crossing_observed_egress_not_proven"
+                        ),
                         "profile_fl_branch_status": "proven",
                     })
                     rendered.append(out)
@@ -148,8 +164,8 @@ def consumer_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, str]]:
                     "profile_fl_branch_status": "proven",
                 })
                 rendered.append(out)
-        else:
-            for kpk in kpk_rows:
+        elif proven_kpk_rows:
+            for kpk in proven_kpk_rows:
                 out = base()
                 out.update({
                     "ucp_service": _ucp_service(kpk),
