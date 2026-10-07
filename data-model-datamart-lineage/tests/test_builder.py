@@ -157,6 +157,79 @@ class Gateway:
         ]
 
 
+
+def test_candidate_exact_source_evidence_accepts_column_alias_at_same_observed_position() -> None:
+    from aisl_data_model_datamart_lineage.builder import _candidate_has_exact_source_evidence
+
+    candidate = {
+        "source_relation_matches": [{
+            "file": "sql/stg_individualname_snp.sql",
+            "line_start": 1,
+            "logical_name": "com_sbt_bm_ucp_retail_model_individual_individualname",
+            "relation_name": "${snp}.com_sbt_bm_ucp_retail_model_individual_individualname",
+        }],
+        "source_column_matches": [{
+            "file": "sql/stg_individualname_snp.sql",
+            "line_start": 1,
+            "column_name": "surname",
+            "relation_name": "source",
+        }],
+    }
+
+    assert _candidate_has_exact_source_evidence(
+        candidate,
+        replica_relation="com_sbt_bm_ucp_retail_model_individual_individualname",
+        replica_column="surname",
+    )
+
+
+def test_candidate_exact_source_evidence_accepts_exact_relation_even_when_column_match_is_elsewhere() -> None:
+    from aisl_data_model_datamart_lineage.builder import _candidate_has_exact_source_evidence
+
+    candidate = {
+        "source_relation_matches": [{
+            "file": "sql/stg_individualname_snp.sql",
+            "line_start": 1,
+            "logical_name": "com_sbt_bm_ucp_retail_model_individual_individualname",
+        }],
+        "source_column_matches": [{
+            "file": "sql/stg_individualname_snp.sql",
+            "line_start": 2,
+            "column_name": "surname",
+            "relation_name": "source",
+        }],
+    }
+
+    assert _candidate_has_exact_source_evidence(
+        candidate,
+        replica_relation="com_sbt_bm_ucp_retail_model_individual_individualname",
+        replica_column="surname",
+    )
+
+
+def test_candidate_exact_source_evidence_rejects_missing_exact_relation() -> None:
+    from aisl_data_model_datamart_lineage.builder import _candidate_has_exact_source_evidence
+
+    candidate = {
+        "source_relation_matches": [{
+            "file": "sql/other.sql",
+            "line_start": 1,
+            "logical_name": "unrelated_relation",
+        }],
+        "source_column_matches": [{
+            "file": "sql/other.sql",
+            "line_start": 1,
+            "column_name": "name",
+            "relation_name": "unrelated_relation",
+        }],
+    }
+
+    assert not _candidate_has_exact_source_evidence(
+        candidate,
+        replica_relation="com_sbt_bm_ucp_retail_model_individual_individualname",
+        replica_column="name",
+    )
+
 def test_birthdate_vertical_slice_preserves_base_and_hist_depth_and_ambiguity():
     rows = build_lineage(
         gateway=Gateway(),

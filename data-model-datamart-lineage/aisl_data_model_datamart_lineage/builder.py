@@ -145,16 +145,26 @@ def _candidate_has_exact_source_evidence(
         _relation_leaf(replica_relation + "_hist"),
         _relation_leaf(replica_relation + "_delta"),
     }
-    relation_match = any(
-        _relation_leaf(row.get("logical_name") or row.get("relation_name")) in allowed
+    relation_rows = [
+        row
         for row in _objects(candidate.get("source_relation_matches"))
-    )
-    column_match = any(
-        _text(row.get("column_name")).casefold() == replica_column.casefold()
-        and _relation_leaf(row.get("relation_name")) in allowed
-        for row in _objects(candidate.get("source_column_matches"))
-    )
-    return relation_match and column_match
+        if _relation_leaf(row.get("logical_name") or row.get("relation_name")) in allowed
+    ]
+    if not relation_rows:
+        return False
+
+    # Target-candidate discovery is only a broad discovery step.  Requiring an
+    # exact source-column match here is unsafe for common SQL identifiers such
+    # as ``name``: the candidate endpoint can retain the exact source relation
+    # while its source_column_matches list is dominated by unrelated same-name
+    # dictionary columns or SQL aliases.
+    #
+    # The next step is the authoritative precision gate: confirmed target-column
+    # lineage must terminate on BOTH the exact replica relation (base/hist/delta)
+    # and the exact replica column.  Therefore an exact source relation is
+    # sufficient to admit a candidate for that exact downstream check; no field
+    # name, alias, target name, or fuzzy inference is introduced here.
+    return True
 
 def _path_expressions(item: Mapping[str, Any]) -> list[str]:
     # target-column-lineage is a backward traversal (target -> terminal source).
