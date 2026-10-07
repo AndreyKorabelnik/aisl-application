@@ -139,3 +139,45 @@ def test_consumer_rows_keep_only_rows_with_at_least_one_proven_downstream_branch
         row["kpk_branch_status"] == "proven" or row["profile_fl_branch_status"] == "proven"
         for row in rows
     )
+
+
+def test_ucp_id_preserves_observed_kpk_crossing_when_profile_branch_is_proven():
+    endpoint = "com.sbt.bm.ucp.retail.model.individual.Individual.id"
+    raw = [
+        _row(
+            endpoint=endpoint,
+            crossing="clientInfo.ucpID",
+            replica_relation="com_sbt_bm_ucp_retail_model_individual_individual",
+            replica_column="id",
+            profile_relation="custom_b2c_profile_fl.epkid_2_epkid",
+            profile_column="merge_epk_id",
+            gap="kpk_consumer_attribute_not_observed",
+        )
+    ]
+
+    rows = consumer_rows(raw)
+
+    assert len(rows) == 1
+    assert rows[0]["ucp_attribute"] == "id"
+    assert rows[0]["ucp_service"] == UCP_SERVICE
+    assert rows[0]["kpk_service"] == KPK_SERVICE
+    assert rows[0]["kpk_crossing_attribute"] == "clientInfo.ucpID"
+    assert rows[0]["kpk_attribute"] == ""
+    assert rows[0]["tsa_replica_relation"] == "com_sbt_bm_ucp_retail_model_individual_individual"
+    assert rows[0]["tsa_replica_column"] == "id"
+    assert rows[0]["profile_fl_relation"] == "custom_b2c_profile_fl.epkid_2_epkid"
+    assert rows[0]["profile_fl_column"] == "merge_epk_id"
+    assert rows[0]["kpk_branch_status"] == "crossing_observed_egress_not_proven"
+    assert rows[0]["profile_fl_branch_status"] == "proven"
+
+
+def test_partial_kpk_crossing_without_any_proven_branch_stays_out_of_consumer_view():
+    rows = consumer_rows([
+        _row(
+            endpoint="example.ucp.ObservedOnly.value",
+            crossing="clientInfo.observedOnly",
+            gap="kpk_consumer_attribute_not_observed",
+        )
+    ])
+
+    assert rows == []
