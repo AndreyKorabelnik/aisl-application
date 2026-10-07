@@ -1,4 +1,4 @@
-name: Export exact source snapshot for UCP TSA replica ER app
+name: Export exact source snapshot for KPK Profile FL lineage app
 
 on:
   push:
@@ -12,10 +12,10 @@ jobs:
   export:
     runs-on: ubuntu-latest
     env:
-      SOURCE_SHA: 8cd36d236c4c24d5d214e4b33267d0f9fae2a9bc
-      SOURCE_TREE: 413c7c9a1361d039dac92ff540ec0ee77b2fb579
-      ARCHIVE_NAME: aisl-application-source-main-8cd36d23.zip
-      ARTIFACT_NAME: aisl-application-source-main-8cd36d23
+      SOURCE_SHA: 3e7dfedc60965bf70413c51cdc28895b9e0a9f70
+      SOURCE_TREE: dd8bfc885eccc8ff8d7de8d36f1e480359ef9130
+      ARCHIVE_NAME: aisl-application-source-main-3e7dfedc.zip
+      ARTIFACT_NAME: aisl-application-source-main-3e7dfedc
     steps:
       - name: Check out exact source commit
         uses: actions/checkout@v4
