@@ -9,7 +9,7 @@ from pathlib import Path
 from .builder import build_replica_model, mermaid_flowchart
 from .contracts import RevisionBinding
 from .gateway import KnowledgeApiGateway
-from .output import write_keys_csv, write_links_csv, write_relationships_csv, write_tables_csv
+from .output import write_keys_csv, write_links_csv, write_relationships_csv, write_tables_csv, write_replica_fields_csv
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -24,6 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--output-json")
     build.add_argument("--tables-csv")
     build.add_argument("--relationships-csv")
+    build.add_argument("--replica-fields-csv")
     build.add_argument("--keys-csv")
     build.add_argument("--links-csv")
     build.add_argument("--output-mermaid")
@@ -32,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     outputs = (
         args.output_json,
         args.tables_csv,
+        args.replica_fields_csv,
         args.relationships_csv,
         args.keys_csv,
         args.links_csv,
@@ -40,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     if not any(outputs):
         build.error(
             "at least one output must be requested: --output-json, --tables-csv, "
-            "--relationships-csv, --keys-csv, --links-csv, or --output-mermaid"
+            "--relationships-csv, --replica-fields-csv, --keys-csv, --links-csv, or --output-mermaid"
         )
 
     gateway = None
@@ -64,6 +66,8 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.tables_csv:
             write_tables_csv(payload["tables"], args.tables_csv)
+        if args.replica_fields_csv:
+            write_replica_fields_csv(payload.get("replica_fields") or [], args.replica_fields_csv)
         if args.relationships_csv:
             write_relationships_csv(payload["relationships"], args.relationships_csv)
         if args.keys_csv:

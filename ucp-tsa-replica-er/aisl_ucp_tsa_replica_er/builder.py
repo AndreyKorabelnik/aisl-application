@@ -160,6 +160,22 @@ def build_replica_model(
         if owner and name:
             effective_names[owner].add(name)
 
+    # A public effective-field occurrence is the exact bridge from a replica's
+    # logical owner to a declared field, including inherited field declarations.
+    effective_by_owner_name: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for row in effective_fields:
+        owner = _text(row.get("effective_owner_type_occurrence_id"))
+        name = _text(row.get("field_name"))
+        field_id = _text(row.get("field_occurrence_id"))
+        if owner and name and field_id:
+            effective_by_owner_name[(owner, name)].add(field_id)
+    direct_by_owner_name: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for field_id, row in fields_by_id.items():
+        owner = _text(row.get("owner_type_occurrence_id"))
+        name = _text(row.get("name"))
+        if owner and name:
+            direct_by_owner_name[(owner, name)].add(field_id)
+
     annotations_by_type: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in annotations:
         if _text(row.get("target_kind")) != "type":
@@ -185,6 +201,7 @@ def build_replica_model(
     gaps: list[dict[str, Any]] = []
     tables: list[dict[str, Any]] = []
     table_by_type_id: dict[str, dict[str, Any]] = {}
+    replica_fields: list[dict[str, Any]] = []
 
     for type_id in sorted(selected_type_ids, key=lambda value: _text(types_by_id.get(value, {}).get("fully_qualified_name"))):
         type_row = types_by_id.get(type_id)
@@ -299,6 +316,76 @@ def build_replica_model(
                 "key": key_provenance,
             },
         }
+        # Field list is driven by observed_exact TSA field mappings, not by
+        # guessed physical columns or by all UCP fields (which might not be replicated).
+        entity_mapping_id = _text(entity_payload.get("mapping_id"))
+        mapped_fields = [
+            wrapped for wrapped in _unique_payloads(tsa_mappings.get("field_mappings") or ())
+            if _text(wrapped["payload"].get("entity_mapping_id")) == entity_mapping_id
+            and _text(wrapped["payload"].get("logical_type_name")) == fqcn
+        ]
+        column_fields: dict[str, set[str]] = defaultdict(set)
+        for mapped in mapped_fields:
+            column = _text(mapped["payload"].get("physical_column_name"))
+            name = _text(mapped["payload"].get("logical_field_name"))
+            if column and name:
+                column_fields[column].add(name)
+        seen_pairs: set[tuple[str, str]] = set()
+        for mapped in sorted(mapped_fields, key=lambda item: (
+            _text(item["payload"].get("physical_column_name")),
+            _text(item["payload"].get("logical_field_name")),
+            _text(item["payload"].get("mapping_id")),
+        )):
+            source = mapped["payload"]
+            field_name = _text(source.get("logical_field_name"))
+            column = _text(source.get("physical_column_name"))
+            if not column or not field_name:
+                # Do not invent either physical or logical identity.
+                continue
+            if (column, field_name) in seen_pairs:
+                continue
+            seen_pairs.add((column, field_name))
+            ambiguous_column = len(column_fields[column]) > 1
+            effective_ids = effective_by_owner_name.get((type_id, field_name), set())
+            candidate_ids = effective_ids if effective_ids else direct_by_owner_name.get((type_id, field_name), set())
+            candidates = [fields_by_id[fid] for fid in sorted(candidate_ids) if fid in fields_by_id]
+            field_row = candidates[0] if len(candidates) == 1 else None
+            document = field_row.get("documentation") if field_row else None
+            if not isinstance(document, Mapping):
+                document = _json(field_row.get("documentation_json"), {}) if field_row else {}
+            doc = document if isinstance(document, Mapping) else {}
+            description = doc.get("description") if isinstance(doc.get("description"), str) else ""
+            type_document = type_row.get("documentation")
+            if not isinstance(type_document, Mapping):
+                type_document = _json(type_row.get("documentation_json"), {})
+            type_description = type_document.get("description") if isinstance(type_document, Mapping) else ""
+            if not isinstance(type_description, str):
+                type_description = ""
+            status = "confirmed" if field_row and description.strip() else (
+                "ucp_description_not_published" if field_row else
+                "ucp_field_ambiguous" if len(candidates) > 1 else "ucp_field_not_found"
+            )
+            gap = (
+                "tsa_column_mapping_ambiguous" if ambiguous_column else
+                "" if status == "confirmed" else status
+            )
+            replica_fields.append({
+                "replica_relation": replica_relation,
+                "replica_column": column,
+                "ucp_type_fqcn": fqcn,
+                "ucp_type_description": type_description,
+                "ucp_field": field_name,
+                "ucp_field_type": _text(field_row.get("declared_type_expression")) if field_row else "",
+                "ucp_field_description": description,
+                "description_status": status,
+                "mapping_status": "ambiguous_multiple_ucp_fields" if ambiguous_column else "observed_exact",
+                "gap": gap,
+                "provenance": {
+                    "ucp_type": _record_provenance(type_row),
+                    "ucp_field": _record_provenance(field_row) if field_row else {},
+                    "tsa_field_mapping": _record_provenance(mapped["record"]),
+                },
+            })
         tables.append(table)
         table_by_type_id[type_id] = table
 
@@ -345,6 +432,7 @@ def build_replica_model(
         })
 
     tables.sort(key=lambda row: (row["replica_relation"], row["logical_type_fqcn"]))
+    replica_fields.sort(key=lambda row: (row["replica_relation"], row["replica_column"], row["ucp_type_fqcn"], row["ucp_field"]))
     relation_rows.sort(key=lambda row: (
         row["source_replica_relation"], row["relationship_field"], row["target_replica_relation"]
     ))
@@ -369,6 +457,7 @@ def build_replica_model(
             "mapping_gaps": len(gaps),
         },
         "tables": tables,
+        "replica_fields": replica_fields,
         "relationships": relation_rows,
         "gaps": gaps,
     }
