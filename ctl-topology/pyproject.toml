@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aisl-ctl-topology"
+version = "0.1.0a1"
+description = "Deterministic cross-revision CTL dependency presentation over pinned public AISL products"
+requires-python = ">=3.10"
+dependencies = ["aisl-sdk>=0.3.10,<0.4"]
+
+[project.scripts]
+aisl-ctl-topology = "aisl_ctl_topology.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aisl_ctl_topology*"]
