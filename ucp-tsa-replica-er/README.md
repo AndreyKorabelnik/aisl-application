@@ -127,3 +127,41 @@ To emit only the outgoing UCP object closure from one or more roots, repeat
 ```bash
   --root-object com.sbt.bm.ucp.retail.model.individual.Individual
 ```
+
+## Replica field inventory (v0.1.0a4)
+
+The new independent `--replica-fields-csv replica-fields.csv` output emits **one row
+per unique exact (TSA replica column, UCP logical field) mapping** for all replica
+tables selected by the same build/root closure. It does not change keys, links,
+relationships, or Mermaid outputs. For example:
+
+```bash
+ucp-tsa-replica-er build \
+  --aisl-base-url http://aisl-server:8080 \
+  --ucp-system ucp-data-model \
+  --ucp-revision rev-7bbcbee57898c69d3e6ac948 \
+  --tsa-system ucp-tsa-v4 \
+  --tsa-revision rev-3aa6417edeb1bc710033e381 \
+  --root-object com.sbt.bm.ucp.retail.model.individual.Individual \
+  --replica-fields-csv replica-fields.csv
+```
+
+CSV fields:
+
+- `replica_relation`, `replica_column`: **exact** TSA physical replica names from
+  published `field_mapping` records;
+- `ucp_type_fqcn`, `ucp_type_description`: declared UCP owner and its published
+  `documentation.description` when present;
+- `ucp_field`, `ucp_field_type`, `ucp_field_description`: exact matching UCP
+  declared/effective field, its declared type and its `documentation.description`;
+- `description_status`, `mapping_status`, `gap`: explicit evidence qualification;
+- `provenance_json`: UCP source and TSA field mapping record provenance.
+
+**Evidence boundary:** this CSV enumerates exactly mapped published TSA replica
+columns, **not** undocumented columns in the physical database, and not all UCP
+fields that TSA may not replicate. It does not infer field descriptions from names
+or other fields. If the exact UCP field or its documentation is unavailable, the
+text stays empty and the row has an explicit gap. Inherited fields use their
+public effective-field occurrence to locate the original declaration. Conflicting
+logical sources for the same replica column are marked ambiguous. `key` and
+`relationship` columns remain logical and never imply physical PK/FK constraints.

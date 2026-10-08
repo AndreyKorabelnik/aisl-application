@@ -144,3 +144,39 @@ def test_cli_requires_at_least_one_output(monkeypatch) -> None:
             "--tsa-system", "tsa", "--tsa-revision", "rev-t",
         ])
     assert exc.value.code == 2
+
+
+def test_cli_can_write_only_replica_fields_csv(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    monkeypatch.setattr(cli, "build_replica_model", lambda **kwargs: {
+        "tables": [{"replica_relation": "replica_individual"}],
+        "relationships": [],
+        "replica_fields": [{
+            "replica_relation": "replica_individual",
+            "replica_column": "birth_date",
+            "ucp_type_fqcn": "com.example.Individual",
+            "ucp_type_description": "Частное лицо",
+            "ucp_field": "birthDate",
+            "ucp_field_type": "BirthDate",
+            "ucp_field_description": "Дата рождения",
+            "description_status": "confirmed",
+            "mapping_status": "observed_exact",
+            "gap": "",
+            "provenance": {"mapping": "exact"},
+        }],
+    })
+    out = tmp_path / "nested" / "replica-fields.csv"
+    rc = cli.main([
+        "build", "--aisl-base-url", "http://aisl",
+        "--ucp-system", "ucp", "--ucp-revision", "rev-u",
+        "--tsa-system", "tsa", "--tsa-revision", "rev-t",
+        "--replica-fields-csv", str(out),
+    ])
+    assert rc == 0
+    import csv
+    with out.open(encoding="utf-8", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    assert len(rows) == 1
+    assert rows[0]["ucp_field_description"] == "Дата рождения"
+    assert rows[0]["provenance_json"] == '{"mapping":"exact"}'
+    assert [p.name for p in tmp_path.rglob("*") if p.is_file()] == ["replica-fields.csv"]

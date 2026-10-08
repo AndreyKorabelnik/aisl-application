@@ -25,6 +25,21 @@ TABLE_COLUMNS = (
     "provenance_json",
 )
 
+REPLICA_FIELD_COLUMNS = (
+    "replica_relation",
+    "replica_column",
+    "ucp_type_fqcn",
+    "ucp_type_description",
+    "ucp_field",
+    "ucp_field_type",
+    "ucp_field_description",
+    "description_status",
+    "mapping_status",
+    "gap",
+    "provenance_json",
+)
+
+
 KEY_COLUMNS = (
     "table",
     "logical_pk",
@@ -134,3 +149,7 @@ def write_links_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> No
         for row in rows
     ]
     _write_csv(projected, LINK_COLUMNS, output)
+
+
+def write_replica_fields_csv(rows: Sequence[Mapping[str, Any]], output: str | Path) -> None:
+    _write_csv(rows, REPLICA_FIELD_COLUMNS, output)
