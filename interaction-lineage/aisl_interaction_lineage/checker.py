@@ -12,12 +12,13 @@ _REQUIRED_CAPABILITY = "workspace.attribute-path-resolver"
 
 
 def _repo_ids(edge: Mapping[str, Any], roles: Sequence[str]) -> list[str]:
-    values: set[str] = set()
-    for role in roles:
-        for field in boundary_fields(edge, transport_role=role):
-            values.add(field.source_repository_id)
-            values.add(field.target_repository_id)
-    return sorted(values)
+    # Repository preparation must not depend on optional observed field names.
+    # v5 may expose a valid transport candidate with zero known DTO fields.
+    return sorted({
+        str(edge.get(key) or "").strip()
+        for key in ("source_repository_id", "target_repository_id")
+        if str(edge.get(key) or "").strip()
+    })
 
 
 
@@ -222,6 +223,7 @@ def check_interaction_lineage(
     bindings: BindingIndex,
     gateway: AislReadinessGateway,
     transport_roles: Sequence[str] = ("request", "response"),
+    prerequisites_only: bool = False,
 ) -> dict[str, Any]:
     edge = select_edge(topology, edge_id)
     repositories: dict[str, dict[str, Any]] = {}
@@ -293,6 +295,62 @@ def check_interaction_lineage(
             "capabilities": capabilities,
             "boundary_anchor_count": 0,
             "boundary_anchor_missing_count": 0,
+        }
+
+    if prerequisites_only:
+        # A cheap admission decision: never infer that anchors, external origins,
+        # or transport crossings exist merely because a pinned revision exposes
+        # the required capability. Detailed `check --deep` and `prepare` retain
+        # the full producer-evidence evaluation below.
+        missing_roles = [
+            role for role in transport_roles
+            if not boundary_fields(edge, transport_role=role)
+        ]
+        for role in missing_roles:
+            diagnostics.append({
+                "code": "candidate_fields_not_observed",
+                "edge_id": edge_id,
+                "transport_role": role,
+                "blocking": True,
+                "reason": "Topology v5 has no observed field probe for this role; public AISL boundary discovery is needed",
+            })
+        items = [repositories[key] for key in sorted(repositories)]
+        for row in items:
+            # The counts are unknown, not zero. In particular, a successful
+            # prereq check must not be mistaken for successful anchor matching.
+            row.pop("boundary_anchor_count", None)
+            row.pop("boundary_anchor_missing_count", None)
+        admitted = bool(items) and not missing_roles and all(
+            item.get("status") == "ready" for item in items
+        )
+        diagnostics.append({
+            "code": "attribute_path_resolution_deferred",
+            "edge_id": edge_id,
+            "blocking": False,
+            "reason": "repository revisions/capabilities checked; per-field anchors and external-origin gaps require check --deep or build",
+        })
+        return {
+            "format": READINESS_FORMAT,
+            "status": "prerequisites_satisfied" if admitted else "not_ready",
+            "readiness_scope": "repository_capabilities_only",
+            "topology_id": str(topology.get("topology_id") or ""),
+            "edge_id": edge_id,
+            "topology_edge_status": "candidate",
+            "repositories": items,
+            "preparation_requirements": [],
+            "diagnostics": sorted(diagnostics, key=lambda item: (
+                str(item.get("repository_id") or ""),
+                str(item.get("code") or ""),
+                str(item.get("transport_role") or ""),
+                str(item.get("field_path") or ""),
+                str(item.get("side") or ""),
+            )),
+            "summary": {
+                "repository_count": len(items),
+                "ready_repository_count": sum(item.get("status") == "ready" for item in items),
+                "not_ready_repository_count": sum(item.get("status") != "ready" for item in items),
+                "attribute_path_resolution": "deferred",
+            },
         }
 
     for role in transport_roles:
@@ -418,13 +476,26 @@ def check_interaction_lineage(
                                     "evidence": list(material_requirement.get("evidence") or ()),
                                 })
 
+    missing_roles = [
+        role for role in transport_roles
+        if not boundary_fields(edge, transport_role=role)
+    ]
+    for role in missing_roles:
+        diagnostics.append({
+            "code": "candidate_fields_not_observed",
+            "edge_id": edge_id,
+            "transport_role": role,
+            "blocking": True,
+            "reason": "Topology v5 has no observed field probe for this role; public AISL boundary discovery is needed",
+        })
     items = [repositories[key] for key in sorted(repositories)]
-    ready = all(item.get("status") == "ready" for item in items) and bool(items)
+    ready = bool(items) and not missing_roles and all(item.get("status") == "ready" for item in items)
     return {
         "format": READINESS_FORMAT,
         "status": "ready" if ready else "not_ready",
         "topology_id": str(topology.get("topology_id") or ""),
         "edge_id": edge_id,
+        "topology_edge_status": "candidate",
         "repositories": items,
         "preparation_requirements": sorted(
             preparation_requirements,

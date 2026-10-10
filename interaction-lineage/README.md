@@ -1,13 +1,13 @@
 # AISL Interaction Lineage
 
-Consumer-owned deterministic composition of one `repository-topology/v4` edge with
+Consumer-owned deterministic composition of one `repository-topology/v5` candidate edge with
 repository-local lineage from exact pinned AISL revisions.
 
 Architecture invariant:
 
 - `build` reads Repository Topology and exact pinned public AISL revisions only;
 - `build` never reads source repositories and never invokes analysis;
-- topology owns the repository/transport edge;
+- topology supplies unverified transport candidates; matching technical identifiers never prove a runtime crossing;
 - each AISL revision owns repository-local observed/derived knowledge for one primary
   analyzed source, plus mechanically required dependency evidence for that revision;
 - Interaction Lineage owns only the task-specific composition across those independent
@@ -45,11 +45,22 @@ explicit bindings.
 
 ## Check
 
-`check` is read-only. It validates the exact pinned revisions from the binding file,
-requires the published `workspace.attribute-path-resolver` capability, and probes the
-selected topology edge's boundary anchors through the same public resolver used by
-`build`. Missing server/revision/capability/anchor state is returned as
-`interaction-lineage-readiness/v1`; no source acquisition or analysis is attempted.
+`check` is a **cheap admission preflight**. It validates exact pinned revisions,
+the published `workspace.attribute-path-resolver` capability, and whether Topology
+contains observed field hints for the requested roles. The output is
+`interaction-lineage-readiness/v1` with `readiness_scope: repository_capabilities_only`.
+`prerequisites_satisfied` means **only that deeper verification can be attempted**;
+it does not establish field-anchor availability, external-origin resolution, or
+any actual crossing. The explicitly non-blocking
+`attribute_path_resolution_deferred` diagnostic records this limitation.
+Missing bindings, revisions, capabilities and Topology field probes retain their
+typed diagnostics. No source acquisition or analysis is attempted.
+
+Use `check --deep` to run the previous detailed readiness check: it resolves
+field anchors and examines material external-origin evidence, retaining preparation
+hints such as `needs_external_source` and `material_semantic_gap`.
+`prepare` continues to run this detailed evaluation internally; `build` continues
+to resolve per-field paths as before. Neither changes semantic behavior.
 
 ```bash
 interaction-lineage check \
@@ -59,6 +70,8 @@ interaction-lineage check \
   --aisl-base-url http://127.0.0.1:8080 \
   --output readiness.json
 ```
+
+Detailed diagnostics: add `--deep` to the command above.
 
 ## Build
 
@@ -151,3 +164,75 @@ cross-reference with the canonical JSON. Detailed operations, transformations, b
 provenance, confidence and anchor-selection evidence remain in the canonical JSON and
 are intentionally not duplicated as separate human CSV columns.
 
+
+## Recall-first Topology v5: candidate batch (Task 51)
+
+Topology v5 supplies *candidate interactions*, not proven attribute crossings.
+The consumer obtains provisional field probes from Inventory half-wire field names/paths
+only. Local AISL resolution of a field does **not** establish the remote runtime target;
+all crossings remain `candidate` until independent exact transport-crossing evidence exists.
+Zero observed fields yield `candidate_fields_not_observed`, not an empty READY result.
+
+Batch `check --all-edges` performs only a command-scoped **cheap prerequisite**
+assessment: one cached revision/capability read per unique pinned revision, no
+attribute-path resolution and no repository value-node traversal. Its positive
+per-edge status is `prerequisites_satisfied`, **not** `ready`; its summary and
+diagnostics explicitly label attribute-path evidence as `deferred`. Use
+`check --deep --all-edges` when full anchor and external-origin diagnostics are
+needed. A successful cheap check does not prove any candidate transport crossing.
+
+For read-only `check --all-edges` / `build --all-edges`, exact pinned AISL reads
+are reused within the command. The cache key includes system/revision identity,
+selected repository IDs, direction, field/source and pagination/filter parameters.
+Transient API errors are not cached; `prepare` never enables read caching because it
+may publish new knowledge. The batch output `summary.aisl_api_cache` records backend
+calls, cache hits and entries by API operation. Cache state does not persist to disk.
+
+`check`, `prepare`, and `build` accept either `--edge-id ID` or explicit
+`--all-edges`; all-edges produces a complete candidate-edge ledger. The sole
+operation authorized to invoke Framework/KCP (including demand-driven Nexus source
+preparation) remains `prepare`. Revisions returned by a successful preparation
+are reused for later edges within that same batch; no v4 compatibility mode is kept.
+
+```bash
+interaction-lineage check \
+  --topology topology-v5.json --all-edges \
+  --bindings bindings.json --aisl-base-url http://aisl-server:8080 \
+  --output readiness-all.json
+
+# Optional: retain the previous full, higher-cost evidence diagnostics
+interaction-lineage check \
+  --topology topology-v5.json --all-edges --deep \
+  --bindings bindings.json --aisl-base-url http://aisl-server:8080 \
+  --output readiness-deep-all.json
+
+interaction-lineage prepare \
+  --topology topology-v5.json --all-edges \
+  --aisl-base-url http://aisl-server:8080 \
+  --kcp-base-url http://knowledge-control-plane:8000 \
+  --output preparation-all.json
+
+interaction-lineage build \
+  --topology topology-v5.json --all-edges \
+  --bindings bindings.json --aisl-base-url http://aisl-server:8080 \
+  --output lineage-all.json
+```
+
+`complete` in the batch envelope means that all selected candidate records were
+processed; it does **not** mean that runtime interactions were proven. An unresolved
+field, unavailable revision, source version mismatch or Nexus provenance gap must
+remain visible rather than converting into a negative assertion or a false crossing.
+
+### Source selection and provenance
+
+The preparation pipeline reuses available published AISL knowledge and requests
+missing source analysis through the existing Framework/KCP lifecycle. Normal
+source acquisition uses the latest available repository source (as requested by
+the consumer); exact identities of the analyzed revisions and any Nexus
+G:A:V dependencies are retained in their published provenance.
+
+Topology v5 `source_snapshot_fingerprint` and KCP source fingerprints are
+**not interchangeable**. Neither fingerprint controls whether a needed analysis
+can be started. A field or interaction remains a `candidate` until sufficiently
+supported by the published evidence; absence of a field probe remains an
+explicit gap, not a proven negative interaction.

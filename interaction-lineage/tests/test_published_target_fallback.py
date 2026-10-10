@@ -11,7 +11,7 @@ EDGE_ID = "repository_edge_published_fallback"
 
 def _topology(field_path: str = "profile.id") -> dict[str, Any]:
     return {
-        "format": "repository-topology/v4",
+        "format": "repository-topology/v5",
         "topology_id": "topology_published_fallback",
         "edges": [{
             "edge_id": EDGE_ID,
@@ -236,7 +236,7 @@ def test_complete_scan_without_payload_scoped_field_use_is_terminal_not_gap() ->
     assert result["summary"]["target_local_anchor_gap_count"] == 0
     row = next(row for row in human_rows(result) if row["crossing_attribute"] == "missing")
     assert row["consumer_attribute"] == ""
-    assert row["gap"] == ""
+    assert row["gap"] == "потенциальная межрепозиторная связь ещё не подтверждена"
     assert "[unresolved target]" not in row["full_attribute_path"]
 
 
@@ -600,7 +600,7 @@ def test_source_counterpart_shape_can_terminate_at_unique_exact_route_payload_in
     assert result["summary"]["source_local_anchor_gap_count"] == 0
     row = next(row for row in human_rows(result) if row["crossing_attribute"] == "missing")
     assert row["producer_attribute"] == ""
-    assert row["gap"] == ""
+    assert row["gap"] == "потенциальная межрепозиторная связь ещё не подтверждена"
     assert "caller: payload → missing" in row["full_attribute_path"]
     assert "[unresolved source]" not in row["full_attribute_path"]
 

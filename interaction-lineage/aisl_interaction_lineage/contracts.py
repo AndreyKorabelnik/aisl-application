@@ -72,6 +72,17 @@ class BindingIndex:
             by_repo[binding.repository_id] = binding
         self._by_repo = by_repo
 
+    def merged(self, rows: list[Mapping[str, Any]]) -> "BindingIndex":
+        """Reuse pinned revisions returned by the canonical Framework preparation."""
+        by_repo = dict(self._by_repo)
+        for row in rows:
+            binding = AislBinding.from_payload(row)
+            by_repo[binding.repository_id] = binding
+        return BindingIndex(list(by_repo.values()))
+
+    def all(self) -> list[AislBinding]:
+        return [self._by_repo[key] for key in sorted(self._by_repo)]
+
     def find(self, repository_id: str) -> AislBinding | None:
         return self._by_repo.get(repository_id)
 

@@ -12,7 +12,7 @@ EDGE_ID = "repository_edge_route_identity_test"
 
 def _topology() -> dict[str, Any]:
     return {
-        "format": "repository-topology/v4",
+        "format": "repository-topology/v5",
         "topology_id": "topology_route_identity_test",
         "edges": [{
             "edge_id": EDGE_ID,

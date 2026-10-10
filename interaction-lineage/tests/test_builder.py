@@ -18,7 +18,7 @@ EDGE_ID = "repository_edge_test"
 
 def topology() -> dict[str, Any]:
     return {
-        "format": "repository-topology/v4",
+        "format": "repository-topology/v5",
         "topology_id": "topology_test",
         "edges": [{
             "edge_id": EDGE_ID,
@@ -191,7 +191,7 @@ def test_response_fields_include_nested_paths_under_published_top_level() -> Non
         ("profile", "service", "caller"),
         ("profile.id", "service", "caller"),
     ]
-    assert fields[1].topology_basis == "topology_payload_shape_under_published_top_level"
+    assert fields[1].topology_basis == "inventory_observed_candidate_field"
 
 
 def test_builder_uses_reverse_on_source_side_and_forward_on_target_side() -> None:
@@ -199,7 +199,8 @@ def test_builder_uses_reverse_on_source_side_and_forward_on_target_side() -> Non
     result = build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway)
     assert result["format"] == "interaction-attribute-lineage/v1"
     assert result["summary"]["journey_count"] == 3
-    assert result["summary"]["resolved_crossing_count"] == 3
+    assert result["summary"]["resolved_crossing_count"] == 0
+    assert result["summary"]["partial_crossing_count"] == 3
     response = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
     assert response["source_repository_id"] == "service"
     assert response["source_side"]["direction"] == "reverse"
@@ -223,7 +224,7 @@ def test_missing_anchor_stays_partial_gap_without_guessing() -> None:
     gateway = FakeGateway(missing={("caller", ref), ("caller", "profile.id")})
     result = build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway, transport_roles=("response",))
     journey = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
-    assert journey["crossing"]["status"] == "resolved"
+    assert journey["crossing"]["status"] == "candidate"
     assert journey["target_side"]["anchor_status"] == "unresolved"
     assert any(gap["reason"] == "target_local_anchor_unresolved" for gap in result["gaps"])
 
@@ -459,7 +460,8 @@ def test_structural_expansion_without_field_specific_flow_is_terminal_not_gap() 
     expanded = next(item for item in result["journeys"] if item["field_path"] == "profile.name")
     assert expanded["source_side"]["anchor_status"] == "terminal"
     assert expanded["target_side"]["anchor_status"] == "terminal"
-    assert result["summary"]["gap_count"] == 0
+    assert result["summary"]["gap_count"] == 3
+    assert all(gap["reason"] == "candidate_transport_crossing_unverified" for gap in result["gaps"])
 
 
 class SelectedRepoIdsGateway(FakeGateway):

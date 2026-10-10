@@ -18,6 +18,8 @@ HUMAN_CSV_COLUMNS = (
 )
 
 _GAP_LABELS_RU = {
+    "candidate_transport_crossing_unverified": "потенциальная межрепозиторная связь ещё не подтверждена",
+    "candidate_fields_not_observed": "Inventory не содержит полей для этого потенциального взаимодействия",
     "source_local_anchor_unresolved": "не удалось определить источник атрибута внутри producer",
     "target_local_anchor_unresolved": "не удалось определить дальнейшее использование атрибута в consumer",
     "payload_identity_not_exactly_compatible": "не удалось доказать точное соответствие transport payload",
