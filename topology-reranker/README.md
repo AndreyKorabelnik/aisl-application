@@ -73,3 +73,27 @@ tampered input packages fail before any adapter call.
 ```bash
 python -m pytest tests -q
 ```
+
+## Published AISL evidence priority (separate read-side mode)
+
+`shortlist-published` is a deterministic **consumer-only** operation, independent of
+`rerank-batch`. It accepts a bounded, already admitted list of HTTP interface
+candidates with exact repository, revision, artifact and interface IDs plus method,
+route, retrieval score and optional exact payload identities. For each candidate
+it calls the generic revision-pinned Knowledge API `get_knowledge_item` endpoint,
+validates exact contract identity and prioritizes observed
+`java_exact_route_annotation` **only within equal retrieval-score groups**.
+All candidate alternatives remain in the output; multiple equally supported Java
+implementations stay ambiguous. Neither rank nor Java evidence proves the runtime
+deployment binding or modifies canonical Topology. The CLI never reads repository
+source, Inventory files or AISL database directly.
+
+```bash
+repository-topology-reranker shortlist-published \
+  --request candidates.json --base-url http://aisl-server:8080 \
+  --output noncanonical-shortlist.json
+```
+
+Missing/inconsistent public evidence is an explicit error, never silently demoted.
+This mode is application-owned and does not create a second published-knowledge
+owner, global discovery index, server or parser.
