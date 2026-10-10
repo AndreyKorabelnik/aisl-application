@@ -2733,11 +2733,11 @@ def build_interaction_lineage(
                 )
 
         payload_compatible = _payload_compatible(field)
-        crossing_status = "resolved" if payload_compatible else "partial"
-        crossing_basis = (
-            "exact_field_path_within_matched_transport_payload"
-            if payload_compatible else "insufficient_exact_boundary_evidence"
-        )
+        # Topology v5 is strictly a candidate graph. Even equal DTO identities
+        # cannot prove that the caller reaches this particular runtime server.
+        crossing_status = "candidate"
+        crossing_basis = "topology_v5_candidate_not_independently_verified"
+        gaps.append(_gap(field.source_repository_id, field, "crossing", "candidate_transport_crossing_unverified"))
         if not payload_compatible:
             gaps.append(_gap(field.source_repository_id, field, "crossing", "payload_identity_not_exactly_compatible"))
         if source_side["anchor_status"] == "unresolved":
@@ -2861,6 +2861,15 @@ def build_interaction_lineage(
         if child_expansion is not None:
             journey["target_side"]["observed_child_expansion"] = child_expansion
 
+    for role in transport_roles:
+        if not boundary_fields(edge, transport_role=role):
+            gaps.append({
+                "reason": "candidate_fields_not_observed",
+                "repository_id": str(edge.get("source_repository_id") or ""),
+                "transport_role": role,
+                "field_path": "",
+                "side": "crossing",
+            })
     journeys.sort(key=lambda item: (item["transport_role"], item["field_path"], item["journey_id"]))
     gaps.sort(key=lambda item: (item["transport_role"], item["field_path"], item["side"], item["repository_id"], item["reason"]))
     output = {
@@ -2870,8 +2879,8 @@ def build_interaction_lineage(
         "edge": {
             "edge_id": str(edge.get("edge_id") or ""), "protocol": edge.get("protocol"),
             "method": edge.get("method"), "matched_identity": edge.get("matched_identity"),
-            "match_classification": edge.get("match_classification"),
-            "claim_classification": edge.get("claim_classification"), "confidence": edge.get("confidence"),
+            "status": "candidate",
+            "basis": [dict(item) for item in edge.get("basis") or () if isinstance(item, Mapping)],
             "source_repository_id": edge.get("source_repository_id"),
             "target_repository_id": edge.get("target_repository_id"),
         },
