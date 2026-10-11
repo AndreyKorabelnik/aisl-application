@@ -1,0 +1,32 @@
+name: Task51 CLI exact source export
+on:
+  push:
+    branches:
+      - automation/task51-cli-export-20261011
+permissions:
+  contents: read
+jobs:
+  export-exact-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 787bb9168282ef7d9082d30312a3361b2c45a958
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Assert exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "787bb9168282ef7d9082d30312a3361b2c45a958"
+          test "$(git rev-parse HEAD^{tree})" = "b3da9a373254f1d17bfd3f43e0c8b631a4b5d000"
+          test -z "$(git status --porcelain)"
+          mkdir -p "$RUNNER_TEMP/source"
+          git archive --format=zip --output="$RUNNER_TEMP/source/source-canonical.zip" 787bb9168282ef7d9082d30312a3361b2c45a958
+          { echo "repository=AndreyKorabelnik/aisl-application"; echo "commit=787bb9168282ef7d9082d30312a3361b2c45a958"; echo "root_tree=b3da9a373254f1d17bfd3f43e0c8b631a4b5d000"; sha256sum "$RUNNER_TEMP/source/source-canonical.zip"; } > "$RUNNER_TEMP/source/identity.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task51-cli-exact-aisl-application
+          path: ${{ runner.temp }}/source/
+          retention-days: 2
+          if-no-files-found: error
