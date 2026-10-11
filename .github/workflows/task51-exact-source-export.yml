@@ -1,0 +1,32 @@
+name: Task51 exact source export
+on:
+  push:
+    branches:
+      - automation/task51-exact-source-20261011
+permissions:
+  contents: read
+jobs:
+  export-exact-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2c999f997878adafae70c0548714fc699ff8d903
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Assert exact source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "2c999f997878adafae70c0548714fc699ff8d903"
+          test "$(git rev-parse HEAD^{tree})" = "7b96872595854b333c1fa19c74bdcf8ae6cc8c0a"
+          test -z "$(git status --porcelain)"
+          mkdir -p "$RUNNER_TEMP/source"
+          git archive --format=zip --output="$RUNNER_TEMP/source/source-canonical.zip" 2c999f997878adafae70c0548714fc699ff8d903
+          { echo "repository=AndreyKorabelnik/aisl-application"; echo "commit=2c999f997878adafae70c0548714fc699ff8d903"; echo "root_tree=7b96872595854b333c1fa19c74bdcf8ae6cc8c0a"; sha256sum "$RUNNER_TEMP/source/source-canonical.zip"; } > "$RUNNER_TEMP/source/identity.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: task51-exact-source-2c999f997878
+          path: ${{ runner.temp }}/source/
+          retention-days: 2
+          if-no-files-found: error
