@@ -1,0 +1,4724 @@
+/* Bundled synthetic fixture, never fetches an external URL. */
+export const demoData = {
+  "format": "interaction-lineage-candidate-batch/v1",
+  "status": "complete",
+  "topology_id": "synthetic-ucp-kpk-profile-analytics",
+  "command": "build",
+  "edges": [
+    {
+      "edge_id": "edge-kpk-ucp",
+      "result": {
+        "format": "interaction-attribute-lineage/v1",
+        "topology_id": "synthetic-ucp-kpk-profile-analytics",
+        "topology_fingerprint": "092d26404274c0a2a0967af7dcec9b3293dda7ebc83faf23118104049f36d262",
+        "edge": {
+          "edge_id": "edge-kpk-ucp",
+          "protocol": "http",
+          "method": "GET",
+          "matched_identity": "/api/individual",
+          "status": "candidate",
+          "basis": [
+            {
+              "kind": "matched_http_method_route",
+              "method": "GET",
+              "route": "/api/individual",
+              "evidence_id": "inventory:edge-kpk-ucp:route"
+            }
+          ],
+          "source_repository_id": "kpk-client",
+          "target_repository_id": "ucp-service"
+        },
+        "aisl_inputs": [
+          {
+            "repository_id": "kpk-client",
+            "system_id": "synthetic-kpk",
+            "revision_id": "synthetic-rev-kpk-20261011"
+          },
+          {
+            "repository_id": "ucp-service",
+            "system_id": "synthetic-ucp",
+            "revision_id": "synthetic-rev-ucp-20261011"
+          }
+        ],
+        "journeys": [
+          {
+            "journey_id": "interaction_attribute_journey_7575ddb4af91acbb8d1c99b5",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "source_repository_id": "kpk-client",
+            "target_repository_id": "ucp-service",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Request",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Request",
+              "source_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/individual:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-4ef8a7fefb97ff6e",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:request.customerId",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 13,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-4ef8a7fefb97ff6e",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:request.customerId",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 13,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-4ef8a7fefb97ff6e",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:request.customerId",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 13,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-a84ad31bec421f60",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.user.customerId",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 182,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-dfeaaec0ff29d6a9",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-1a83e9f11198ec79",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.lookup.request.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 74,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-4ef8a7fefb97ff6e",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:request.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 13,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-00b00723139acf7c",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-a84ad31bec421f60",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.user.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 182,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-1a83e9f11198ec79",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.lookup.request.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 74,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/individual:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-05063ec9ea0a4cba",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:request.customerId",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 90,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-05063ec9ea0a4cba",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:request.customerId",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 90,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-05063ec9ea0a4cba",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:request.customerId",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 90,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-3480b343457fd513",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.search.customerKey",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 130,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-7894a905d4a890a5",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-05063ec9ea0a4cba",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:request.customerId",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 90,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-35fbedf0debbf930",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.controller.customerId",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 153,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-bfa780af4a4103e5",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-35fbedf0debbf930",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.controller.customerId",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 153,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-3480b343457fd513",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.search.customerKey",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 130,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_35a44bd0c512e822d3dda4eb",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "response",
+            "field_path": "individual.birthDate",
+            "source_repository_id": "ucp-service",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "source_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response individual.birthdate",
+              "attempted_anchors": [
+                "HTTP response individual.birthdate",
+                "boundary:rest:/api/individual:response.individual.birthDate",
+                "individual.birthDate"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-4efd1d61736f0dc7",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 13,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-4efd1d61736f0dc7",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 13,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-4efd1d61736f0dc7",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 13,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-db20774534076af5",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.db.individual.birthDate",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 96,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-dbd54d1ce6fdc0d6",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-42442920f0551257",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 170,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-4efd1d61736f0dc7",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 13,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-7c5b668d1fed276f",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-af501c78d32ada7e",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.model.Individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 115,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-42442920f0551257",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 170,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-a2ca1865dac9811a",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-db20774534076af5",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.db.individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 96,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-af501c78d32ada7e",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.model.Individual.birthDate",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 115,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response individual.birthdate",
+              "attempted_anchors": [
+                "HTTP response individual.birthdate",
+                "boundary:rest:/api/individual:response.individual.birthDate",
+                "individual.birthDate"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-589cf669ce4e4eaf",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 167,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-589cf669ce4e4eaf",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 167,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-589cf669ce4e4eaf",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 167,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-df98fa7069adf3f9",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.age",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 167,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-8e305e177b455313",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-589cf669ce4e4eaf",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 167,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-3dd151c632d06586",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 99,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-633785d46a09a5be",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-3dd151c632d06586",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 99,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-87b977fbac2570d2",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.dateToAge",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 21,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.dateToAge"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-ada05595797b6a06",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-87b977fbac2570d2",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.dateToAge",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 21,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-df98fa7069adf3f9",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.age",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 167,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.dateToAge"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-589cf669ce4e4eaf",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 167,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-cb1447d03c000b61",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.birthDate",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 19,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-8e305e177b455313",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-589cf669ce4e4eaf",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 167,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-3dd151c632d06586",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 99,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-8934e8fa5c81762a",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-3dd151c632d06586",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 99,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-cb1447d03c000b61",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.birthDate",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 19,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_5998010261b88f6b78248205",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "response",
+            "field_path": "individual.email",
+            "source_repository_id": "ucp-service",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "source_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response individual.email",
+              "attempted_anchors": [
+                "HTTP response individual.email",
+                "boundary:rest:/api/individual:response.individual.email",
+                "individual.email"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-81b710cf8a3d4d9e",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 105,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-81b710cf8a3d4d9e",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 105,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-81b710cf8a3d4d9e",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 105,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-794b515bc8bd1f05",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.db.contact.email",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 150,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-8e7d59c74eee2c3b",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-8174f39dd03794ae",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 101,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-81b710cf8a3d4d9e",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 105,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-36c52f7f5f28a6fa",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-0f7f644873b26a40",
+                            "repo_id": "ucp-service",
+                            "node_kind": "derivation",
+                            "display_ref": "UCP.email.normalize",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 77,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-8174f39dd03794ae",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 101,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "UCP.email.normalize"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-a04c1f7734015f82",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-794b515bc8bd1f05",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.db.contact.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 150,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-0f7f644873b26a40",
+                            "repo_id": "ucp-service",
+                            "node_kind": "derivation",
+                            "display_ref": "UCP.email.normalize",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 77,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "UCP.email.normalize"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-81b710cf8a3d4d9e",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 105,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-12e94df5e6cf78d4",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.external.contact.email",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 132,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-8e7d59c74eee2c3b",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-8174f39dd03794ae",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 101,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-81b710cf8a3d4d9e",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 105,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-36c52f7f5f28a6fa",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-0f7f644873b26a40",
+                            "repo_id": "ucp-service",
+                            "node_kind": "derivation",
+                            "display_ref": "UCP.email.normalize",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 77,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-8174f39dd03794ae",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 101,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "UCP.email.normalize"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-b141b6cdbe08f8cf",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-12e94df5e6cf78d4",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.external.contact.email",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 132,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-0f7f644873b26a40",
+                            "repo_id": "ucp-service",
+                            "node_kind": "derivation",
+                            "display_ref": "UCP.email.normalize",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 77,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "UCP.email.normalize"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response individual.email",
+              "attempted_anchors": [
+                "HTTP response individual.email",
+                "boundary:rest:/api/individual:response.individual.email",
+                "individual.email"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-85be459615a99a00",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 169,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-85be459615a99a00",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 169,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-85be459615a99a00",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 169,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-b153ea8f12c2472f",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.primaryEmail",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 147,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-1a69ab336f2ea9f2",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-85be459615a99a00",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 169,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-ac37783d281cec84",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 65,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-92aef39a1eb23350",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-ac37783d281cec84",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 65,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-b153ea8f12c2472f",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.primaryEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    },
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-85be459615a99a00",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 169,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-e97f5c9a415c3485",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.audit.contactEmail",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 145,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-1a69ab336f2ea9f2",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-85be459615a99a00",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 169,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-ac37783d281cec84",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 65,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-33388905deb633d5",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-ac37783d281cec84",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.email",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 65,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-e97f5c9a415c3485",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.audit.contactEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 145,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_a7d2e3eca832f24da16954da",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "response",
+            "field_path": "individual.firstName",
+            "source_repository_id": "ucp-service",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "source_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response individual.firstname",
+              "attempted_anchors": [
+                "HTTP response individual.firstname",
+                "boundary:rest:/api/individual:response.individual.firstName",
+                "individual.firstName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-d3e56fa3dea41165",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 160,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-d3e56fa3dea41165",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 160,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-d3e56fa3dea41165",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 160,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-149ef15d4e0a1579",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.db.individual.firstName",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 159,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-48866ff8e9d2837d",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-c9cef4a8a13a6b9c",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.firstName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 178,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-d3e56fa3dea41165",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 160,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-c4b7335984b5091c",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-149ef15d4e0a1579",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.db.individual.firstName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 159,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-c9cef4a8a13a6b9c",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.firstName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 178,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response individual.firstname",
+              "attempted_anchors": [
+                "HTTP response individual.firstname",
+                "boundary:rest:/api/individual:response.individual.firstName",
+                "individual.firstName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-129417e9d44cbf90",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 127,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-129417e9d44cbf90",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 127,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-129417e9d44cbf90",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 127,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-679516f575b2d7d5",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.fullName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 47,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-5674876e7977f2ca",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-129417e9d44cbf90",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.firstName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 127,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-a92587920da42676",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.firstName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 16,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-3df1598499069b84",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-a92587920da42676",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.firstName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 16,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-55dade0bb2f6a97a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.composeFullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.composeFullName"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-c212b62af0bb9ac9",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-55dade0bb2f6a97a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.composeFullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-679516f575b2d7d5",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 47,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.composeFullName"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_828a55d9c9fb588e6466d375",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "response",
+            "field_path": "individual.lastName",
+            "source_repository_id": "ucp-service",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "source_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response individual.lastname",
+              "attempted_anchors": [
+                "HTTP response individual.lastname",
+                "boundary:rest:/api/individual:response.individual.lastName",
+                "individual.lastName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-de284771ef9ff548",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 144,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-de284771ef9ff548",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 144,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-de284771ef9ff548",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 144,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-78e57abff5ff20c4",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.db.individual.lastName",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 144,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-72cb03be73f3f4b7",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-71d1136a290a57c6",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.lastName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 31,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-de284771ef9ff548",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 144,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-38d9a471bf12ace6",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-78e57abff5ff20c4",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.db.individual.lastName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 144,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-71d1136a290a57c6",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.lastName",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 31,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response individual.lastname",
+              "attempted_anchors": [
+                "HTTP response individual.lastname",
+                "boundary:rest:/api/individual:response.individual.lastName",
+                "individual.lastName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-97977248baaa7ae8",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 95,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-97977248baaa7ae8",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 95,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-97977248baaa7ae8",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 95,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-679516f575b2d7d5",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.fullName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 47,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-2f6b6982cf1840d6",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-97977248baaa7ae8",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.lastName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 95,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-69ea1773f6879878",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.lastName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 84,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-2a597e8458b202c5",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-69ea1773f6879878",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.lastName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 84,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-55dade0bb2f6a97a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.composeFullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.composeFullName"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-c212b62af0bb9ac9",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-55dade0bb2f6a97a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.mapper.composeFullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-679516f575b2d7d5",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 47,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.mapper.composeFullName"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_59d58ce561ae2c20ecb6dd12",
+            "edge_id": "edge-kpk-ucp",
+            "transport_role": "response",
+            "field_path": "individual.phone",
+            "source_repository_id": "ucp-service",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "target_payload_identity": "example.contract.edge-kpk-ucp.Response",
+              "source_interface_ids": [
+                "edge-kpk-ucp:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-kpk-ucp:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "ucp-service",
+              "system_id": "synthetic-ucp",
+              "revision_id": "synthetic-rev-ucp-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response individual.phone",
+              "attempted_anchors": [
+                "HTTP response individual.phone",
+                "boundary:rest:/api/individual:response.individual.phone",
+                "individual.phone"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-b68f467922209443",
+                "repo_id": "ucp-service",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/individual:response.individual.phone",
+                "operation": "example.ucp_service.resolve",
+                "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                "source_line": 50,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-ucp",
+                "revision_id": "synthetic-rev-ucp-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-b68f467922209443",
+                    "repo_id": "ucp-service",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/individual:response.individual.phone",
+                    "operation": "example.ucp_service.resolve",
+                    "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                    "source_line": 50,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-b68f467922209443",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/individual:response.individual.phone",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 50,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-7316b589d9411c11",
+                        "repo_id": "ucp-service",
+                        "node_kind": "field",
+                        "display_ref": "UCP.db.contact.phone",
+                        "operation": "example.ucp_service.resolve",
+                        "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                        "source_line": 51,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-373327f5aa42c2a0",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-682c7ee48295fb97",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.phone",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 56,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-b68f467922209443",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/individual:response.individual.phone",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 50,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-980ddf844c3b2809",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-7316b589d9411c11",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.db.contact.phone",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 51,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-682c7ee48295fb97",
+                            "repo_id": "ucp-service",
+                            "node_kind": "field",
+                            "display_ref": "UCP.dto.individual.phone",
+                            "operation": "example.ucp_service.resolve",
+                            "source_path": "src/main/java/example/ucp_service/ExampleFlow.java",
+                            "source_line": 56,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response individual.phone",
+              "attempted_anchors": [
+                "HTTP response individual.phone",
+                "boundary:rest:/api/individual:response.individual.phone",
+                "individual.phone"
+              ],
+              "resolved_anchor": null,
+              "anchor_status": "terminal",
+              "anchor_selection_basis": "complete_published_value_node_scan:no_payload_scoped_field_specific_use",
+              "query": {
+                "result": {
+                  "status": "resolved_terminal",
+                  "paths": [],
+                  "gaps": []
+                }
+              },
+              "terminal_proof": {
+                "payload_identity": "example.contract.edge-kpk-ucp.Response",
+                "field_path": "individual.phone",
+                "repository_value_node_scan_complete": true,
+                "payload_scoped_structural_candidate_count": 0
+              }
+            }
+          }
+        ],
+        "gaps": [
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "kpk-client",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "ucp-service",
+            "transport_role": "response",
+            "field_path": "individual.birthDate",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "ucp-service",
+            "transport_role": "response",
+            "field_path": "individual.email",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "ucp-service",
+            "transport_role": "response",
+            "field_path": "individual.firstName",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "ucp-service",
+            "transport_role": "response",
+            "field_path": "individual.lastName",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "ucp-service",
+            "transport_role": "response",
+            "field_path": "individual.phone",
+            "side": "crossing"
+          }
+        ],
+        "summary": {
+          "journey_count": 6,
+          "resolved_crossing_count": 0,
+          "partial_crossing_count": 6,
+          "source_local_anchor_gap_count": 0,
+          "source_material_semantic_gap_count": 0,
+          "source_external_origin_link_gap_count": 0,
+          "target_local_anchor_gap_count": 0,
+          "gap_count": 6
+        },
+        "content_fingerprint": "f5b2a8038a29dd859f8fa45a05cd7c3081807b2f7a6a3e4a5108148c385e04da"
+      }
+    },
+    {
+      "edge_id": "edge-profile-kpk",
+      "result": {
+        "format": "interaction-attribute-lineage/v1",
+        "topology_id": "synthetic-ucp-kpk-profile-analytics",
+        "topology_fingerprint": "092d26404274c0a2a0967af7dcec9b3293dda7ebc83faf23118104049f36d262",
+        "edge": {
+          "edge_id": "edge-profile-kpk",
+          "protocol": "http",
+          "method": "GET",
+          "matched_identity": "/api/client/profile",
+          "status": "candidate",
+          "basis": [
+            {
+              "kind": "matched_http_method_route",
+              "method": "GET",
+              "route": "/api/client/profile",
+              "evidence_id": "inventory:edge-profile-kpk:route"
+            }
+          ],
+          "source_repository_id": "profile-fl-loader",
+          "target_repository_id": "kpk-client"
+        },
+        "aisl_inputs": [
+          {
+            "repository_id": "kpk-client",
+            "system_id": "synthetic-kpk",
+            "revision_id": "synthetic-rev-kpk-20261011"
+          },
+          {
+            "repository_id": "profile-fl-loader",
+            "system_id": "synthetic-profile-fl",
+            "revision_id": "synthetic-rev-profile-fl-20261011"
+          }
+        ],
+        "journeys": [
+          {
+            "journey_id": "interaction_attribute_journey_789cac34220e2573920fb7e0",
+            "edge_id": "edge-profile-kpk",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "source_repository_id": "profile-fl-loader",
+            "target_repository_id": "kpk-client",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-profile-kpk.Request",
+              "target_payload_identity": "example.contract.edge-profile-kpk.Request",
+              "source_interface_ids": [
+                "edge-profile-kpk:outbound"
+              ],
+              "target_interface_ids": [
+                "edge-profile-kpk:inbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/client/profile:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-d8f92cdca91a37c8",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 61,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-d8f92cdca91a37c8",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 61,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-d8f92cdca91a37c8",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 61,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-84782edc9309629c",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.loader.customerId",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 149,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-f1a99a20cc6caacc",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-6db1837f6e534e27",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.request.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 145,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-d8f92cdca91a37c8",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 61,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-4b79c88d2a94db9e",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-84782edc9309629c",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.loader.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 149,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-6db1837f6e534e27",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.request.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 145,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/client/profile:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-432a6073c7fffcce",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 184,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-432a6073c7fffcce",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 184,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-432a6073c7fffcce",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 184,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-b0a5f55382297276",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.lookupKey",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 136,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-af7734c926a4424e",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-432a6073c7fffcce",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:request.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 184,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-70daa4b7450f7dfd",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.controller.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 15,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-6cea2e5495307e37",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-70daa4b7450f7dfd",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.controller.customerId",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 15,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-b0a5f55382297276",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.lookupKey",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 136,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_94c2d797c875bd97613b722a",
+            "edge_id": "edge-profile-kpk",
+            "transport_role": "response",
+            "field_path": "profile.age",
+            "source_repository_id": "kpk-client",
+            "target_repository_id": "profile-fl-loader",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "target_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "source_interface_ids": [
+                "edge-profile-kpk:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-profile-kpk:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response profile.age",
+              "attempted_anchors": [
+                "HTTP response profile.age",
+                "boundary:rest:/api/client/profile:response.profile.age",
+                "profile.age"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-cd0cf39add777f13",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 50,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-cd0cf39add777f13",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 50,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-cd0cf39add777f13",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 50,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-df98fa7069adf3f9",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.age",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 167,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-cd620fa19010d0a8",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-7a4dce6be6bc3cbf",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.age",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 166,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-cd0cf39add777f13",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 50,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-9a741041b5548d2e",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-df98fa7069adf3f9",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.age",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 167,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-7a4dce6be6bc3cbf",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.age",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 166,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response profile.age",
+              "attempted_anchors": [
+                "HTTP response profile.age",
+                "boundary:rest:/api/client/profile:response.profile.age",
+                "profile.age"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-5bf92bdf63ce7c59",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 41,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-5bf92bdf63ce7c59",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 41,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-5bf92bdf63ce7c59",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 41,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-42c798fe976e4898",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.age",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 178,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-08df0448370e2305",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-5bf92bdf63ce7c59",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 41,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-07126aa9e42ceb8a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-c527206efc9d2d81",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-07126aa9e42ceb8a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-42c798fe976e4898",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 178,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    },
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-5bf92bdf63ce7c59",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 41,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-2a0479c27469cf23",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.ageBucket",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 142,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-08df0448370e2305",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-5bf92bdf63ce7c59",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 41,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-07126aa9e42ceb8a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-d892cd101b2d1c06",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-07126aa9e42ceb8a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.age",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 123,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-38fa30460e09fbc3",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "derivation",
+                            "display_ref": "ProfileFL.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 21,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "ProfileFL.ageBucket"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-d2af6b60f48952f2",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-38fa30460e09fbc3",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "derivation",
+                            "display_ref": "ProfileFL.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 21,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-2a0479c27469cf23",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 142,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "ProfileFL.ageBucket"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_c878a8d186f7475a94454931",
+            "edge_id": "edge-profile-kpk",
+            "transport_role": "response",
+            "field_path": "profile.fullName",
+            "source_repository_id": "kpk-client",
+            "target_repository_id": "profile-fl-loader",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "target_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "source_interface_ids": [
+                "edge-profile-kpk:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-profile-kpk:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response profile.fullname",
+              "attempted_anchors": [
+                "HTTP response profile.fullname",
+                "boundary:rest:/api/client/profile:response.profile.fullName",
+                "profile.fullName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-45f0d6fbea8a38d8",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 49,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-45f0d6fbea8a38d8",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 49,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-45f0d6fbea8a38d8",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 49,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-679516f575b2d7d5",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.fullName",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 47,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-9903793ecc2c364d",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-a039f0a47b97a824",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 53,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-45f0d6fbea8a38d8",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 49,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-8712e193c6451ad4",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-679516f575b2d7d5",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 47,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-a039f0a47b97a824",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.fullName",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 53,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response profile.fullname",
+              "attempted_anchors": [
+                "HTTP response profile.fullname",
+                "boundary:rest:/api/client/profile:response.profile.fullName",
+                "profile.fullName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-7be479576221079f",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 12,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-7be479576221079f",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 12,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-7be479576221079f",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 12,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-2a583becec31821d",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.fullName",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 147,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-8ff65713fde60983",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-7be479576221079f",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.fullName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 12,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-26ee58fd773b8368",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.fullName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 92,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-1adc1c6ac5565f91",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-26ee58fd773b8368",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.fullName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 92,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-2a583becec31821d",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.fullName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_931d229b5a44d809213890a6",
+            "edge_id": "edge-profile-kpk",
+            "transport_role": "response",
+            "field_path": "profile.maskedPhone",
+            "source_repository_id": "kpk-client",
+            "target_repository_id": "profile-fl-loader",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "target_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "source_interface_ids": [
+                "edge-profile-kpk:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-profile-kpk:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response profile.maskedphone",
+              "attempted_anchors": [
+                "HTTP response profile.maskedphone",
+                "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                "profile.maskedPhone"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-bdaaefd4d698c443",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 164,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-bdaaefd4d698c443",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 164,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-bdaaefd4d698c443",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 164,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-557f900b247b3b69",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.dto.individual.phone",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 117,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-88395c88ee9c37b6",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-87ef30767048070f",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.maskedPhone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 24,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-bdaaefd4d698c443",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 164,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-5400ff5fac009780",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-c5285b891c08e723",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.maskPhone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 104,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-87ef30767048070f",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.maskedPhone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 24,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.maskPhone"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-910a9fafd6b4c6c1",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-557f900b247b3b69",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.dto.individual.phone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 117,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-c5285b891c08e723",
+                            "repo_id": "kpk-client",
+                            "node_kind": "derivation",
+                            "display_ref": "KPK.maskPhone",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 104,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "KPK.maskPhone"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response profile.maskedphone",
+              "attempted_anchors": [
+                "HTTP response profile.maskedphone",
+                "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                "profile.maskedPhone"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-ced2cc1892989a33",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 79,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-ced2cc1892989a33",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 79,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 1,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-ced2cc1892989a33",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 79,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-d7e79b600c91c38c",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.stage.maskedPhone",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 44,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-af6c1dd8ba4d9436",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-ced2cc1892989a33",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.maskedPhone",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 79,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-d7e79b600c91c38c",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.maskedPhone",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 44,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_99f4c579283cbba495d36af7",
+            "edge_id": "edge-profile-kpk",
+            "transport_role": "response",
+            "field_path": "profile.primaryEmail",
+            "source_repository_id": "kpk-client",
+            "target_repository_id": "profile-fl-loader",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "target_payload_identity": "example.contract.edge-profile-kpk.Response",
+              "source_interface_ids": [
+                "edge-profile-kpk:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-profile-kpk:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "kpk-client",
+              "system_id": "synthetic-kpk",
+              "revision_id": "synthetic-rev-kpk-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response profile.primaryemail",
+              "attempted_anchors": [
+                "HTTP response profile.primaryemail",
+                "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                "profile.primaryEmail"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-f5dedbd6bc0c8e0f",
+                "repo_id": "kpk-client",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                "operation": "example.kpk_client.resolve",
+                "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                "source_line": 163,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-kpk",
+                "revision_id": "synthetic-rev-kpk-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-f5dedbd6bc0c8e0f",
+                    "repo_id": "kpk-client",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                    "operation": "example.kpk_client.resolve",
+                    "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                    "source_line": 163,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-f5dedbd6bc0c8e0f",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 163,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-b153ea8f12c2472f",
+                        "repo_id": "kpk-client",
+                        "node_kind": "field",
+                        "display_ref": "KPK.profile.primaryEmail",
+                        "operation": "example.kpk_client.resolve",
+                        "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                        "source_line": 147,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-5d36fefa06236d9b",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-b159c9cdd3864a7a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.primaryEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-f5dedbd6bc0c8e0f",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 163,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-fb9b47d296c401fc",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-b153ea8f12c2472f",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.profile.primaryEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-b159c9cdd3864a7a",
+                            "repo_id": "kpk-client",
+                            "node_kind": "field",
+                            "display_ref": "KPK.response.profile.primaryEmail",
+                            "operation": "example.kpk_client.resolve",
+                            "source_path": "src/main/java/example/kpk_client/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response profile.primaryemail",
+              "attempted_anchors": [
+                "HTTP response profile.primaryemail",
+                "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                "profile.primaryEmail"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-fff65655e7d6e41b",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 145,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-fff65655e7d6e41b",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 145,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 3,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-fff65655e7d6e41b",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 145,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-1b96ebe806fc48e5",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.emailDomain",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 91,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-6f22fb9fa01fe162",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-fff65655e7d6e41b",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 145,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-5e6ef661250be844",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 80,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-60b204a175a10f18",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-5e6ef661250be844",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 80,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-374d87d08e8b8c83",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "derivation",
+                            "display_ref": "ProfileFL.emailDomain",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 174,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "ProfileFL.emailDomain"
+                          }
+                        },
+                        {
+                          "value_flow_edge_id": "flow-2d6630cf8dfaaf82",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-374d87d08e8b8c83",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "derivation",
+                            "display_ref": "ProfileFL.emailDomain",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 174,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-1b96ebe806fc48e5",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.emailDomain",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 91,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow",
+                          "transformation": {
+                            "kind": "derived_value",
+                            "expression": "ProfileFL.emailDomain"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-fff65655e7d6e41b",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 145,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-edc828bca83ba9e1",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.email",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 34,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-6f22fb9fa01fe162",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-fff65655e7d6e41b",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/client/profile:response.profile.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 145,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-5e6ef661250be844",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 80,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-70bf32bf7fd39155",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-5e6ef661250be844",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.stage.primaryEmail",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 80,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-edc828bca83ba9e1",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.email",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 34,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          }
+        ],
+        "gaps": [
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "profile-fl-loader",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "kpk-client",
+            "transport_role": "response",
+            "field_path": "profile.age",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "kpk-client",
+            "transport_role": "response",
+            "field_path": "profile.fullName",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "kpk-client",
+            "transport_role": "response",
+            "field_path": "profile.maskedPhone",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "kpk-client",
+            "transport_role": "response",
+            "field_path": "profile.primaryEmail",
+            "side": "crossing"
+          }
+        ],
+        "summary": {
+          "journey_count": 5,
+          "resolved_crossing_count": 0,
+          "partial_crossing_count": 5,
+          "source_local_anchor_gap_count": 0,
+          "source_material_semantic_gap_count": 0,
+          "source_external_origin_link_gap_count": 0,
+          "target_local_anchor_gap_count": 0,
+          "gap_count": 5
+        },
+        "content_fingerprint": "a36093c627362d59970c622f8819d86e064a79a563c51f8b9e1c597d4725a6d1"
+      }
+    },
+    {
+      "edge_id": "edge-analytics-profile",
+      "result": {
+        "format": "interaction-attribute-lineage/v1",
+        "topology_id": "synthetic-ucp-kpk-profile-analytics",
+        "topology_fingerprint": "092d26404274c0a2a0967af7dcec9b3293dda7ebc83faf23118104049f36d262",
+        "edge": {
+          "edge_id": "edge-analytics-profile",
+          "protocol": "http",
+          "method": "GET",
+          "matched_identity": "/api/profile/summary",
+          "status": "candidate",
+          "basis": [
+            {
+              "kind": "matched_http_method_route",
+              "method": "GET",
+              "route": "/api/profile/summary",
+              "evidence_id": "inventory:edge-analytics-profile:route"
+            }
+          ],
+          "source_repository_id": "analytics-ui",
+          "target_repository_id": "profile-fl-loader"
+        },
+        "aisl_inputs": [
+          {
+            "repository_id": "analytics-ui",
+            "system_id": "synthetic-analytics",
+            "revision_id": "synthetic-rev-analytics-20261011"
+          },
+          {
+            "repository_id": "profile-fl-loader",
+            "system_id": "synthetic-profile-fl",
+            "revision_id": "synthetic-rev-profile-fl-20261011"
+          }
+        ],
+        "journeys": [
+          {
+            "journey_id": "interaction_attribute_journey_d3f3bc49efac159a46af17b1",
+            "edge_id": "edge-analytics-profile",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "source_repository_id": "analytics-ui",
+            "target_repository_id": "profile-fl-loader",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-analytics-profile.Request",
+              "target_payload_identity": "example.contract.edge-analytics-profile.Request",
+              "source_interface_ids": [
+                "edge-analytics-profile:outbound"
+              ],
+              "target_interface_ids": [
+                "edge-analytics-profile:inbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "analytics-ui",
+              "system_id": "synthetic-analytics",
+              "revision_id": "synthetic-rev-analytics-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/profile/summary:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-54a2500d56908172",
+                "repo_id": "analytics-ui",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                "operation": "example.analytics_ui.resolve",
+                "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                "source_line": 104,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-analytics",
+                "revision_id": "synthetic-rev-analytics-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-54a2500d56908172",
+                    "repo_id": "analytics-ui",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                    "operation": "example.analytics_ui.resolve",
+                    "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                    "source_line": 104,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 1,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-54a2500d56908172",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 104,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-92af1b67f90a47ce",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "AnalyticsUI.filters.customerId",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 16,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-73d2d95b83946d4d",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-92af1b67f90a47ce",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.filters.customerId",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 16,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-54a2500d56908172",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 104,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP request customerid",
+              "attempted_anchors": [
+                "HTTP request customerid",
+                "boundary:rest:/api/profile/summary:request.customerId",
+                "customerId",
+                "this.customerId"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-fa71df544a6a389c",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 57,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-fa71df544a6a389c",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 57,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-fa71df544a6a389c",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 57,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-874c3ce1c37d1355",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.customerId",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 14,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-244188441c21e057",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-fa71df544a6a389c",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:request.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 57,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-1723b05f838eb495",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 20,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-bef87de185f33e93",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-1723b05f838eb495",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 20,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-874c3ce1c37d1355",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.customerId",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 14,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_06bfd5ffa302056f88b9a8c1",
+            "edge_id": "edge-analytics-profile",
+            "transport_role": "response",
+            "field_path": "customer.ageBucket",
+            "source_repository_id": "profile-fl-loader",
+            "target_repository_id": "analytics-ui",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "target_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "source_interface_ids": [
+                "edge-analytics-profile:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-analytics-profile:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response customer.agebucket",
+              "attempted_anchors": [
+                "HTTP response customer.agebucket",
+                "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                "customer.ageBucket"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-2a18bd15ecf4fbce",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 143,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-2a18bd15ecf4fbce",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 143,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-2a18bd15ecf4fbce",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 143,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-2a0479c27469cf23",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.ageBucket",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 142,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-71abb91ea2b8a00d",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-63137118e4afd1c3",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customer.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 155,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-2a18bd15ecf4fbce",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 143,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-676690454d368827",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-2a0479c27469cf23",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 142,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-63137118e4afd1c3",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customer.ageBucket",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 155,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "analytics-ui",
+              "system_id": "synthetic-analytics",
+              "revision_id": "synthetic-rev-analytics-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response customer.agebucket",
+              "attempted_anchors": [
+                "HTTP response customer.agebucket",
+                "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                "customer.ageBucket"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-a19026c24ba0a74b",
+                "repo_id": "analytics-ui",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                "operation": "example.analytics_ui.resolve",
+                "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                "source_line": 75,
+                "type_ref": "Object"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-analytics",
+                "revision_id": "synthetic-rev-analytics-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-a19026c24ba0a74b",
+                    "repo_id": "analytics-ui",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                    "operation": "example.analytics_ui.resolve",
+                    "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                    "source_line": 75,
+                    "type_ref": "Object"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-a19026c24ba0a74b",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 75,
+                        "type_ref": "Object"
+                      },
+                      "end": {
+                        "value_node_id": "value-d49948e740a9d262",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "AnalyticsUI.chart.ageBucket",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 171,
+                        "type_ref": "Object"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-82669cb744b920a7",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-a19026c24ba0a74b",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:response.customer.ageBucket",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 75,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-872acdbc5be3892d",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.widget.ageDistribution",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 12,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-b0e01d67e8272e3c",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-872acdbc5be3892d",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.widget.ageDistribution",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 12,
+                            "type_ref": "Object"
+                          },
+                          "target": {
+                            "value_node_id": "value-d49948e740a9d262",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.chart.ageBucket",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 171,
+                            "type_ref": "Object"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_55c3c23bf4278dd11ddeebe7",
+            "edge_id": "edge-analytics-profile",
+            "transport_role": "response",
+            "field_path": "customer.displayName",
+            "source_repository_id": "profile-fl-loader",
+            "target_repository_id": "analytics-ui",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "target_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "source_interface_ids": [
+                "edge-analytics-profile:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-analytics-profile:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response customer.displayname",
+              "attempted_anchors": [
+                "HTTP response customer.displayname",
+                "boundary:rest:/api/profile/summary:response.customer.displayName",
+                "customer.displayName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-6ff1685d24b0b846",
+                "repo_id": "profile-fl-loader",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                "operation": "example.profile_fl_loader.resolve",
+                "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                "source_line": 181,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-6ff1685d24b0b846",
+                    "repo_id": "profile-fl-loader",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                    "operation": "example.profile_fl_loader.resolve",
+                    "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                    "source_line": 181,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 2,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-6ff1685d24b0b846",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 181,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-2a583becec31821d",
+                        "repo_id": "profile-fl-loader",
+                        "node_kind": "field",
+                        "display_ref": "ProfileFL.mart.fullName",
+                        "operation": "example.profile_fl_loader.resolve",
+                        "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                        "source_line": 147,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-5eaec928852cbb8c",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-7947e7fa4ab1268a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customer.displayName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 150,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-6ff1685d24b0b846",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 181,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        },
+                        {
+                          "value_flow_edge_id": "flow-1a9ec768ba3c04fe",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-2a583becec31821d",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.mart.fullName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-7947e7fa4ab1268a",
+                            "repo_id": "profile-fl-loader",
+                            "node_kind": "field",
+                            "display_ref": "ProfileFL.api.customer.displayName",
+                            "operation": "example.profile_fl_loader.resolve",
+                            "source_path": "src/main/java/example/profile_fl_loader/ExampleFlow.java",
+                            "source_line": 150,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "analytics-ui",
+              "system_id": "synthetic-analytics",
+              "revision_id": "synthetic-rev-analytics-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response customer.displayname",
+              "attempted_anchors": [
+                "HTTP response customer.displayname",
+                "boundary:rest:/api/profile/summary:response.customer.displayName",
+                "customer.displayName"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-f4d778904aab781c",
+                "repo_id": "analytics-ui",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                "operation": "example.analytics_ui.resolve",
+                "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                "source_line": 147,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-analytics",
+                "revision_id": "synthetic-rev-analytics-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-f4d778904aab781c",
+                    "repo_id": "analytics-ui",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                    "operation": "example.analytics_ui.resolve",
+                    "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                    "source_line": 147,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 1,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-f4d778904aab781c",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 147,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-819317cb63c0ac99",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "AnalyticsUI.card.displayName",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 103,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-c7ce306d2aeb3c61",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-f4d778904aab781c",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:response.customer.displayName",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 147,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-819317cb63c0ac99",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.card.displayName",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 103,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          },
+          {
+            "journey_id": "interaction_attribute_journey_04ec15ae6d7edb2e70ab8572",
+            "edge_id": "edge-analytics-profile",
+            "transport_role": "response",
+            "field_path": "customer.emailDomain",
+            "source_repository_id": "profile-fl-loader",
+            "target_repository_id": "analytics-ui",
+            "topology_basis": "inventory_observed_candidate_field",
+            "crossing": {
+              "status": "candidate",
+              "basis": "topology_v5_candidate_not_independently_verified",
+              "source_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "target_payload_identity": "example.contract.edge-analytics-profile.Response",
+              "source_interface_ids": [
+                "edge-analytics-profile:inbound"
+              ],
+              "target_interface_ids": [
+                "edge-analytics-profile:outbound"
+              ]
+            },
+            "source_side": {
+              "repository_id": "profile-fl-loader",
+              "system_id": "synthetic-profile-fl",
+              "revision_id": "synthetic-rev-profile-fl-20261011",
+              "direction": "reverse",
+              "requested_anchor": "HTTP response customer.emaildomain",
+              "attempted_anchors": [
+                "HTTP response customer.emaildomain",
+                "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                "customer.emailDomain"
+              ],
+              "resolved_anchor": null,
+              "anchor_status": "unresolved",
+              "anchor_selection_basis": "exact_topology_field_path:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-profile-fl",
+                "revision_id": "synthetic-rev-profile-fl-20261011",
+                "result": {
+                  "status": "source_not_found",
+                  "paths": [],
+                  "gaps": [
+                    {
+                      "reason": "no_exact_published_source_anchor"
+                    }
+                  ]
+                }
+              }
+            },
+            "target_side": {
+              "repository_id": "analytics-ui",
+              "system_id": "synthetic-analytics",
+              "revision_id": "synthetic-rev-analytics-20261011",
+              "direction": "forward",
+              "requested_anchor": "HTTP response customer.emaildomain",
+              "attempted_anchors": [
+                "HTTP response customer.emaildomain",
+                "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                "customer.emailDomain"
+              ],
+              "resolved_anchor": {
+                "value_node_id": "value-d667d010f7cbbcb0",
+                "repo_id": "analytics-ui",
+                "node_kind": "field",
+                "display_ref": "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                "operation": "example.analytics_ui.resolve",
+                "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                "source_line": 20,
+                "type_ref": "String"
+              },
+              "anchor_status": "resolved",
+              "anchor_selection_basis": "exact_topology_route_boundary:unique_exact_display_ref",
+              "query": {
+                "schema_version": "knowledge_attribute_path_query/v1",
+                "system_id": "synthetic-analytics",
+                "revision_id": "synthetic-rev-analytics-20261011",
+                "result": {
+                  "status": "confirmed_complete",
+                  "source": {
+                    "value_node_id": "value-d667d010f7cbbcb0",
+                    "repo_id": "analytics-ui",
+                    "node_kind": "field",
+                    "display_ref": "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                    "operation": "example.analytics_ui.resolve",
+                    "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                    "source_line": 20,
+                    "type_ref": "String"
+                  },
+                  "paths": [
+                    {
+                      "status": "complete",
+                      "hop_count": 1,
+                      "confidence": "confirmed",
+                      "start": {
+                        "value_node_id": "value-d667d010f7cbbcb0",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 20,
+                        "type_ref": "String"
+                      },
+                      "end": {
+                        "value_node_id": "value-0da7f262d8502e7a",
+                        "repo_id": "analytics-ui",
+                        "node_kind": "field",
+                        "display_ref": "AnalyticsUI.widget.emailDomain",
+                        "operation": "example.analytics_ui.resolve",
+                        "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                        "source_line": 48,
+                        "type_ref": "String"
+                      },
+                      "steps": [
+                        {
+                          "value_flow_edge_id": "flow-f455b29c6b888509",
+                          "flow_kind": "value_flow",
+                          "source": {
+                            "value_node_id": "value-d667d010f7cbbcb0",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "boundary:rest:/api/profile/summary:response.customer.emailDomain",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 20,
+                            "type_ref": "String"
+                          },
+                          "target": {
+                            "value_node_id": "value-0da7f262d8502e7a",
+                            "repo_id": "analytics-ui",
+                            "node_kind": "field",
+                            "display_ref": "AnalyticsUI.widget.emailDomain",
+                            "operation": "example.analytics_ui.resolve",
+                            "source_path": "src/main/java/example/analytics_ui/ExampleFlow.java",
+                            "source_line": 48,
+                            "type_ref": "String"
+                          },
+                          "confidence": "confirmed",
+                          "basis": "synthetic_published_local_value_flow"
+                        }
+                      ]
+                    }
+                  ],
+                  "gaps": []
+                }
+              }
+            }
+          }
+        ],
+        "gaps": [
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "analytics-ui",
+            "transport_role": "request",
+            "field_path": "customerId",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "profile-fl-loader",
+            "transport_role": "response",
+            "field_path": "customer.ageBucket",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "profile-fl-loader",
+            "transport_role": "response",
+            "field_path": "customer.displayName",
+            "side": "crossing"
+          },
+          {
+            "reason": "candidate_transport_crossing_unverified",
+            "repository_id": "profile-fl-loader",
+            "transport_role": "response",
+            "field_path": "customer.emailDomain",
+            "side": "crossing"
+          },
+          {
+            "reason": "source_local_anchor_unresolved",
+            "repository_id": "profile-fl-loader",
+            "transport_role": "response",
+            "field_path": "customer.emailDomain",
+            "side": "source"
+          }
+        ],
+        "summary": {
+          "journey_count": 4,
+          "resolved_crossing_count": 0,
+          "partial_crossing_count": 4,
+          "source_local_anchor_gap_count": 1,
+          "source_material_semantic_gap_count": 0,
+          "source_external_origin_link_gap_count": 0,
+          "target_local_anchor_gap_count": 0,
+          "gap_count": 5
+        },
+        "content_fingerprint": "32e1e317ecf69e421bf80580de74fea7b46a8450b93b2a4fadd7ae6766186af5"
+      }
+    }
+  ],
+  "summary": {
+    "candidate_edge_count": 3,
+    "processed_edge_count": 3,
+    "failed_or_blocked_count": 0,
+    "framework_invocation_count": 0,
+    "deferred_group_count": 0
+  }
+}
+;
