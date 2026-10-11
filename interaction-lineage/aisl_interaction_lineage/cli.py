@@ -14,6 +14,7 @@ from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings, BINDINGS_SCHEMA_VERSION
 from .human_csv import write_human_csv
 from .prepare import KnowledgeControlPlaneGateway, PreparationBudget, prepare_interaction_lineage
+from .repository_sources import load_inventory_remote_sources, KcpRepositoryRegistrar
 from .topology import validate_topology
 
 
@@ -66,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
                          help="Hard limit on total KCP calls across all selected edges (default: 1; 0 = no KCP calls)")
     prepare.add_argument("--max-kcp-steps", type=int, default=1,
                          help="KCP-enforced max_steps per call, 1..32 (default: 1)")
+    prepare.add_argument("--inventory-manifest", action="append", default=[],
+                         help="Inventory remote_batch_manifest.json or parent directory; repeat for UCP and KPK. Required to auto-register sources; omit for existing KCP registration")
     prepare.add_argument("--progress-jsonl",
                          help="Append sanitized progress events as JSON lines and also emit them to stderr")
 
@@ -97,6 +100,15 @@ def main(argv: list[str] | None = None) -> int:
         kcp = KnowledgeControlPlaneGateway(args.kcp_base_url) if args.command == "prepare" else None
         budget = (PreparationBudget(args.max_preparations, args.max_kcp_steps)
                   if args.command == "prepare" else None)
+        selected_source_ids = {
+            str(edge.get(key) or "").strip()
+            for edge in topology.get("edges") or () if isinstance(edge, Mapping)
+            and (args.all_edges or str(edge.get("edge_id") or "") in edge_ids)
+            for key in ("source_repository_id", "target_repository_id")
+        }
+        registrar = (KcpRepositoryRegistrar(args.kcp_base_url, load_inventory_remote_sources(
+            args.inventory_manifest, selected_ids=selected_source_ids))
+                     if args.command == "prepare" and args.inventory_manifest else None)
 
         def progress(event: Mapping[str, Any]) -> None:
             item = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), **dict(event)}
@@ -120,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
                         topology, edge_id=edge_id, bindings=bindings,
                         readiness_gateway=query_gateway, preparation_gateway=kcp,
                         transport_roles=roles, budget=budget, progress=progress,
+                        ensure_repository=registrar.ensure if registrar is not None else None,
                     )
                     updated = item.get("bindings")
                     if isinstance(updated, Mapping):
