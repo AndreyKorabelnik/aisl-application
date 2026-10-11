@@ -273,3 +273,38 @@ Topology v5 `source_snapshot_fingerprint` and KCP source fingerprints are
 can be started. A field or interaction remains a `candidate` until sufficiently
 supported by the published evidence; absence of a field probe remains an
 explicit gap, not a proven negative interaction.
+
+## Task 51 Inventory → KCP selected-source registration
+
+An optional `prepare --inventory-manifest` (repeatable) bridges **only** the selected
+candidate source to KCP's existing repository registry. Use the actual
+`remote_batch_manifest.json` written by the UCP/КПК Inventory discovery runs:
+
+```bash
+interaction-lineage prepare \
+  --topology topology.json --edge-id '<selected-edge-id>' \
+  --inventory-manifest inventories/ucp/remote_batch_manifest.json \
+  --inventory-manifest inventories/kpk/remote_batch_manifest.json \
+  --aisl-base-url http://localhost:8080 --kcp-base-url http://localhost:8000 \
+  --max-preparations 1 --max-kcp-steps 1 \
+  --progress-jsonl progress.jsonl --output preparation.json
+```
+
+The Application reads only verified successful (`completed`/`reused`) Inventory
+records containing a Git URL, source repository id and exact observed commit.
+It **does not** rediscover repositories using remote APIs, register every Inventory
+repository, fetch code, or initiate analysis on registration. Before a budgeted
+KCP preparation it checks the KCP registry for exactly one compatible source;
+if missing it POSTs `/api/v1/repositories/discover` using `defer_checkout=true`,
+`refresh=false`, then verifies the registered record. Conflicting/ambiguous
+registrations or unavailable Inventory records stop that edge, not silently
+fall back to a different remote. Without `--inventory-manifest`, the previous
+explicitly pre-registered-KCP path is unchanged.
+
+**Revision limitation:** KCP discovery tracks a Git ref and does not itself
+pin the Inventory observed commit. Registration progress distinguishes
+`registered_ref_unverified` from `registered_exact_snapshot`, retaining
+`inventory_resolved_commit`; KCP/Runner remains responsible for immutable
+source snapshots at analysis time. Do not equate `registered_ref_unverified`
+with analysis of the exact Inventory commit. A moved branch needs a separate
+identity audit before claiming snapshot parity.

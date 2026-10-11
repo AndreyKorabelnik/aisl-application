@@ -40,6 +40,7 @@ class PreparationBudget:
 
 
 ProgressSink = Callable[[Mapping[str, Any]], None]
+RepositoryEnsure = Callable[[str], Mapping[str, Any]]
 
 def _repo_ids(edge: Mapping[str, Any], roles: Sequence[str]) -> list[str]:
     values: set[str] = set()
@@ -193,6 +194,7 @@ def prepare_interaction_lineage(
     transport_roles: Sequence[str] = ("request", "response"),
     budget: PreparationBudget | None = None,
     progress: ProgressSink | None = None,
+    ensure_repository: RepositoryEnsure | None = None,
 ) -> dict[str, Any]:
     edge = select_edge(topology, edge_id)
     repository_ids = _repo_ids(edge, transport_roles)
@@ -337,6 +339,12 @@ def prepare_interaction_lineage(
             selector_context.setdefault("repository_id", repository_id)
             selector_context.setdefault("system_id", str(representative.get("system_id") or ""))
             selector_context.pop("attribute_path", None)
+        registration = None
+        if ensure_repository is not None and repository_id:
+            registration = dict(ensure_repository(repository_id))
+            if progress is not None:
+                progress({"event": "repository.registration_checked", "edge_id": edge_id,
+                          "repository_id": repository_id, **registration})
         request = {
             "consumer_id": "interaction-lineage",
             "journey_id": journey_id,
@@ -366,6 +374,20 @@ def prepare_interaction_lineage(
                           "repository_id": repository_id, "elapsed_seconds": round(time.monotonic() - started, 3),
                           "exception_type": type(exc).__name__})
             raise
+        # Registration tracks a Git ref, not the Inventory snapshot itself.
+        # A published Framework step must report exactly the observed commit.
+        if registration is not None:
+            expected_commit = str(registration.get("inventory_resolved_commit") or "").lower()
+            if not expected_commit:
+                raise RuntimeError("Inventory snapshot commit missing from KCP registration evidence")
+            for step in result.get("steps") or ():
+                if not isinstance(step, Mapping) or step.get("status") != "published":
+                    continue
+                refs = [ref for ref in step.get("source_provenance_refs") or ()
+                        if isinstance(ref, Mapping) and ref.get("source_kind") == "repository"
+                        and ref.get("repository_id") == repository_id]
+                if len(refs) != 1 or str(refs[0].get("revision") or "").lower() != expected_commit:
+                    raise RuntimeError(f"KCP prepared source revision does not match Inventory resolved commit: {repository_id}")
         elapsed = round(time.monotonic() - started, 3)
         if progress is not None:
             source_ids = sorted({
