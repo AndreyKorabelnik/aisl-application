@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -12,7 +13,7 @@ from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings, BINDINGS_SCHEMA_VERSION
 from .human_csv import write_human_csv
-from .prepare import KnowledgeControlPlaneGateway, prepare_interaction_lineage
+from .prepare import KnowledgeControlPlaneGateway, PreparationBudget, prepare_interaction_lineage
 from .topology import validate_topology
 
 
@@ -61,6 +62,12 @@ def main(argv: list[str] | None = None) -> int:
     prepare.add_argument("--kcp-base-url", required=True)
     prepare.add_argument("--transport-role", choices=("request", "response", "all"), default="all")
     prepare.add_argument("--output", required=True)
+    prepare.add_argument("--max-preparations", type=int, default=1,
+                         help="Hard limit on total KCP calls across all selected edges (default: 1; 0 = no KCP calls)")
+    prepare.add_argument("--max-kcp-steps", type=int, default=1,
+                         help="KCP-enforced max_steps per call, 1..32 (default: 1)")
+    prepare.add_argument("--progress-jsonl",
+                         help="Append sanitized progress events as JSON lines and also emit them to stderr")
 
     args = parser.parse_args(argv)
     if args.command == "csv":
@@ -88,6 +95,17 @@ def main(argv: list[str] | None = None) -> int:
                          if args.all_edges and args.command in ("check", "build")
                          else gateway)
         kcp = KnowledgeControlPlaneGateway(args.kcp_base_url) if args.command == "prepare" else None
+        budget = (PreparationBudget(args.max_preparations, args.max_kcp_steps)
+                  if args.command == "prepare" else None)
+
+        def progress(event: Mapping[str, Any]) -> None:
+            item = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), **dict(event)}
+            line = json.dumps(item, ensure_ascii=False, sort_keys=True)
+            print(line, file=sys.stderr, flush=True)
+            if args.progress_jsonl:
+                with Path(args.progress_jsonl).open("a", encoding="utf-8") as log:
+                    log.write(line + "\n")
+
         results: list[dict[str, Any]] = []
         for edge_id in edge_ids:
             try:
@@ -101,7 +119,7 @@ def main(argv: list[str] | None = None) -> int:
                     item = prepare_interaction_lineage(
                         topology, edge_id=edge_id, bindings=bindings,
                         readiness_gateway=query_gateway, preparation_gateway=kcp,
-                        transport_roles=roles,
+                        transport_roles=roles, budget=budget, progress=progress,
                     )
                     updated = item.get("bindings")
                     if isinstance(updated, Mapping):
@@ -125,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.all_edges:
             # A complete ledger even when individual candidates are unresolved.
             states = [str(item.get("status") or "candidate") for item in results]
-            bad = {"not_ready", "failed", "blocked", "no_progress", "step_limit"}
+            bad = {"not_ready", "failed", "blocked", "no_progress", "step_limit", "budget_exhausted"}
             output_status = "partial" if any(state in bad for state in states) else "complete"
             result = {
                 "format": "interaction-lineage-candidate-batch/v1",
@@ -138,6 +156,7 @@ def main(argv: list[str] | None = None) -> int:
                     "processed_edge_count": len(results),
                     "failed_or_blocked_count": sum(state in bad for state in states),
                     "framework_invocation_count": sum(int(item.get("summary", {}).get("framework_invocation_count") or 0) for item in results),
+                    "deferred_group_count": sum(int(item.get("summary", {}).get("deferred_group_count") or 0) for item in results),
                 },
             }
             if isinstance(query_gateway, BatchCachingGateway):
@@ -164,7 +183,7 @@ def main(argv: list[str] | None = None) -> int:
         if gateway is not None:
             gateway.close()
     Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit", "partial"} else 2
+    return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit", "partial", "budget_exhausted"} else 2
 
 
 if __name__ == "__main__":

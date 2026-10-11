@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Mapping, Protocol, Sequence
+import time
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping, Protocol, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -11,9 +13,33 @@ from .contracts import AislBinding, BINDINGS_SCHEMA_VERSION, BindingIndex
 from .topology import boundary_fields, select_edge
 
 PREPARATION_FORMAT = "interaction-lineage-preparation/v1"
-_PROFILE_ID = "interaction-lineage-attribute-lineage-v1"
+_PROFILE_ID = "attribute-lineage-v1"
 _REQUIRED_CAPABILITY = "workspace.attribute-path-resolver"
 
+
+
+@dataclass
+class PreparationBudget:
+    """One command-scoped ceiling across all selected edges; KCP enforces max_steps."""
+
+    max_preparations: int = 1
+    max_steps_per_preparation: int = 1
+    used: int = 0
+
+    def __post_init__(self) -> None:
+        if self.max_preparations < 0:
+            raise ValueError("max_preparations cannot be negative")
+        if not 1 <= self.max_steps_per_preparation <= 32:
+            raise ValueError("max_steps_per_preparation must be in [1, 32]")
+
+    def reserve(self) -> bool:
+        if self.used >= self.max_preparations:
+            return False
+        self.used += 1  # Fail closed even on transport timeout/exception.
+        return True
+
+
+ProgressSink = Callable[[Mapping[str, Any]], None]
 
 def _repo_ids(edge: Mapping[str, Any], roles: Sequence[str]) -> list[str]:
     values: set[str] = set()
@@ -165,6 +191,8 @@ def prepare_interaction_lineage(
     readiness_gateway: AislReadinessGateway,
     preparation_gateway: PreparationGateway,
     transport_roles: Sequence[str] = ("request", "response"),
+    budget: PreparationBudget | None = None,
+    progress: ProgressSink | None = None,
 ) -> dict[str, Any]:
     edge = select_edge(topology, edge_id)
     repository_ids = _repo_ids(edge, transport_roles)
@@ -263,7 +291,19 @@ def prepare_interaction_lineage(
         if (binding := bindings.find(repository_id)) is not None
     }
     framework_results: list[dict[str, Any]] = []
-    for group in groups:
+    deferred_groups: list[dict[str, Any]] = []
+    exhausted = False
+    for group_index, group in enumerate(groups):
+        if budget is not None and not budget.reserve():
+            exhausted = True
+            deferred_groups = [{
+                "reason": "preparation_budget_exhausted",
+                "requirements": [dict(item) for item in pending],
+            } for pending in groups[group_index:]]
+            if progress is not None:
+                progress({"event": "preparation.budget_exhausted", "edge_id": edge_id,
+                          "deferred_group_count": len(deferred_groups)})
+            break
         representative = sorted(
             group,
             key=lambda item: (
@@ -310,11 +350,40 @@ def prepare_interaction_lineage(
             ),
             "selector_context": selector_context,
         }
-        result = dict(preparation_gateway.run_preparation(request))
+        if budget is not None:
+            request["max_steps"] = budget.max_steps_per_preparation
+        started = time.monotonic()
+        if progress is not None:
+            progress({"event": "preparation.started", "edge_id": edge_id,
+                      "repository_id": repository_id, "group_index": group_index + 1,
+                      "group_count": len(groups), "profile_id": _PROFILE_ID,
+                      "max_steps": request.get("max_steps", 8)})
+        try:
+            result = dict(preparation_gateway.run_preparation(request))
+        except Exception as exc:
+            if progress is not None:
+                progress({"event": "preparation.failed", "edge_id": edge_id,
+                          "repository_id": repository_id, "elapsed_seconds": round(time.monotonic() - started, 3),
+                          "exception_type": type(exc).__name__})
+            raise
+        elapsed = round(time.monotonic() - started, 3)
+        if progress is not None:
+            source_ids = sorted({
+                str(source_id) for step in result.get("steps") or () if isinstance(step, Mapping)
+                for source in step.get("source_provenance_refs") or () if isinstance(source, Mapping)
+                for source_id in source.get("selected_source_ids") or () if str(source_id)
+            })
+            progress({"event": "preparation.completed", "edge_id": edge_id,
+                      "repository_id": repository_id, "outcome": result.get("outcome"),
+                      "elapsed_seconds": elapsed,
+                      "job_ids": [str(step.get("step_id")) for step in result.get("steps") or ()
+                                  if isinstance(step, Mapping) and step.get("step_id")],
+                      "selected_source_ids": source_ids})
         framework_results.append({
             "journey_id": journey_id,
             "repository_id": repository_id,
             "field_count": len(group),
+            "elapsed_seconds": elapsed,
             "outcome": result.get("outcome"),
             "initial_readiness": result.get("initial_readiness"),
             "final_readiness": result.get("final_readiness"),
@@ -324,6 +393,10 @@ def prepare_interaction_lineage(
         for repo, binding in _binding_updates(result).items():
             current[repo] = binding
         if str(result.get("outcome") or "") in {"blocked", "no_progress", "step_limit"}:
+            deferred_groups = [{
+                "reason": "previous_preparation_stopped",
+                "requirements": [dict(item) for item in pending],
+            } for pending in groups[group_index + 1:]]
             break
 
     if any(repository_id not in current for repository_id in repository_ids):
@@ -342,6 +415,8 @@ def prepare_interaction_lineage(
     outcomes = [str(item.get("outcome") or "") for item in framework_results]
     if success:
         status = "prepared"
+    elif exhausted:
+        status = "budget_exhausted"
     elif "no_progress" in outcomes:
         status = "no_progress"
     elif "step_limit" in outcomes:
@@ -354,11 +429,13 @@ def prepare_interaction_lineage(
         "topology_id": str(topology.get("topology_id") or ""),
         "edge_id": edge_id,
         "framework_preparations": framework_results,
+        "deferred_groups": deferred_groups,
         "bindings": final_bindings_payload,
         "readiness_before": before,
         "readiness_after": after,
         "summary": {
             "framework_invocation_count": len(framework_results),
+            "deferred_group_count": len(deferred_groups),
             "prepared_group_count": sum(
                 1 for item in framework_results
                 if item.get("outcome") in {"prepared", "resolved_terminal", "already_prepared"}
