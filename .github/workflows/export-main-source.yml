@@ -1,0 +1,87 @@
+name: Exact main source export
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: exact-main-source-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  export:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact event commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify source and archive it
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "AndreyKorabelnik/aisl-application"
+          test "$GITHUB_REF" = "refs/heads/main"
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SOURCE_TREE="$(git rev-parse HEAD^{tree})"
+          test "$SOURCE_SHA" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          mkdir -p "$RUNNER_TEMP/exact-source" "$RUNNER_TEMP/source-check"
+          ARCHIVE="$RUNNER_TEMP/exact-source/source-canonical.zip"
+          git archive --format=zip --output="$ARCHIVE" "$SOURCE_SHA"
+          # Restore ZIP file modes and symlinks before checking the Git tree.
+          python3 - "$ARCHIVE" "$RUNNER_TEMP/source-check" <<'PYTHON'
+          import os
+          from pathlib import Path, PurePosixPath
+          import stat
+          import sys
+          import zipfile
+
+          archive, root = sys.argv[1], Path(sys.argv[2])
+          with zipfile.ZipFile(archive) as source:
+              for entry in source.infolist():
+                  rel = PurePosixPath(entry.filename)
+                  if rel.is_absolute() or '..' in rel.parts:
+                      raise SystemExit('unsafe ZIP entry path')
+                  target = root.joinpath(*rel.parts)
+                  if entry.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  mode = entry.external_attr >> 16
+                  if stat.S_ISLNK(mode):
+                      os.symlink(source.read(entry).decode('utf-8'), target)
+                  else:
+                      target.write_bytes(source.read(entry))
+                      os.chmod(target, 0o755 if mode & 0o111 else 0o644)
+          PYTHON
+          git -C "$RUNNER_TEMP/source-check" init -q
+          git -C "$RUNNER_TEMP/source-check" add -A -f
+          test "$(git -C "$RUNNER_TEMP/source-check" write-tree)" = "$SOURCE_TREE"
+          ARCHIVE_SHA256="$(sha256sum "$ARCHIVE" | cut -d' ' -f1)"
+          {
+            printf 'repository=%s\n' "$GITHUB_REPOSITORY"
+            printf 'ref=refs/heads/main\n'
+            printf 'commit=%s\n' "$SOURCE_SHA"
+            printf 'root_tree=%s\n' "$SOURCE_TREE"
+            printf 'archive_sha256=%s\n' "$ARCHIVE_SHA256"
+          } > "$RUNNER_TEMP/exact-source/identity.txt"
+
+      - name: Upload exact source bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-main-source-${{ github.sha }}
+          path: ${{ runner.temp }}/exact-source/
+          if-no-files-found: error
+          retention-days: 7
