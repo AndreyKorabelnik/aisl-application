@@ -86,6 +86,39 @@ interaction-lineage build \
 
 The output contract is `interaction-attribute-lineage/v1`.
 
+## Task 51 bounded prepare and observability
+
+`prepare` is explicitly bounded **across all selected edges** by `--max-preparations`
+(default `1`, `0` means no KCP calls) and `--max-kcp-steps` (default `1`,
+allowed `1..32`). The latter is passed to the KCP public preparation contract,
+not merely enforced by the client. Every KCP invocation consumes one budget
+unit before dispatch, including timeout/failure. When the budget is exhausted,
+all remaining requirement groups appear under `deferred_groups` with
+`preparation_budget_exhausted`; a blocked/no-progress/step-limit result retains
+unattempted groups with `previous_preparation_stopped`. The command-scoped
+budget is shared across `--all-edges`. No candidate edge is silently removed.
+
+Use `--progress-jsonl progress.jsonl` to receive flushed, timestamped progress
+both on stderr and in a local JSONL audit trail. Each KCP group has a start and
+completion event including elapsed time, outcome, returned job IDs and selected
+source IDs. This does **not** expose intra-job Nexus progress to the client:
+server KCP runtime logging records Nexus G:A:V starts/completions and elapsed
+seconds (from Runner), source digests, analysis-job state changes and AISL
+publication. Consult the KCP runtime log / job logs while the synchronous
+`prepare` request is running. Logs must be sanitized before export.
+
+The KCP built-in analysis profile is `attribute-lineage-v1`, scope `workspace`,
+selecting only `attribute-lineage` (Runner product `repository-value-flow`,
+capability `workspace.attribute-path-resolver`). It runs selected source-local
+value-flow evidence, not complete portfolio/system-interaction analysis; Nexus
+artifacts are admitted only through bounded, observed external-source demands.
+The new profile requires deploying the matching KCP release. An Application-only
+upgrade must fail closed if the server lacks this profile.
+
+These controls do not guarantee a wall-clock/CPU bound **within** one KCP job.
+Operators must also configure/verify server-side Runner/Nexus limits before real
+bank execution; do not use `prepare --all-edges` as an unbounded analysis probe.
+
 ## Prepare (transitional lifecycle)
 
 `prepare` is retained only because the current accepted production journey still needs a
@@ -108,6 +141,8 @@ interaction-lineage prepare \
   --edge-id repository_edge_... \
   --aisl-base-url http://127.0.0.1:8080 \
   --kcp-base-url http://127.0.0.1:8000 \
+  --max-preparations 1 --max-kcp-steps 1 \
+  --progress-jsonl preparation-progress.jsonl \
   --output preparation.json
 ```
 
@@ -210,6 +245,8 @@ interaction-lineage prepare \
   --topology topology-v5.json --all-edges \
   --aisl-base-url http://aisl-server:8080 \
   --kcp-base-url http://knowledge-control-plane:8000 \
+  --max-preparations 1 --max-kcp-steps 1 \
+  --progress-jsonl preparation-progress.jsonl \
   --output preparation-all.json
 
 interaction-lineage build \

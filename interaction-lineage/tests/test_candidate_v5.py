@@ -200,7 +200,7 @@ def test_v5_missing_binding_invokes_existing_kcp_preparation_without_git_gate():
     )
     assert len(calls) == 2
     assert {x["observed_boundary"]["repository_id"] for x in calls} == {"caller", "service"}
-    assert all(x["analysis_profile_id"] == "interaction-lineage-attribute-lineage-v1" for x in calls)
+    assert all(x["analysis_profile_id"] == "attribute-lineage-v1" for x in calls)
     assert result["status"] == "prepared"
     assert result["summary"]["framework_invocation_count"] == 2
 
