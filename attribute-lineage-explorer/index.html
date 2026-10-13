@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>AISL · Attribute Flow Explorer</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="product">
+        <div class="product-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M6 10h9l6 6h5M6 22h9l6-6h5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><circle cx="6" cy="10" r="3"/><circle cx="6" cy="22" r="3"/><circle cx="26" cy="16" r="3"/></svg></div>
+        <div><div class="product-name">AISL <span>Attribute Flow</span></div><div class="product-desc">Explorer <span class="tiny-dot">·</span> Визуализация происхождения данных</div></div>
+      </div>
+      <div class="toolbar-right">
+        <span class="status-tag"><span class="status-dot"></span> Только в браузере</span>
+        <button class="light-button" id="btnDemo">↺ <span>Пример</span></button>
+        <button class="primary-button" id="btnUpload">↑ Загрузить JSON</button>
+        <input id="fileUpload" type="file" accept=".json,application/json" hidden>
+      </div>
+    </header>
+    <div class="global-warning" id="syntheticNotice"><span class="diamond"></span><strong>Демонстрационные данные.</strong> Все имена систем, атрибутов и путей в примере синтетические. Статус переходов не повышается до confirmed.</div>
+    <main class="workspace">
+      <aside class="sidebar">
+        <div class="sidebar-section heading-pane"><div class="overline">РАБОЧЕЕ ПРОСТРАНСТВО</div><h1>Исследование атрибутов</h1><p>Проследите путь данных от источника до потребителя.</p></div>
+        <div class="sidebar-section"><div class="section-label">Найти узел или атрибут</div><div class="search-wrap"><span>⌕</span><input id="search" placeholder="Например, birthDate" autocomplete="off"></div><div class="search-results" id="searchResults" hidden></div></div>
+        <div class="sidebar-section"><div class="section-label">БЫСТРЫЕ СЦЕНАРИИ</div><div class="examples" id="examples"></div></div>
+        <div class="sidebar-section journeys-section"><div class="section-head"><div class="section-label">АТРИБУТЫ ВЗАИМОДЕЙСТВИЙ</div><span class="small-count" id="journeyCount">0</span></div><div id="journeyList" class="journey-list"></div></div>
+        <div class="sidebar-footer"><div class="lock-icon">◈</div> Данные обрабатываются локально. Никаких внешних запросов.</div>
+      </aside>
+      <section class="canvas-panel" aria-label="Ориентированный граф">
+        <div class="canvas-toolbar">
+          <div class="view-switch"><button id="overviewBtn" class="switch-btn">Обзор систем</button><button id="detailBtn" class="switch-btn active">Поток атрибутов</button><button id="webBtn" class="switch-btn web-trigger" title="Весь связный граф — демонстрационный режим">✧ Паутина</button></div>
+          <div class="canvas-opts"><label class="toggle"><input id="candidateToggle" type="checkbox" checked><span class="toggle-track"></span><span>Кандидатные переходы</span></label><button class="web-present-button" id="webPresent" hidden title="Скрыть боковые панели и показать граф крупнее">⛶ На весь экран</button><select id="flowDirection" title="Направление исследования"><option value="both">↔ Оба направления</option><option value="downstream">→ Вниз по потоку</option><option value="upstream">← К источникам</option></select></div>
+        </div>
+        <div class="canvas-title"><div><div class="overline" id="canvasKicker">ИНТЕРАКТИВНАЯ СХЕМА</div><h2 id="canvasHeading">Сквозной маршрут birthDate</h2><p id="canvasSubheading">Доказанные локальные переходы и кандидатные пересечения систем</p></div><div class="mini-counts" id="miniCounts"></div></div>
+        <div class="canvas-stage" id="stage"><svg id="graph" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Направленный граф данных"><defs>
+          <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#dce3e9"/></pattern>
+          <marker id="arrow-confirmed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#8498ae"/></marker>
+          <marker id="arrow-candidate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#e5a246"/></marker>
+        </defs><rect id="graphBackground" x="0" y="0" width="100%" height="100%" fill="url(#dots)"/><g id="world"></g></svg>
+          <div class="canvas-hint" id="canvasHint">Нажмите на узел или связь, чтобы увидеть доказательства</div>
+          <div class="web-overlay" id="webOverlay" hidden>
+            <div class="web-overlay-head"><div class="web-label">✦ ПАУТИНА ВЗАИМОСВЯЗЕЙ</div><div class="web-focus-search"><span>⌕</span><input id="webSearch" placeholder="Найти атрибут…" aria-label="Поиск узла в паутине"><div class="web-search-results" id="webSearchResults" hidden></div></div></div>
+            <div class="web-overlay-bottom"><div class="web-info" id="webInfo"></div><button id="webClear" class="web-clear" hidden>✕ Сбросить выделение</button></div>
+          </div>
+          <div class="zoom-tools"><button id="zoomIn" title="Приблизить">+</button><button id="zoomOut" title="Отдалить">−</button><button id="fit" title="Вписать граф">⤢</button></div>
+        </div>
+        <div class="legend"><span class="legend-item"><span class="legend-line solid"></span> Подтверждённый локальный путь</span><span class="legend-item"><span class="legend-line dashed"></span> Кандидатный переход</span><span class="legend-item"><span class="legend-gap">!</span> Разрыв / неопределённость</span><span class="legend-help">Колесо — масштаб · Перетаскивание — перемещение</span></div>
+      </section>
+      <aside class="inspector"><div class="inspector-head"><div><div class="overline">ПОДРОБНОСТИ</div><h2>Доказательства</h2></div><button id="resetSelection" title="Сбросить выбор" class="muted-icon">↺</button></div><div class="inspector-body" id="inspectorBody"></div><div class="inspector-foot"><span class="evidence-dot"></span> Read-only · без семантических догадок</div></aside>
+    </main>
+    <div id="dropOverlay" class="drop-overlay" hidden><div class="drop-card">⇪<h2>Загрузить AISL JSON</h2><p>Отпустите файл, чтобы исследовать его локально</p></div></div>
+    <div class="toast" id="toast" role="alert" hidden></div>
+  </div>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
