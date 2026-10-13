@@ -92,16 +92,29 @@ The output contract is `interaction-attribute-lineage/v1`.
 (default `1`, `0` means no KCP calls) and `--max-kcp-steps` (default `1`,
 allowed `1..32`). The latter is passed to the KCP public preparation contract,
 not merely enforced by the client. Every KCP invocation consumes one budget
-unit before dispatch, including timeout/failure. When the budget is exhausted,
-all remaining requirement groups appear under `deferred_groups` with
-`preparation_budget_exhausted`; a blocked/no-progress/step-limit result retains
-unattempted groups with `previous_preparation_stopped`. The command-scoped
-budget is shared across `--all-edges`. No candidate edge is silently removed.
+unit before dispatch, including timeout/failure. A **single** `prepare` now
+re-checks pinned AISL readiness after each completed preparation wave and
+continues to *newly observed*, materially relevant external-source groups in
+that same command. It never traverses every POM dependency by default.
+The exact source boundary is selected by the public readiness evidence; KCP owns
+Nexus G:A:V acquisition, reuse and publication. Already attempted unchanged
+boundaries are not retried merely because a revision ID changed.
+When the budget is exhausted, pending groups are preserved in `deferred_groups`
+with `preparation_budget_exhausted`; blocked or no-progress KCP outcomes retain
+unattempted groups with `previous_preparation_stopped`. A KCP `step_limit` can
+admit a *different* newly observed boundary but cannot resubmit the same one.
+The command-scoped budget is shared across `--all-edges`. No candidate edge is
+silently removed. Individual source gaps may still remain explicit PARTIAL/BLOCKED.
 
 Use `--progress-jsonl progress.jsonl` to receive flushed, timestamped progress
 both on stderr and in a local JSONL audit trail. Each KCP group has a start and
 completion event including elapsed time, outcome, returned job IDs and selected
-source IDs. This does **not** expose intra-job Nexus progress to the client:
+source IDs. Re-evaluation events (`preparation.readiness_rechecked`) show how
+many *new* requirement groups were discovered, and `preparation.finished` emits
+the final status. `framework_preparations[*].requested_boundary`, `steps`, and
+`published_dependency_revisions` preserve the mechanical reason and pinned
+knowledge references in the result JSON. This does **not** expose intra-job
+Nexus progress to the client:
 server KCP runtime logging records Nexus G:A:V starts/completions and elapsed
 seconds (from Runner), source digests, analysis-job state changes and AISL
 publication. Consult the KCP runtime log / job logs while the synchronous
@@ -141,7 +154,7 @@ interaction-lineage prepare \
   --edge-id repository_edge_... \
   --aisl-base-url http://127.0.0.1:8080 \
   --kcp-base-url http://127.0.0.1:8000 \
-  --max-preparations 1 --max-kcp-steps 1 \
+  --max-preparations 12 --max-kcp-steps 8 \
   --progress-jsonl preparation-progress.jsonl \
   --output preparation.json
 ```
@@ -157,7 +170,11 @@ generic Framework path. Such dependencies remain evidence of the primary revisio
 do not become independent system revisions or application-owned source knowledge.
 
 The preparation output embeds exact `interaction-lineage-aisl-bindings/v1` bindings and
-can be passed to `check` or `build`. Interaction Lineage itself owns no Git/Nexus client,
+can be passed to `check` or `build`. The command reports READY (`prepared` or
+`already_prepared`), PARTIAL (`budget_exhausted`, `step_limit` or `no_progress`),
+or BLOCKED (`blocked`) rather than claiming exhaustive discovery of all runtime
+links. A newly observed external dependency is followed only when a fresh
+public AISL check supplies an exact mechanical preparation requirement. Interaction Lineage itself owns no Git/Nexus client,
 source parser, repository discovery heuristic, or publication implementation.
 
 ## Human CSV
