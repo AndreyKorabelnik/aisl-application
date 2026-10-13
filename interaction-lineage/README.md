@@ -325,3 +325,52 @@ pin the Inventory observed commit. Registration progress distinguishes
 source snapshots at analysis time. Do not equate `registered_ref_unverified`
 with analysis of the exact Inventory commit. A moved branch needs a separate
 identity audit before claiming snapshot parity.
+
+## Manual bundles integrated into `prepare` (Task 51)
+
+Repository Inventory/Topology is a **separate application**. The only source-discovery
+input to Interaction Lineage is `topology.json`. Its `repositories[]` records may
+contain an observed `repository_url` and an exact `resolved_commit` (from a matching
+Inventory batch manifest). The consumer never invents Git URLs or commits.
+
+One command runs existing bounded KCP/AISL/Nexus preparation for every selected
+candidate, then gives exact manual work remaining:
+
+```bash
+interaction-lineage prepare \
+  --topology topology.json --all-edges \
+  --aisl-base-url http://127.0.0.1:8080 \
+  --kcp-base-url http://127.0.0.1:8000 \
+  --max-preparations 12 --max-kcp-steps 8 \
+  --progress-jsonl results/progress.jsonl \
+  --output-dir results
+```
+
+`--output` is optional with `--output-dir`; defaults to `results/preparation.json`.
+On the way in, `prepare` reuses published AISL revisions with matching immutable
+Git snapshot (URL and full commit), requested capability, and unambiguous binding
+before starting avoidable KCP preparation. KCP remains responsible for its own
+bounded generic Git/Nexus analysis, dependency reuse and publication bundle
+creation. On the way out, `prepare` runs a final exact AISL catalog check and
+writes these **additional** files:
+
+- `missing-revisions.json` — full per-repository readiness, ambiguity and gap ledger;
+- `resolved-bindings.json` — exact pinned revisions verified by catalog identity;
+- `prepare-missing-bundles.sh` — executable commands only for missing revisions with
+  verified Git URL+commit; profile `attribute-lineage-v1`.
+
+A partial result is reported while manual bundles or source identities are
+outstanding; the existing detailed edge preparation results and diagnostic ledger
+are retained. A missing exact commit is an explicit gap, never a guessed branch.
+
+**Copying bundles and importing them on AISL Server are manual.** Neither the
+app nor generated script performs transfer or import. Each completed KCP CLI job
+has a `publication_bundle.path` in its JSON. After manually publishing, run
+**the same `interaction-lineage prepare` command again**; it checks newly
+published revisions and continues with the remaining work. There is no
+separate `plan-bundles` command.
+
+The output remains bounded by the explicit KCP budget. `--all-edges` visits
+all candidate edges in the provided Topology, not an exhaustive proof of every
+runtime program path. Multi-edge end-to-end composition remains a separate
+unaccepted Task 51 gate, not something this source change purports to solve.
