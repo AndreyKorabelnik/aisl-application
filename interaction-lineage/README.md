@@ -132,6 +132,14 @@ These controls do not guarantee a wall-clock/CPU bound **within** one KCP job.
 Operators must also configure/verify server-side Runner/Nexus limits before real
 bank execution; do not use `prepare --all-edges` as an unbounded analysis probe.
 
+A `prepare` invocation invalidates its previous `missing-revisions.json`,
+`resolved-bindings.json`, and executable `prepare-missing-bundles.sh` in the
+chosen output directory *before* contacting AISL. If the invocation fails
+(including a failure while rendering the bundle plan), no old/manual bundle
+script survives. The `preparation.json` result records the failure; a new
+manual script is available only after a successful planning pass. Operators
+must not reuse saved scripts from earlier invocations.
+
 ## Prepare (transitional lifecycle)
 
 `prepare` is retained only because the current accepted production journey still needs a

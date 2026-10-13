@@ -175,6 +175,15 @@ def render_preparation_script(plan: Mapping[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+BUNDLE_PLAN_FILES = ("missing-revisions.json", "resolved-bindings.json", "prepare-missing-bundles.sh")
+
+
+def invalidate_bundle_plan(directory: str | Path) -> None:
+    """Remove stale executable handoffs when prepare has no valid current plan."""
+    for name in BUNDLE_PLAN_FILES:
+        (Path(directory) / name).unlink(missing_ok=True)
+
+
 def write_bundle_plan(plan: Mapping[str, Any], directory: str | Path) -> None:
     root = Path(directory)
     root.mkdir(parents=True, exist_ok=True)

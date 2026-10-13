@@ -164,3 +164,72 @@ def test_cli_prepare_resumes_after_manual_publication(tmp_path, monkeypatch):
     assert all(observed[0])
     assert json.loads((out / "missing-revisions.json").read_text())["status"] == "ready"
     assert 'No mechanically executable' in (out / "prepare-missing-bundles.sh").read_text()
+
+
+def test_cli_prepare_clears_previous_bundle_plan_on_catalog_failure(tmp_path, monkeypatch):
+    from aisl_interaction_lineage import cli
+    ucp, kpk = _r("ucp_api", "a" * 40), _r("kpk_gateway", "b" * 40)
+    topology_file = tmp_path / "topology.json"
+    topology_file.write_text(json.dumps(_topology([ucp, kpk])))
+    state = {"available": True}
+
+    class Catalog(FakeCatalog):
+        def list_systems(self):
+            if not state["available"]:
+                raise RuntimeError("AISL catalog HTTP 503")
+            return super().list_systems()
+
+    class Gateway:
+        def __init__(self, *_):
+            self._client = Catalog([_rev(ucp["repository_url"], ucp["resolved_commit"])])
+        def close(self):
+            pass
+
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    monkeypatch.setattr(cli, "KnowledgeControlPlaneGateway", lambda *_: object())
+    monkeypatch.setattr(cli, "prepare_interaction_lineage",
+                        lambda *_args, **_kwargs: {"status": "already_prepared"})
+    out = tmp_path / "out"
+    cmd = ["prepare", "--topology", str(topology_file), "--all-edges",
+           "--aisl-base-url", "http://server:8080", "--kcp-base-url", "http://kcp:8000",
+           "--max-preparations", "0", "--output-dir", str(out)]
+    assert cli.main(cmd) == 2
+    assert "kpk_gateway" in (out / "prepare-missing-bundles.sh").read_text()
+    state["available"] = False
+    assert cli.main(cmd) == 2
+    assert json.loads((out / "preparation.json").read_text())["status"] == "failed"
+    for name in ("missing-revisions.json", "resolved-bindings.json",
+                 "prepare-missing-bundles.sh"):
+        assert not (out / name).exists(), name
+
+
+def test_cli_prepare_clears_partial_plan_files_if_plan_writer_fails(tmp_path, monkeypatch):
+    from aisl_interaction_lineage import cli
+    ucp, kpk = _r("ucp_api", "a" * 40), _r("kpk_gateway", "b" * 40)
+    topology_file = tmp_path / "topology.json"
+    topology_file.write_text(json.dumps(_topology([ucp, kpk])))
+
+    class Gateway:
+        def __init__(self, *_):
+            self._client = FakeCatalog([])
+        def close(self):
+            pass
+
+    original = cli.write_bundle_plan
+    def interrupted_write(plan, root):
+        original(plan, root)
+        raise RuntimeError("simulated output interruption")
+
+    monkeypatch.setattr(cli, "KnowledgeApiGateway", Gateway)
+    monkeypatch.setattr(cli, "KnowledgeControlPlaneGateway", lambda *_: object())
+    monkeypatch.setattr(cli, "prepare_interaction_lineage",
+                        lambda *_args, **_kwargs: {"status": "already_prepared"})
+    monkeypatch.setattr(cli, "write_bundle_plan", interrupted_write)
+    out = tmp_path / "out"
+    assert cli.main(["prepare", "--topology", str(topology_file), "--all-edges",
+                     "--aisl-base-url", "http://server:8080", "--kcp-base-url", "http://kcp:8000",
+                     "--output-dir", str(out)]) == 2
+    assert json.loads((out / "preparation.json").read_text())["status"] == "failed"
+    for name in ("missing-revisions.json", "resolved-bindings.json",
+                 "prepare-missing-bundles.sh"):
+        assert not (out / name).exists(), name
