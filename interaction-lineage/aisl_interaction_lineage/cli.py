@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .aisl import KnowledgeApiGateway
-from .bundle_plan import plan_missing_bundles, write_bundle_plan
+from .bundle_plan import invalidate_bundle_plan, plan_missing_bundles, write_bundle_plan
 from .batch_cache import BatchCachingGateway
 from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
@@ -90,6 +90,8 @@ def main(argv: list[str] | None = None) -> int:
                 else output_file.parent)
     if args.command == "prepare":
         plan_dir.mkdir(parents=True, exist_ok=True)
+        # Never expose a previous run's manual bundle tasks as this run's result.
+        invalidate_bundle_plan(plan_dir)
     gateway = None
     try:
         topology = _load_object(args.topology)
@@ -223,6 +225,9 @@ def main(argv: list[str] | None = None) -> int:
                 if result.get("status") not in {"failed", "blocked", "no_progress", "step_limit", "budget_exhausted"}:
                     result["status"] = "partial"
     except Exception as exc:
+        if args.command == "prepare":
+            # Includes errors *after* plan files were partially written.
+            invalidate_bundle_plan(plan_dir)
         result = {
             "format": "interaction-lineage-command-result/v1",
             "status": "failed",
