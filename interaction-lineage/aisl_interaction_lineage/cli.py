@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .aisl import KnowledgeApiGateway
+from .bundle_plan import plan_missing_bundles, write_bundle_plan
 from .batch_cache import BatchCachingGateway
 from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
@@ -62,7 +63,8 @@ def main(argv: list[str] | None = None) -> int:
     prepare.add_argument("--aisl-base-url", required=True)
     prepare.add_argument("--kcp-base-url", required=True)
     prepare.add_argument("--transport-role", choices=("request", "response", "all"), default="all")
-    prepare.add_argument("--output", required=True)
+    prepare.add_argument("--output", help="Detailed preparation JSON (default: <output-dir>/preparation.json)")
+    prepare.add_argument("--output-dir", help="Directory for missing-revisions.json, resolved-bindings.json and prepare-missing-bundles.sh; defaults to --output parent")
     prepare.add_argument("--max-preparations", type=int, default=1,
                          help="Hard limit on total KCP calls across all selected edges (default: 1; 0 = no KCP calls)")
     prepare.add_argument("--max-kcp-steps", type=int, default=1,
@@ -81,6 +83,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"interaction-lineage csv failed: {type(exc).__name__}: {exc}", file=sys.stderr)
             return 2
 
+    if args.command == "prepare" and not (args.output or args.output_dir):
+        parser.error("prepare requires --output or --output-dir")
+    output_file = (Path(args.output) if args.output else Path(args.output_dir) / "preparation.json")
+    plan_dir = (Path(args.output_dir) if args.command == "prepare" and args.output_dir
+                else output_file.parent)
+    if args.command == "prepare":
+        plan_dir.mkdir(parents=True, exist_ok=True)
     gateway = None
     try:
         topology = _load_object(args.topology)
@@ -94,6 +103,15 @@ def main(argv: list[str] | None = None) -> int:
         else:
             edge_ids = [args.edge_id]
         gateway = KnowledgeApiGateway(args.aisl_base_url)
+        # Reuse compatible exact source revisions BEFORE expensive KCP preparation.
+        # The catalog is the only discovery owner; it does not infer bindings from names.
+        has_exact_sources = args.command == "prepare" and any(
+            isinstance(row, Mapping) and row.get("repository_url") and row.get("resolved_commit")
+            for row in topology.get("repositories") or ()
+        )
+        if has_exact_sources:
+            preplan = plan_missing_bundles(topology, client=gateway._client, bindings=bindings)
+            bindings = bindings.merged(preplan["resolved_bindings"]["repositories"])
         query_gateway = (BatchCachingGateway(gateway)
                          if args.all_edges and args.command in ("check", "build")
                          else gateway)
@@ -181,6 +199,29 @@ def main(argv: list[str] | None = None) -> int:
                 }
         else:
             result = results[0]
+        if args.command == "prepare":
+            # One user action: do all bounded automatic work, then generate
+            # exact-source manual bundle tasks for the residual published gaps.
+            final_plan = plan_missing_bundles(
+                topology, client=getattr(gateway, "_client", None), bindings=bindings,
+            )
+            write_bundle_plan(final_plan, plan_dir)
+            progress({
+                "event": "preparation.manual_bundles_planned",
+                "ready_count": final_plan["summary"]["ready_count"],
+                "requires_bundle_count": final_plan["summary"]["requires_bundle_count"],
+                "unresolved_count": final_plan["summary"]["unresolved_count"],
+            })
+            result["manual_bundles"] = {
+                "status": final_plan["status"],
+                "summary": final_plan["summary"],
+                "missing_revisions": str(plan_dir / "missing-revisions.json"),
+                "resolved_bindings": str(plan_dir / "resolved-bindings.json"),
+                "preparation_script": str(plan_dir / "prepare-missing-bundles.sh"),
+            }
+            if final_plan["summary"]["requires_bundle_count"] or final_plan["summary"]["unresolved_count"]:
+                if result.get("status") not in {"failed", "blocked", "no_progress", "step_limit", "budget_exhausted"}:
+                    result["status"] = "partial"
     except Exception as exc:
         result = {
             "format": "interaction-lineage-command-result/v1",
@@ -195,7 +236,18 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         if gateway is not None:
             gateway.close()
-    Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    output_file.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.command == "prepare" and isinstance(result.get("manual_bundles"), Mapping):
+        message = result["manual_bundles"]
+        print(json.dumps({
+            "status": result.get("status"),
+            "preparation_result": str(output_file),
+            "remaining_manual_bundles": message["summary"]["requires_bundle_count"],
+            "unresolved_source_identities": message["summary"]["unresolved_count"],
+            "prepare_missing_bundles_script": message["preparation_script"],
+            "missing_revisions": message["missing_revisions"],
+        }, ensure_ascii=False, sort_keys=True))
     return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit", "partial", "budget_exhausted"} else 2
 
 

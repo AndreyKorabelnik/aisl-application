@@ -138,7 +138,7 @@ def test_batch_prepare_reuses_pinned_bindings_across_candidate_edges(monkeypatch
     monkeypatch.setattr(cli,"KnowledgeApiGateway",Gateway)
     monkeypatch.setattr(cli,"KnowledgeControlPlaneGateway",lambda *a:object())
     monkeypatch.setattr(cli,"prepare_interaction_lineage",prepare)
-    assert cli.main(["prepare","--topology",str(p),"--all-edges","--aisl-base-url","http://unused","--kcp-base-url","http://unused","--output",str(o)])==0
+    assert cli.main(["prepare","--topology",str(p),"--all-edges","--aisl-base-url","http://unused","--kcp-base-url","http://unused","--output",str(o)])==2  # missing immutable Topology source identity is now reported
     assert observed==[("candidate-1",None),("candidate-2","rev-updated")]
     out=json.loads(o.read_text())
     assert out["summary"]["candidate_edge_count"]==2
