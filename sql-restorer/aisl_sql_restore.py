@@ -93,11 +93,7 @@ class PublicSqlRestorer:
     def _render_relation(self, query_id: str, rel: dict[str, Any]) -> str:
         kind=str(rel.get('relation_kind') or '')
         if kind == 'generated':
-            # PUBLIC query-context currently exposes a generated alias but not
-            # its LATERAL VIEW / EXPLODE expression. Never silently drop it.
-            raise ReconstructionError(
-                f"Generated source {rel.get('relation_name')!r} lacks generator expression in public Knowledge API"
-            )
+            raise ReconstructionError('Generated relation must be rendered as a LATERAL VIEW clause')
         if kind == 'derived':
             scopes=rel.get('source_scope_ids') or []
             if len(scopes) != 1:
@@ -145,8 +141,26 @@ class PublicSqlRestorer:
                 raise ReconstructionError(f'JOIN condition not published {query}:{scope_id}')
             sql+=line
         other=[r for r in rels if r.get('usage_role')=='join' and r.get('sql_relation_id') not in joined_ids]
-        if any(r.get('relation_kind')=='generated' for r in rels):
-            raise ReconstructionError(f'Generated source expression missing from public API in {query}:{scope_id}')
+        generated = [r for r in rels if r.get('relation_kind') == 'generated']
+        if generated:
+            # The published legacy relation facts do not record LATERAL ordering
+            # relative to JOINs or multiple generators. Refuse ambiguous cases.
+            if ctx.get('joins') or len(generated) != 1:
+                raise ReconstructionError(f'Generated-source clause ordering is unresolved in {query}:{scope_id}')
+            # Each generated relation is a row source, never a physical table.
+            # A reconstructed SELECT must retain that row-multiplying operation.
+            # The legacy public facts lack lateral ordering/OUTER information;
+            # reject multiple generators instead of choosing an arbitrary order.
+            groups = {(str(r.get('generator_expression') or ''),
+                       str(r.get('generator_wrapper_alias') or '')) for r in generated}
+            if len(groups) != 1:
+                raise ReconstructionError(f'Ambiguous LATERAL VIEW generators in {query}:{scope_id}')
+            expression, alias = next(iter(groups))
+            names = [str(r.get('relation_name') or '') for r in generated]
+            if not expression or not alias or not all(names):
+                raise ReconstructionError(f'Generated source expression/alias missing in {query}:{scope_id}')
+            # The generator comes after the FROM/JOIN sources, before predicates.
+            sql += '\nLATERAL VIEW ' + expression + ' ' + alias + ' AS ' + ', '.join(names)
         if other:
             raise ReconstructionError(f'Non-reconstructed JOIN relations {query}:{scope_id}: {[r.get("relation_name") for r in other]}')
         for attr,keyword in [('where_predicate','WHERE'),('group_by_clause','GROUP BY'),

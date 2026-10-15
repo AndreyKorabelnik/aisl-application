@@ -20,18 +20,19 @@ Arguments are exact runtime inputs. On another AISL catalog import the returned 
 
 The app discovers SQL query IDs from the public `sql/relations` endpoint, resolves each query and child scope with `sql/query-context`, composes CTEs, set operations, joins, projections and filters, and saves syntactically parsed Spark SQL. Output `restoration_report.json` contains statuses and SHA-256. An unresolved scope causes an explicit diagnostic and **no SQL** for that target. Nonzero exit code indicates unresolved results.
 
-## Real V3 experiment
+## Verified V3 experiment (Task 53 final gate)
 
 - AISL system: `profile-fl-v3-prototype`.
-- Locally published revision: `rev-d2897d0840cbdaaf453d39ef`.
+- Existing locally published pinned revision: `rev-d2897d0840cbdaaf453d39ef`.
 - Input: 28 V3 SQL files only (no legacy code).
-- `27 / 28` SQL queries reconstructed; independent AST comparison with reference V3, ignoring SQL comments, unquoted identifier case and equivalent `JOIN`/`INNER JOIN`: `27 / 27` reconstructed SQL structurally matches.
-- `t_client_link_dzo.sql` remains unresolved. The current public query-context exposes the **generated alias** `uid` but not the `LATERAL VIEW EXPLODE(SPLIT(p.ucpids, ';'))` expression. Generating an incomplete SELECT would be misleading. This is a MATERIAL_SEMANTIC_GAP in the published consumer view; a generic Framework improvement would be needed for full replay.
-- These comparisons test SQL structural preservation, not data parity, production portability, or correctness of the V3 business hypotheses.
+- **28 / 28 SQL restored via the real HTTP Knowledge API; 28 / 28 structurally match independently supplied V3 reference SQL.** Zero unresolved queries.
+- The bounded generic Knowledge API fix exposes `generator_expression` and `generator_wrapper_alias` already saved in immutable `sql_relation` knowledge; no change to original observed evidence or revision identity was necessary.
+- SQL with a single unambiguous `LATERAL VIEW EXPLODE` is now reconstructable. Multiple generated aliases or generator/JOIN ordering ambiguity remain fail-closed; the current research corpus contains neither case.
+- This is a structural replay test, not data parity, production readiness or a review of V3 business hypotheses.
 
 ## Design boundaries
 
-- Framework and AISL remain unmodified.
+- Uses the bounded public Knowledge API query-context projection fix; AISL revisions remain immutable.
 - The consumer accepts a pinned system/revision and remains read-only.
 - Source-file paths are used **only as published result names**; expressions come from public SQL knowledge.
 - A product relation named `final` or `raw_events` is not treated as a physical staging table.
