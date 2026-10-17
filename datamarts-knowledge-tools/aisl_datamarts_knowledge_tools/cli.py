@@ -17,6 +17,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--system')
     parser.add_argument('--revision')
     parser.add_argument('--repo-id')
+    parser.add_argument('--model-system')
+    parser.add_argument('--model-revision')
+    parser.add_argument('--replica-system')
+    parser.add_argument('--replica-revision')
     commands = parser.add_subparsers(dest='command', required=True)
     commands.add_parser('tools-json')
     for name in ('search_objects', 'get_object_details', 'find_change_locations', 'get_dependencies',
@@ -26,6 +30,9 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument('--query', required=True)
             p.add_argument('--limit', type=int, default=30)
             p.add_argument('--no-fuzzy', action='store_true')
+        elif name == 'get_object_details':
+            p.add_argument('--relation', default='')
+            p.add_argument('--object-id')
         elif name == 'get_calculation_logic':
             p.add_argument('--query-id', required=True)
             p.add_argument('--scope-id')
@@ -39,12 +46,19 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not args.system or not args.revision:
         parser.error('--system and --revision are required for all research operations')
-    tools = DataMartsTools(Gateway(args.base_url, args.system, args.revision))
+    if bool(args.model_system) != bool(args.model_revision):
+        parser.error('--model-system and --model-revision must be supplied together')
+    if bool(args.replica_system) != bool(args.replica_revision):
+        parser.error('--replica-system and --replica-revision must be supplied together')
+    tools = DataMartsTools(
+        Gateway(args.base_url, args.system, args.revision),
+        model_gateway=Gateway(args.base_url, args.model_system, args.model_revision) if args.model_system else None,
+        replica_gateway=Gateway(args.base_url, args.replica_system, args.replica_revision) if args.replica_system else None)
     try:
         if args.command == 'search_objects':
             result = tools.search_objects(query=args.query, limit=args.limit, include_fuzzy=not args.no_fuzzy)
         elif args.command == 'get_object_details':
-            result = tools.get_object_details(relation=args.relation)
+            result = tools.get_object_details(relation=args.relation, object_id=args.object_id)
         elif args.command == 'get_calculation_logic':
             result = tools.get_calculation_logic(query_id=args.query_id, repo_id=args.repo_id or '', scope_id=args.scope_id)
         else:

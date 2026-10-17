@@ -4,12 +4,15 @@ from __future__ import annotations
 from typing import Any
 
 from .gateway import Gateway
-from .search import ObjectSearch, relation_records
+from .search import ObjectSearch, relation_records, declared_model_records, replica_mapping_records
 
 
 class DataMartsTools:
-    def __init__(self, gateway: Gateway):
+    def __init__(self, gateway: Gateway, *, model_gateway: Gateway | None = None,
+                 replica_gateway: Gateway | None = None):
         self.gateway = gateway
+        self.model_gateway = model_gateway
+        self.replica_gateway = replica_gateway
         self._relations: list[dict[str, Any]] | None = None
         self._search: ObjectSearch | None = None
 
@@ -17,6 +20,8 @@ class DataMartsTools:
         if self._search:
             self._search.close()
         self.gateway.close()
+        if self.model_gateway: self.model_gateway.close()
+        if self.replica_gateway: self.replica_gateway.close()
 
     def _get_relations(self) -> list[dict[str, Any]]:
         if self._relations is None:
@@ -25,18 +30,57 @@ class DataMartsTools:
 
     def _search_index(self) -> ObjectSearch:
         if self._search is None:
-            self._search = ObjectSearch(relation_records(self._get_relations()))
+            sql_rows = relation_records(self._get_relations())
+            for row in sql_rows:
+                row['system_id'] = self.gateway.system_id
+                row['revision_id'] = self.gateway.revision_id
+            rows = sql_rows
+            if self.model_gateway:
+                rows += declared_model_records(
+                    self.model_gateway.declared_records('types'),
+                    self.model_gateway.declared_records('fields'),
+                    system_id=self.model_gateway.system_id, revision_id=self.model_gateway.revision_id)
+            if self.replica_gateway:
+                mappings, entities = self.replica_gateway.tsa_mapping_records()
+                rows += replica_mapping_records(
+                    mappings, entities, system_id=self.replica_gateway.system_id,
+                    revision_id=self.replica_gateway.revision_id)
+            self._search = ObjectSearch(rows)
         return self._search
 
     def search_objects(self, *, query: str, limit: int = 30, include_fuzzy: bool = True) -> dict[str, Any]:
-        return self._search_index().search(query, limit=limit, include_fuzzy=include_fuzzy)
+        result = self._search_index().search(query, limit=limit, include_fuzzy=include_fuzzy)
+        result['search_coverage'] = sorted({r['source'] for r in self._search.records})
+        result['systems_searched'] = sorted({(r['system_id'], r['revision_id']) for r in self._search.records})
+        return result
 
-    def get_object_details(self, *, relation: str) -> dict[str, Any]:
-        records = [r for r in self._get_relations()
-                   if str(r.get('relation_name') or r.get('logical_name') or '').casefold() == relation.casefold()]
-        return {'requested_relation': relation, 'matches': records, 'count': len(records),
-                'resolution': 'not_found' if not records else 'ambiguous' if len(records) > 1 else 'candidate',
-                'warning': 'A SQL relation occurrence is not automatically a deployed physical table'}
+    def get_object_details(self, *, relation: str, object_id: str | None = None) -> dict[str, Any]:
+        """Return all exact-name occurrences across configured revisions, or a stable ID."""
+        rows = self._search_index().records
+        records = [r for r in rows
+                   if (str(r.get('object_id') or '') == object_id if object_id
+                       else str(r.get('name') or '').casefold() == relation.casefold())]
+        enriched: list[dict[str, Any]] = []
+        for match in records:
+            item = dict(match)
+            # These are explicit, published relationship keys. Do not infer a
+            # relationship by name similarity or cross-system coincidence.
+            if match.get('kind') == 'replica_table':
+                item['published_fields'] = [r for r in rows
+                    if r.get('kind') == 'replica_field'
+                    and r.get('system_id') == match.get('system_id')
+                    and r.get('physical_table') == match.get('name')
+                    and r.get('name') == r.get('physical_column')]
+            if match.get('kind') == 'declared_type':
+                item['published_fields'] = [r for r in rows
+                    if r.get('kind') == 'declared_field'
+                    and r.get('system_id') == match.get('system_id')
+                    and r.get('parent_type') == match.get('qualified_name')]
+            enriched.append(item)
+        return {'requested_relation': relation, 'requested_object_id': object_id,
+                'matches': enriched, 'count': len(enriched),
+                'resolution': 'not_found' if not enriched else 'ambiguous' if len(enriched) > 1 else 'candidate',
+                'warning': 'Matching names and mapping records are not proof of deployment or all edit locations'}
 
     def get_attribute_lineage(self, *, relation: str, column: str, repo_id: str | None = None) -> dict[str, Any]:
         return self.gateway.target_lineage(relation, column=column, repo_id=repo_id)

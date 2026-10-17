@@ -47,7 +47,7 @@ class ObjectSearch:
         # RapidFuzz is used only to suggest candidates. It must never declare identity.
         if include_fuzzy:
             names = [str(r.get('name') or '') for r in self.records]
-            for _, score, i in process.extract(term, names, scorer=fuzz.WRatio, limit=max(limit * 4, 50), score_cutoff=65):
+            for _, score, i in process.extract(term, names, scorer=fuzz.WRatio, limit=None, score_cutoff=65):
                 matches.setdefault(i, ('fuzzy_candidate', round(float(score), 2)))
         order = {'exact': 0, 'fts5': 1, 'fuzzy_candidate': 2}
         hits = [{**self.records[i], 'match_kind': kind, 'match_score': score}
@@ -84,4 +84,68 @@ def relation_records(relations: Iterable[dict[str, Any]]) -> list[dict[str, Any]
                             'kind': 'field', 'parent_relation': name,
                             'file': ff[0] if ff else '', 'evidence_files': ff,
                             'source': 'public_sql_relations'})
+    return results
+
+
+def declared_model_records(types: Iterable[dict[str, Any]], fields: Iterable[dict[str, Any]],
+                           *, system_id: str, revision_id: str) -> list[dict[str, Any]]:
+    """Project observed declared types and fields from public dataset records."""
+    type_rows = list(types)
+    owners = {str(r.get('type_occurrence_id')): r for r in type_rows}
+    results: list[dict[str, Any]] = []
+    for row in type_rows:
+        fqcn = str(row.get('fully_qualified_name') or '')
+        ref = row.get('source_ref') or {}
+        results.append({'object_id': row.get('type_occurrence_id'), 'name': row.get('simple_name'),
+                        'qualified_name': fqcn, 'kind': 'declared_type', 'repo_id': row.get('repo_id'),
+                        'file': ref.get('repository_relative_path', ''), 'source_ref': ref,
+                        'system_id': system_id, 'revision_id': revision_id,
+                        'source': 'public_declared_model_dataset'})
+    for row in fields:
+        owner = owners.get(str(row.get('owner_type_occurrence_id')), {})
+        ref = row.get('source_ref') or {}
+        results.append({'object_id': row.get('field_occurrence_id'), 'name': row.get('name'),
+                        'kind': 'declared_field', 'parent_type': owner.get('fully_qualified_name'),
+                        'field_type': row.get('declared_type_expression'), 'repo_id': row.get('repo_id'),
+                        'file': ref.get('repository_relative_path', ''), 'source_ref': ref,
+                        'system_id': system_id, 'revision_id': revision_id,
+                        'source': 'public_declared_model_dataset'})
+    return [row for row in results if row.get('name')]
+
+
+def replica_mapping_records(fields: Iterable[dict[str, Any]], entities: Iterable[dict[str, Any]],
+                            *, system_id: str, revision_id: str) -> list[dict[str, Any]]:
+    """Only observed TSA logical↔physical mapping evidence; no inferred equality."""
+    entity_rows = list(entities)
+    entity_by_id = {str(r.get('payload', {}).get('mapping_id')): r.get('payload', {})
+                    for r in entity_rows}
+    results: list[dict[str, Any]] = []
+    for row in entity_rows:
+        p = row.get('payload') or {}
+        name = p.get('physical_table_name')
+        if name:
+            refs = p.get('source_refs') or []
+            results.append({'object_id': row.get('local_id'), 'name': name,
+                            'kind': 'replica_table', 'logical_type': p.get('logical_type_name'),
+                            'mapping_status': p.get('mapping_status'), 'mapping_basis': p.get('mapping_basis'),
+                            'file': refs[0].get('repository_relative_path', '') if refs else '',
+                            'source_refs': refs, 'system_id': system_id, 'revision_id': revision_id,
+                            'source': 'public_tsa_mapping_evidence'})
+    for row in fields:
+        p = row.get('payload') or {}
+        parent = entity_by_id.get(str(p.get('entity_mapping_id')), {})
+        refs = p.get('source_refs') or []
+        data = {'object_id': row.get('local_id'), 'kind': 'replica_field',
+                'physical_table': parent.get('physical_table_name'),
+                'logical_type': p.get('logical_type_name'),
+                'logical_field': p.get('logical_field_name'),
+                'physical_column': p.get('physical_column_name'),
+                'mapping_status': p.get('mapping_status'), 'mapping_basis': p.get('mapping_basis'),
+                'file': refs[0].get('repository_relative_path', '') if refs else '',
+                'source_refs': refs, 'system_id': system_id, 'revision_id': revision_id,
+                'source': 'public_tsa_mapping_evidence'}
+        if p.get('physical_column_name'):
+            results.append({'name': p['physical_column_name'], **data})
+        if p.get('logical_field_name') and p.get('logical_field_name') != p.get('physical_column_name'):
+            results.append({'name': p['logical_field_name'], **data})
     return results
