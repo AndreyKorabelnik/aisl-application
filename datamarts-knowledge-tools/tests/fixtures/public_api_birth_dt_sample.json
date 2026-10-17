@@ -1,0 +1,106 @@
+{
+  "source": "2026-10-17 published local AISL API readback, sampled; no runtime data",
+  "context": {
+    "query_id": "query_datamart_profile_fl_000102",
+    "repo_id": "datamart_profile_fl",
+    "selection_status": "selected",
+    "statement": {
+      "file": "hdfs/oozie-app/b2c_infra/__DATAMART_NAME__/wf/dml/epk_client/epk_client.sql",
+      "line_start": 1
+    },
+    "projections": [
+      {
+        "output_name": "birth_dt",
+        "expression": "CAST(birth_dt AS TIMESTAMP) AS birth_dt"
+      }
+    ]
+  },
+  "lineage": {
+    "target_resolution": {
+      "requested_relation": "epk_client",
+      "resolved_relation": null,
+      "status": "logical_target_confirmed_physical_ambiguous",
+      "logical_target_name": "epk_client",
+      "logical_target_status": "confirmed_unique",
+      "physical_relation_status": "ambiguous",
+      "physical_relation_recommendation": "custom_b2c_profile_fl.epk_client",
+      "physical_relation_recommendation_status": "probable_ranked",
+      "physical_relation_candidates": [
+        "${$ref_reconciliation_schema_name}.epk_client",
+        "custom_b2c_profile_fl.epk_client"
+      ],
+      "basis": [
+        "existing_sql_target_resolver_logical_target"
+      ],
+      "candidate_count": 100,
+      "matching_candidate_count": 1,
+      "candidates": [
+        {
+          "logical_target_name": "epk_client",
+          "recommended_target_relation": "custom_b2c_profile_fl.epk_client",
+          "target_relation_recommendation_status": "probable_ranked",
+          "target_relation_candidates": [
+            "${$ref_reconciliation_schema_name}.epk_client",
+            "custom_b2c_profile_fl.epk_client"
+          ],
+          "reasons": [
+            "logical_target_name_match",
+            "concrete_relation_identity",
+            "observed_downstream_read_identity"
+          ]
+        }
+      ]
+    },
+    "items": [
+      {
+        "sql_recursive_column_lineage_id": "sql_workflow_target_column_lineage_9835292b510835573020",
+        "workflow_target_logical_name": "epk_client",
+        "target_column": "birth_dt",
+        "terminal_relation_name": "${hist_src_schema_name}.com_sbt_bm_ucp_retail_model_individual_birthdate_hist",
+        "terminal_column": "value",
+        "file": "hdfs/oozie-app/b2c_infra/__DATAMART_NAME__/wf/dml/epk_client/epk_client.sql",
+        "query_id": "query_datamart_profile_fl_000102",
+        "recursion_depth": 18,
+        "lineage_status": "confirmed",
+        "physical_origin_status": "confirmed"
+      },
+      {
+        "sql_recursive_column_lineage_id": "sql_workflow_target_column_lineage_fec7c61b329a2bfb6677",
+        "workflow_target_logical_name": "epk_client",
+        "target_column": "birth_dt",
+        "terminal_relation_name": "${hist_src_schema_name}.com_sbt_bm_ucp_retail_model_individual_birthdate_hist",
+        "terminal_column": "value",
+        "file": "hdfs/oozie-app/b2c_infra/__DATAMART_NAME__/wf/dml/epk_client/epk_client.sql",
+        "query_id": "query_datamart_profile_fl_000102",
+        "recursion_depth": 18,
+        "lineage_status": "confirmed",
+        "physical_origin_status": "confirmed"
+      },
+      {
+        "sql_recursive_column_lineage_id": "sql_workflow_target_column_lineage_076f0fd7d292ed25c580",
+        "workflow_target_logical_name": "epk_client",
+        "target_column": "birth_dt",
+        "terminal_relation_name": "${snp_src_schema_name}.com_sbt_bm_ucp_retail_model_individual_birthdate",
+        "terminal_column": "value",
+        "file": "hdfs/oozie-app/b2c_infra/__DATAMART_NAME__/wf/dml/epk_client/epk_client.sql",
+        "query_id": "query_datamart_profile_fl_000102",
+        "recursion_depth": 18,
+        "lineage_status": "confirmed",
+        "physical_origin_status": "confirmed"
+      },
+      {
+        "sql_recursive_column_lineage_id": "sql_workflow_target_column_lineage_2d081c87ac61f31452bf",
+        "workflow_target_logical_name": "epk_client",
+        "target_column": "birth_dt",
+        "terminal_relation_name": "${snp_src_schema_name}.com_sbt_bm_ucp_retail_model_individual_birthdate",
+        "terminal_column": "value",
+        "file": "hdfs/oozie-app/b2c_infra/__DATAMART_NAME__/wf/dml/epk_client/epk_client.sql",
+        "query_id": "query_datamart_profile_fl_000102",
+        "recursion_depth": 18,
+        "lineage_status": "confirmed",
+        "physical_origin_status": "confirmed"
+      }
+    ],
+    "gaps_truncated": false
+  }
+}
