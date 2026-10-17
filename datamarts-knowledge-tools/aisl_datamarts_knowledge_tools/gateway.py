@@ -69,18 +69,32 @@ class Gateway:
         return self.all_items('/sql/relation-materializations')[0]
 
     def downstream_candidates(self, source_relation: str, *, source_column: str | None = None) -> dict[str, Any]:
-        """Public target discovery; candidates are NOT confirmed lineage edges."""
-        params: dict[str, Any] = {'source_relation': [source_relation], 'surface': 'all', 'limit': 5000, 'offset': 0}
+        """Page all public target candidates, without promoting them to edges."""
+        params: dict[str, Any] = {'source_relation': [source_relation], 'surface': 'all'}
         if source_column:
             params['source_column'] = [source_column]
-        payload = self.get('/sql/target-candidates', **params)
-        rows = payload.get('candidates')
-        if not isinstance(rows, list):
-            raise KnowledgeError('Target discovery API response has no candidates list')
-        count = int(payload.get('candidate_count', len(rows)))
-        if count > len(rows):
-            raise KnowledgeError(f'Target discovery truncated: {len(rows)} of {count}')
-        return payload
+        accumulated: list[dict[str, Any]] = []
+        first: dict[str, Any] = {}
+        offset = 0
+        for _ in range(100_000):
+            page = self.get('/sql/target-candidates', **params, offset=offset, limit=100)
+            rows = page.get('candidates')
+            if not isinstance(rows, list) or not all(isinstance(x, dict) for x in rows):
+                raise KnowledgeError('Target discovery API response has malformed candidates')
+            if not first:
+                first = {k: v for k, v in page.items() if k != 'candidates'}
+            accumulated.extend(rows)
+            count = int(page.get('candidate_count', len(rows)))
+            if int(first.get('candidate_count', count)) != count:
+                raise KnowledgeError('Target discovery count changed between pages')
+            if len(accumulated) == count:
+                first['candidates'] = accumulated
+                first['returned_count'] = len(accumulated)
+                return first
+            if not rows or len(accumulated) > count:
+                raise KnowledgeError(f'Target discovery truncated: {len(accumulated)} of {count}')
+            offset += len(rows)
+        raise KnowledgeError('Excessive candidate pages; refused incomplete retrieval')
 
     def target_lineage(self, relation: str, *, column: str | None = None, repo_id: str | None = None) -> dict[str, Any]:
         params: dict[str, Any] = {'target_relation': relation, 'include_gaps': True, 'max_gaps': 500}
@@ -103,3 +117,24 @@ class Gateway:
         if scope_id:
             params['scope_id'] = scope_id
         return self.get('/sql/query-context', **params)
+
+    def declared_records(self, kind: str) -> list[dict[str, Any]]:
+        """Read published declared model dataset with full server pagination."""
+        if kind not in {'types', 'fields'}:
+            raise ValueError('Unsupported declared record kind')
+        return self.all_items(f'/data-model/declared-dataset/{kind}')[0]
+
+    def tsa_mapping_records(self) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """Read exact TSA mapping observations, never infer bindings from names."""
+        import urllib.parse
+        snapshot = self.get(f'/revisions/{urllib.parse.quote(self.revision_id, safe="")}')
+        products = [p for p in snapshot.get('knowledge_artifacts', [])
+                    if p.get('model_kind') == 'logical-physical-mapping-evidence'
+                    and 'common.observed-record-set' in p.get('capabilities', [])]
+        if len(products) != 1:
+            raise KnowledgeError(f'TSA mapping record product must be unique, got {len(products)}')
+        artifact = urllib.parse.quote(products[0]['artifact_id'], safe='')
+        suffix = f'/observed-records/{artifact}'
+        fields = self.all_items(suffix, item_kind='field_mapping')[0]
+        entities = self.all_items(suffix, item_kind='entity_mapping')[0]
+        return fields, entities
