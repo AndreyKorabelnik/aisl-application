@@ -143,3 +143,21 @@ Execution context is an explicit opt-in with `--include-execution-context`: exac
 CTL associations require an **explicit CTL entity ID**, e.g. `--ctl-entity-id 935120601`. The tool looks up the unique published CTL product and joins CTL flow-to-entity records by **exact CTL entity ID**. It does not assume the published CTL entity and SQL physical target with different schema names are the same object. No Topology product is manufactured when it is absent from the selected revisions; other revisions are not implicitly inspected.
 
 A5 integration is consumer-side only. It does not parse source, infer new intersystem mappings, upgrade logical relations into physical JOINs, or run an LLM. The Task 34 Discovery/Tantivy HTTP search endpoint remains a separate pending integration.
+
+## A6: cross-revision lineage and provenance routed by purpose
+
+`get_attribute_lineage` retrieves the original, already published SQL target lineage
+and, for an exact TSA replica field in a pinned UCP/TSA pair, the accepted Task46
+cross-revision UCP→TSA→datamart lineage. It reuses the same deterministic composer
+as `get_dependencies`, without SQL parsing or inferred correspondence.
+
+`get_evidence --relation <replica> --column <field> --evidence-source task46 --record-index 0`
+retrieves the full Task46 path and `provenance_json` for one zero-based branch.
+Use `--evidence-source task49 --record-index 0` for a projected declared
+UCP/TSA relationship; it is explicitly **not** proof of a physical SQL JOIN/FK.
+Default SQL evidence is now paged (20 entries) to avoid unbounded weak-LLM payloads.
+The default `get_attribute_lineage` SQL projection has 20 compact rows with
+`sql_page.next_offset`, and supports `--sql-offset`, `--sql-limit`,
+`--include-sql-details` to page through every original published row.
+The zero-based record index is scoped to the same immutable revisions, relation,
+column, and source family; it is not an AISL published object ID.

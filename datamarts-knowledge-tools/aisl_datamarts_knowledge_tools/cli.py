@@ -40,10 +40,23 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument('--output-name')
         else:
             p.add_argument('--relation', required=True)
+            if name == 'get_attribute_lineage':
+                p.add_argument('--include-cross-revision-details', action='store_true')
+                p.add_argument('--sql-offset', type=int, default=0)
+                p.add_argument('--sql-limit', type=int, default=20)
+                p.add_argument('--include-sql-details', action='store_true')
+            if name == 'get_evidence':
+                p.add_argument('--evidence-source', choices=('sql','task46','task49'), default='sql')
+                p.add_argument('--record-index', type=int)
+                p.add_argument('--offset', type=int, default=0)
+                p.add_argument('--limit', type=int, default=20)
             if name == 'get_dependencies':
                 p.add_argument('--include-candidate-details', action='store_true')
                 p.add_argument('--include-edge-details', action='store_true')
                 p.add_argument('--include-cross-revision-details', action='store_true')
+                p.add_argument('--sql-offset', type=int, default=0)
+                p.add_argument('--sql-limit', type=int, default=20)
+                p.add_argument('--include-sql-details', action='store_true')
                 p.add_argument('--edge-offset', type=int, default=0)
                 p.add_argument('--edge-limit', type=int, default=20)
                 p.add_argument('--include-execution-context', action='store_true')
@@ -77,6 +90,14 @@ def main(argv: list[str] | None = None) -> int:
             kw = {'relation': args.relation, 'repo_id': args.repo_id}
             if args.column:
                 kw['column'] = args.column
+            if args.command == 'get_attribute_lineage':
+                kw['include_cross_revision_details'] = args.include_cross_revision_details
+                kw['sql_offset'] = args.sql_offset
+                kw['sql_limit'] = args.sql_limit
+                kw['include_sql_details'] = args.include_sql_details
+            if args.command == 'get_evidence':
+                kw.update(evidence_source=args.evidence_source, record_index=args.record_index,
+                          offset=args.offset, limit=args.limit)
             if args.command == 'get_dependencies':
                 kw['include_candidate_details'] = args.include_candidate_details
                 kw['include_edge_details'] = args.include_edge_details
