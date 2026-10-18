@@ -120,3 +120,26 @@ Task 49 published package version: `aisl-ucp-tsa-replica-er==0.1.0a4`
 (or compatible 0.1.0a4+). It depends on the existing `aisl-sdk` API client.
 No source repository is read at runtime. This integration can run before the
 separately planned common Discovery/Tantivy search endpoint is implemented.
+
+## A5: published cross-revision and execution-context access
+
+`get_dependencies` now reuses the published **Task 46** `aisl-data-model-datamart-lineage` consumer library for a **selected exact TSA replica column** and returns its paths separately in `cross_revision_lineage`. Pass both `--model-system/--model-revision` and `--replica-system/--replica-revision`, in addition to the Profile FL `--system/--revision`. For example:
+
+```shell
+# Replace the URL with the actual AISL Knowledge API host in the target environment.
+aisldm --base-url http://localhost:8080 \
+  --system datamart_profile_fl --revision rev-150997201317410ecf2dd2ef \
+  --model-system ucp-data-model --model-revision rev-c39ad2888fc29779cf411bd9 \
+  --replica-system ucp-tsa-v4 --replica-revision rev-5a16127953b6774b18dd8268 \
+  get_dependencies --relation com_sbt_bm_ucp_retail_model_individual_birthdate --column value
+```
+
+The exact `column` is required for Task 46 source-to-target paths. If omitted, `cross_revision_available_fields` provides published TSA-to-UCP field mappings and `cross_revision_lineage_status=requires_exact_replica_column`. Mapping ambiguity or missing publication is explicit. Task 46 physical-target ambiguities **remain ambiguous**. For all original path provenance and segments, pass `--include-cross-revision-details`. No Task 46 algorithm is copied into this package.
+
+For SQL target lineage, the ordinary reply is a **20-edge identity/summary page**, not an unbounded multi-megabyte LLM context. `edge_page` reports the exact total, offset, and `next_offset`. Use `--edge-offset`, `--edge-limit`, and `--include-edge-details` to read *every* original lineage edge with transformations and provenance, one page at a time. Pagination of the read response does not silently truncate the Knowledge API source retrieval.
+
+Execution context is an explicit opt-in with `--include-execution-context`: exact published query IDs and workflow files are used to retrieve SQL JOINs, materializations, workflow bindings, and reachable-file observations. The response includes category counts and limited samples, with the public API route and exact selection keys to retrieve the full records. These contexts are **not** additional proved data-flow edges.
+
+CTL associations require an **explicit CTL entity ID**, e.g. `--ctl-entity-id 935120601`. The tool looks up the unique published CTL product and joins CTL flow-to-entity records by **exact CTL entity ID**. It does not assume the published CTL entity and SQL physical target with different schema names are the same object. No Topology product is manufactured when it is absent from the selected revisions; other revisions are not implicitly inspected.
+
+A5 integration is consumer-side only. It does not parse source, infer new intersystem mappings, upgrade logical relations into physical JOINs, or run an LLM. The Task 34 Discovery/Tantivy HTTP search endpoint remains a separate pending integration.
