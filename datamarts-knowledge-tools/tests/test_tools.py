@@ -36,10 +36,10 @@ def _payload(request):
                                          'target_resolution': {'status': 'ambiguous'},
                                          'gaps': [{'kind': 'missing_physical_mapping'}], 'gaps_truncated': False})
     if path.endswith('/sql/target-candidates'):
-        return httpx.Response(200, json={'candidate_count': 1, 'candidates': [{'logical_target_name':'epk_client','repo_id':'profile'}]})
+        return httpx.Response(200, json={'candidate_count': 1, 'candidates': [{'logical_target_name':'epk_client','repo_id':'profile', 'source_relation_matches': [{'logical_name': 'epk_client'}]}]})
     if path.endswith('/sql/query-context'):
         return httpx.Response(200, json={'selection_status': 'selected', 'query_id': p.get('query_id'),
-                                         'projections': [{'expression': 'CAST(birth_dt AS TIMESTAMP) AS birth_dt'}]})
+                                         'projections': [{'output_name': 'birth_dt','expression': 'CAST(birth_dt AS TIMESTAMP) AS birth_dt'}, {'output_name': 'death_dt', 'expression': 'death_dt'}]})
     return httpx.Response(404, text='unavailable')
 
 
@@ -71,9 +71,9 @@ def test_sql_tools_keep_gaps_and_candidates(tools):
     assert lineage['gaps'][0]['kind'] == 'missing_physical_mapping'
     graph = tools.get_dependencies(relation='epk_client')
     assert graph['edge_count'] == 1
-    assert graph['coverage'] == 'published_sql_target_column_lineage_and_target_candidate_discovery'
+    assert graph['coverage'] == 'published_sql_target_column_lineage_and_target_candidate_discovery_plus_optional_ucp_tsa_replica_er'
     assert graph['downstream_candidate_count'] == 1
-    assert 'Downstream candidates require separate lineage confirmation' in graph['limitations']
+    assert any('require separate lineage confirmation' in reason for reason in graph['limitations'])
     candidates = tools.find_change_locations(relation='epk_client', column='birth_dt')
     assert candidates['status'] == 'candidates_only'
     assert candidates['files'][0]['file'] == 'sql/epk.sql'
@@ -119,3 +119,56 @@ def test_limit_indicates_truncation():
         assert r['truncated'] and r['total_matches']==2 and len(r['items'])==1
     finally:
         search.close()
+
+
+def test_unknown_source_does_not_inherit_global_downstream_candidates(tools):
+    # The provider returns the same broad candidate pool for unknown source names.
+    # The app must not pass unrelated rows as evidence for that source.
+    result = tools.get_dependencies(relation='unpublished_missing_relation')
+    assert result['edge_count'] == 1  # mock upstream is intentionally unfiltered
+    assert result['downstream_candidate_count'] == 0
+    assert result['discovery_pool_count'] == 1
+    assert result['candidate_match_policy'] == 'exact_observed_source_relation_only'
+
+
+def test_column_dependency_candidates_remain_unverified(tools):
+    result = tools.get_dependencies(relation='epk_client', column='birth_dt')
+    assert result['downstream_candidate_count'] == 1
+    assert result['candidate_column_evidence_status'] == 'not_proven_by_relation_match'
+    assert 'source_relation_matches' in result['downstream_target_candidates'][0]
+
+
+def test_search_selection_ref_resolves_published_occurrence(tools):
+    result = tools.search_objects(query='epk_client', include_fuzzy=False)
+    assert result['items']
+    key = result['items'][0]['selection_ref']
+    resolved = tools.get_object_details(selection_ref_id=key)
+    assert resolved['count'] == 1
+    assert resolved['matches'][0]['name'] == result['items'][0]['name']
+    assert resolved['resolution'] == 'exact_published_record'
+    assert key.startswith('search-row-sha256:')
+
+
+def test_get_object_details_requires_identifier(tools):
+    with pytest.raises(ValueError,match='Provide relation'):
+        tools.get_object_details()
+
+
+def test_exact_projection_context_is_bounded_and_does_not_pretend_full_lineage(tools):
+    result = tools.get_calculation_logic(query_id='q1', repo_id='profile', output_name='birth_dt')
+    assert result['matched_projection_count'] == 1
+    assert result['total_scope_projection_count'] == 2
+    assert result['projections'][0]['output_name'] == 'birth_dt'
+    assert 'not proof of full upstream calculation' in result['limitations'][0]
+    absent = tools.get_calculation_logic(query_id='q1', repo_id='profile', output_name='missing_field')
+    assert absent['projection_match_status'] == 'not_found_in_selected_scope'
+
+
+def test_candidates_compact_by_default_with_full_evidence_opt_in(tools):
+    compact = tools.get_dependencies(relation='epk_client')
+    assert compact['downstream_candidate_count'] == 1
+    assert compact['candidate_details_included'] is False
+    assert compact['downstream_target_candidates'][0]['candidate_status'] == 'unconfirmed_dependency'
+    full = tools.get_dependencies(relation='epk_client', include_candidate_details=True)
+    assert full['candidate_details_included'] is True
+    assert full['downstream_target_candidates'][0]['logical_target_name'] == compact['downstream_target_candidates'][0]['logical_target_name']
