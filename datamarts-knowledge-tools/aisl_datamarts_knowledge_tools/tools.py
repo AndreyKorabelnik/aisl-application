@@ -128,8 +128,87 @@ class DataMartsTools:
                 'resolution': 'not_found' if not enriched else 'ambiguous' if len(enriched) > 1 else 'exact_published_record' if (object_id or selection_ref_id) else 'name_candidate',
                 'warning': 'Matching names and mapping records are not proof of deployment or all edit locations'}
 
-    def get_attribute_lineage(self, *, relation: str, column: str, repo_id: str | None = None) -> dict[str, Any]:
-        return self.gateway.target_lineage(relation, column=column, repo_id=repo_id)
+    def _cross_revision_for(self, relation: str, column: str | None, *,
+                            replica_model: ReplicaERIndex | None = None,
+                            include_details: bool = False) -> tuple[str, dict[str, Any] | None, list[dict[str, Any]]]:
+        """Single exact Task49 mapping -> accepted Task46 composition access path.
+
+        The consumer may select a field, but never re-derive cross-revision
+        mappings or promote ambiguous physical targets.
+        """
+        if not (self.model_gateway and self.replica_gateway):
+            return 'not_configured', None, []
+        replica_model = replica_model or self._replica_er_for(relation)
+        if replica_model is None:
+            return 'not_exact_replica', None, []
+        try:
+            fields = replica_model.table_details(relation)['replica_fields']
+            if not column:
+                available = [
+                    {'replica_column': x.get('replica_column'), 'ucp_field': x.get('ucp_field'),
+                     'ucp_type_fqcn': x.get('ucp_type_fqcn'), 'mapping_status': x.get('mapping_status')}
+                    for x in fields]
+                return 'requires_exact_replica_column', None, available
+            if self._cross_revision is None:
+                self._cross_revision = CrossRevisionLineage(
+                    str(self.gateway.client.base_url),
+                    model_system=self.model_gateway.system_id, model_revision=self.model_gateway.revision_id,
+                    replica_system=self.replica_gateway.system_id, replica_revision=self.replica_gateway.revision_id,
+                    profile_system=self.gateway.system_id, profile_revision=self.gateway.revision_id)
+            result = self._cross_revision.for_field(relation=relation, column=column, mapped_fields=fields)
+            if result.get('status') == 'available':
+                result = dict(result)
+                if not include_details:
+                    result['rows'] = [
+                        {k: row.get(k) for k in ('source_type_fqcn', 'source_field',
+                            'replica_relation', 'replica_column', 'profile_source_relation',
+                            'profile_representation_variant', 'target_relation', 'target_column',
+                            'lineage_depth', 'status', 'gap', 'relation_path')}
+                        for row in result['rows']]
+                result['details_included'] = include_details
+                result['row_selection'] = ('Use get_evidence(evidence_source=task46, '
+                                           'relation=<same>, column=<same>, record_index=<zero-based index>) '
+                                           'for a specific branch and its complete published provenance')
+            return str(result.get('status')), result, []
+        except (RuntimeError, ValueError, KeyError) as exc:
+            return 'unavailable', {'status': 'unavailable', 'complete': False,
+                                   'gap': f'{type(exc).__name__}: {exc}', 'rows': []}, []
+
+    def get_attribute_lineage(self, *, relation: str, column: str, repo_id: str | None = None,
+                              include_cross_revision_details: bool = False,
+                              sql_offset: int = 0, sql_limit: int = 20,
+                              include_sql_details: bool = False) -> dict[str, Any]:
+        if sql_offset < 0 or not (1 <= sql_limit <= 500):
+            raise ValueError('sql_offset >= 0 and 1 <= sql_limit <= 500 required')
+        # AISL already parsed this SQL. Page only the LLM-facing projection,
+        # never the source retrieval or public evidence identity.
+        raw = self.gateway.target_lineage(relation, column=column, repo_id=repo_id)
+        all_rows = raw.get('items') or []
+        selected = all_rows[sql_offset:sql_offset + sql_limit]
+        if not include_sql_details:
+            selected = [{k: row.get(k) for k in (
+                'sql_recursive_column_lineage_id', 'workflow_target_logical_name',
+                'target_relation_name', 'target_column', 'terminal_relation_name',
+                'terminal_column', 'lineage_status', 'physical_origin_status',
+                'file', 'line_start', 'query_id')}
+                for row in selected if isinstance(row, dict)]
+        more = sql_offset + len(selected) < len(all_rows)
+        status, paths, fields = self._cross_revision_for(
+            relation, column, include_details=include_cross_revision_details)
+        return {**raw, 'items': selected, 'item_count': len(all_rows),
+                'sql_details_included': include_sql_details,
+                'sql_page': {'offset': sql_offset, 'limit': sql_limit,
+                             'returned': len(selected), 'total': len(all_rows),
+                             'has_more': more,
+                             'next_offset': sql_offset + len(selected) if more else None},
+                'complete_public_items': raw.get('item_count') == len(all_rows),
+                'cross_revision_lineage': paths,
+                'cross_revision_lineage_status': status,
+                'cross_revision_available_fields': fields,
+                'coverage_by_family': {'sql_target_lineage': 'available', 'task46_lineage': status},
+                'limitations': list(raw.get('limitations') or []) + [
+                    'Task46 composition only for unique exact UCP/TSA field mapping; physical target ambiguity remains explicit',
+                    'A missing SQL target row does not refute a Task46 source-to-target journey']}
 
     def get_dependencies(self, *, relation: str, column: str | None = None,
                          repo_id: str | None = None,
@@ -208,49 +287,9 @@ class DataMartsTools:
                 replica_links = {'status': 'unavailable', 'relationship_count': 0,
                                  'gap': f'{type(exc).__name__}: {exc}',
                                  'complete_projected_model': False}
-        # Task46 is the sole semantic composer of UCP → TSA → SQL paths.
-        cross_revision: dict[str, Any] | None = None
-        available_cross_revision_fields: list[dict[str, Any]] = []
-        cross_status = 'not_configured' if not (self.model_gateway and self.replica_gateway) else 'not_exact_replica'
-        if replica_model:
-            if not column:
-                try:
-                    fields = replica_model.table_details(relation)['replica_fields']
-                    available_cross_revision_fields = [
-                        {'replica_column':x.get('replica_column'), 'ucp_field':x.get('ucp_field'),
-                         'ucp_type_fqcn':x.get('ucp_type_fqcn'), 'mapping_status':x.get('mapping_status')}
-                        for x in fields]
-                    cross_status = 'requires_exact_replica_column'
-                except (RuntimeError,ValueError,KeyError) as exc:
-                    cross_status = 'unavailable'
-                    cross_revision = {'status':'unavailable','complete':False,'gap':str(exc),'rows':[]}
-            else:
-                try:
-                    mapped_fields = replica_model.table_details(relation)['replica_fields']
-                    if self._cross_revision is None:
-                        self._cross_revision = CrossRevisionLineage(
-                            str(self.gateway.client.base_url),
-                            model_system=self.model_gateway.system_id, model_revision=self.model_gateway.revision_id,
-                            replica_system=self.replica_gateway.system_id, replica_revision=self.replica_gateway.revision_id,
-                            profile_system=self.gateway.system_id, profile_revision=self.gateway.revision_id)
-                    cross_revision = self._cross_revision.for_field(
-                        relation=relation, column=column, mapped_fields=mapped_fields)
-                    if not include_cross_revision_details and cross_revision['status'] == 'available':
-                        cross_revision = dict(cross_revision)
-                        cross_revision['rows'] = [
-                            {k: row.get(k) for k in ('source_type_fqcn','source_field',
-                                'replica_relation','replica_column','profile_source_relation',
-                                'profile_representation_variant','target_relation','target_column',
-                                'lineage_depth','status','gap','relation_path')}
-                            for row in cross_revision['rows']]
-                        cross_revision['details_included'] = False
-                    elif cross_revision['status'] == 'available':
-                        cross_revision['details_included'] = True
-                    cross_status = cross_revision['status']
-                except (RuntimeError, ValueError, KeyError) as exc:
-                    cross_status = 'unavailable'
-                    cross_revision = {'status': 'unavailable', 'complete': False,
-                                      'gap': f'{type(exc).__name__}: {exc}', 'rows': []}
+        cross_status, cross_revision, available_cross_revision_fields = self._cross_revision_for(
+            relation, column, replica_model=replica_model,
+            include_details=include_cross_revision_details)
         sql_context = None
         if include_execution_context:
             qids = {str(x.get('query_id')) for x in raw.get('items', []) if x.get('query_id')}
@@ -379,12 +418,68 @@ class DataMartsTools:
         }
 
     def get_evidence(self, *, relation: str, column: str | None = None,
-                     repo_id: str | None = None) -> dict[str, Any]:
-        raw = self.gateway.target_lineage(relation, column=column, repo_id=repo_id)
-        return {'relation': relation, 'column': column, 'items': [
-            {'lineage_id': x.get('sql_recursive_column_lineage_id'), 'file': x.get('file'),
-             'line_start': x.get('line_start'), 'query_id': x.get('query_id'),
-             'evidence': x.get('evidence_json'), 'lineage_status': x.get('lineage_status')}
-            for x in raw.get('items') or [] if isinstance(x, dict)],
-            'gaps': raw.get('gaps'), 'gaps_truncated': raw.get('gaps_truncated', False),
-            'target_resolution': raw.get('target_resolution')}
+                     repo_id: str | None = None, evidence_source: str = 'sql',
+                     record_index: int | None = None, offset: int = 0,
+                     limit: int = 20) -> dict[str, Any]:
+        """Evidence from the same published owner that produced the reported claim.
+
+        `record_index` is a scoped ephemeral selector, never a publisher object ID;
+        call with the same pinned revisions/relation/column as the original tool.
+        """
+        if evidence_source not in {'sql', 'task46', 'task49'}:
+            raise ValueError('evidence_source must be sql, task46 or task49')
+        if offset < 0 or not (1 <= limit <= 500) or (record_index is not None and record_index < 0):
+            raise ValueError('offset/record_index >= 0 and 1 <= limit <= 500 required')
+        if evidence_source == 'sql':
+            raw = self.gateway.target_lineage(relation, column=column, repo_id=repo_id)
+            all_records = [
+                {'lineage_id': x.get('sql_recursive_column_lineage_id'), 'file': x.get('file'),
+                 'line_start': x.get('line_start'), 'query_id': x.get('query_id'),
+                 'evidence': x.get('evidence_json'), 'lineage_status': x.get('lineage_status')}
+                for x in raw.get('items') or [] if isinstance(x, dict)]
+            gaps = raw.get('gaps')
+            context = {'target_resolution': raw.get('target_resolution'),
+                       'gaps_truncated': raw.get('gaps_truncated', False)}
+            status = 'available'
+        elif evidence_source == 'task46':
+            if not column:
+                raise ValueError('column is required to select a Task46 lineage field')
+            status, result, fields = self._cross_revision_for(relation, column, include_details=True)
+            all_records = (result or {}).get('rows') or []
+            gaps = (result or {}).get('gap')
+            context = {'bindings': (result or {}).get('bindings'),
+                       'source_type': (result or {}).get('source_type'),
+                       'source_field': (result or {}).get('source_field'),
+                       'available_fields': fields,
+                       'physical_target_policy': 'preserve_ambiguity'}
+        else:
+            projection = self._replica_er_for(relation)
+            if projection is None:
+                status = 'not_configured' if not (self.model_gateway and self.replica_gateway) else 'not_exact_replica'
+                all_records, gaps, context = [], 'exact_TSA_replica_required', {}
+            else:
+                try:
+                    result = projection.relationships(relation, column=column)
+                    status = result['status']
+                    all_records = result['relationships']
+                    gaps = None
+                    context = {'ucp_binding': result['ucp_binding'],
+                               'tsa_binding': result['tsa_binding'],
+                               'semantic_category': 'declared_logical_relationship_not_physical_join'}
+                except (RuntimeError, ValueError, KeyError) as exc:
+                    status, all_records, gaps, context = 'unavailable', [], f'{type(exc).__name__}: {exc}', {}
+        total = len(all_records)
+        if record_index is not None:
+            page = [all_records[record_index]] if record_index < total else []
+            page_offset = record_index
+        else:
+            page = all_records[offset:offset + limit]
+            page_offset = offset
+        more = page_offset + len(page) < total
+        return {'relation': relation, 'column': column, 'evidence_source': evidence_source,
+                'source_status': status, 'items': page, 'item_count': total,
+                'selection_policy': 'scoped_zero_based_index_not_publisher_identity',
+                'page': {'offset': page_offset, 'limit': 1 if record_index is not None else limit,
+                         'returned': len(page), 'total': total, 'has_more': more,
+                         'next_offset': page_offset + len(page) if more else None},
+                'gaps': gaps, **context}
