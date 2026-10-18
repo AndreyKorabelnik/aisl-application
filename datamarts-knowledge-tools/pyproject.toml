@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aisl-datamarts-knowledge-tools"
-version = "0.1.0a2"
+version = "0.1.0a4"
 description = "Revision-pinned public AISL datamart tools for a weak-LLM consumer"
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.27,<1", "RapidFuzz>=3.14,<4"]
+dependencies = ["httpx>=0.27,<1", "RapidFuzz>=3.14,<4", "aisl-ucp-tsa-replica-er>=0.1.0a4,<0.2"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]

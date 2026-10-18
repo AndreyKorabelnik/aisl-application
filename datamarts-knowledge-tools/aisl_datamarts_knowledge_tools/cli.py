@@ -33,11 +33,15 @@ def main(argv: list[str] | None = None) -> int:
         elif name == 'get_object_details':
             p.add_argument('--relation', default='')
             p.add_argument('--object-id')
+            p.add_argument('--selection-ref-id')
         elif name == 'get_calculation_logic':
             p.add_argument('--query-id', required=True)
             p.add_argument('--scope-id')
+            p.add_argument('--output-name')
         else:
             p.add_argument('--relation', required=True)
+            if name == 'get_dependencies':
+                p.add_argument('--include-candidate-details', action='store_true')
             if name not in ('get_object_details',):
                 p.add_argument('--column')
     args = parser.parse_args(argv)
@@ -58,13 +62,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == 'search_objects':
             result = tools.search_objects(query=args.query, limit=args.limit, include_fuzzy=not args.no_fuzzy)
         elif args.command == 'get_object_details':
-            result = tools.get_object_details(relation=args.relation, object_id=args.object_id)
+            result = tools.get_object_details(relation=args.relation, object_id=args.object_id,
+                                              selection_ref_id=args.selection_ref_id)
         elif args.command == 'get_calculation_logic':
-            result = tools.get_calculation_logic(query_id=args.query_id, repo_id=args.repo_id or '', scope_id=args.scope_id)
+            result = tools.get_calculation_logic(query_id=args.query_id, repo_id=args.repo_id or '',
+                                                 scope_id=args.scope_id, output_name=args.output_name)
         else:
             kw = {'relation': args.relation, 'repo_id': args.repo_id}
             if args.column:
                 kw['column'] = args.column
+            if args.command == 'get_dependencies':
+                kw['include_candidate_details'] = args.include_candidate_details
             result = getattr(tools, args.command)(**kw)
         print(json.dumps({'system_id': args.system, 'revision_id': args.revision,
                           'tool': args.command, 'result': result}, ensure_ascii=False, indent=2, default=str))

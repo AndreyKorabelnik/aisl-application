@@ -66,3 +66,57 @@ accepts `--object-id` to disambiguate search results.
 
 `get_dependencies` now pages all target-candidates at the API's maximum
 100 records per page. Downstream candidates are explicitly not confirmed edges.
+
+## LLM self-check A3 (2026-10-17)
+
+A real local AISL Server with pinned UCP / TSA / Profile FL bundles exposed
+three model-facing usability problems in A2:
+
+1. `/sql/target-candidates` returns a broad discovery pool (110 entries even
+   for an unknown relation). `get_dependencies` now exposes ONLY candidates
+   carrying exact published `source_relation_matches`. These are still NOT
+   confirmed lineage edges. `discovery_pool_count` discloses the original pool.
+   When `column` is specified, relation-only candidates do not prove a field link.
+2. SQL search records sometimes have empty publisher `object_id`.
+   `search_objects` returns a deterministic `selection_ref`; pass it as
+   `selection_ref_id` to `get_object_details`. This digest identifies exactly
+   one record in a pinned search projection; it is **not** a published semantic
+   object ID and does not resolve physical table ambiguity.
+3. `get_calculation_logic` may return many projections. An optional exact
+   `output_name` returns the selected-scope projection with source identity
+   and caveats; omit it to obtain the complete public query context.
+   A final SQL CAST does not establish full upstream calculation lineage.
+
+`get_dependencies` defaults to a compact projection of **every exact
+source-matched candidate**, preserving evidence matches; specify
+`include_candidate_details=true` for the same tool to return the original full
+public candidate metadata. This is one tool catalog, not two access tiers.
+
+**Unresolved:** generic, evidence-complete graph of any replica across all
+selected revisions; controlled GLM provider E2E; broader CTL/Inventory flows.
+This alpha does not claim any of these capabilities as accepted.
+
+## Task 49 UCP/TSA Replica ER reuse (0.1.0a4)
+
+When both `--model-system/--model-revision` and `--replica-system/--replica-revision`
+are pinned, `get_dependencies` additionally returns `replica_logical_relationships`
+for an exactly observed TSA replica table. This is computed once per process and
+revision pair using the published `aisl-ucp-tsa-replica-er` package and its
+public AISL API loader; it is **not** a new graph or mapping resolver. The full
+model is built (not a root-only outgoing closure), then indexed for both incoming
+and outgoing declared relationships. For `get_object_details` on a TSA replica,
+Task 49 also contributes logical identity columns, UCP field descriptions and
+explicit physical-key gaps.
+
+`replica_logical_relationships` is separate from SQL `edges` and downstream
+SQL candidates. UCP-declared relationships projected onto exact TSA mappings
+are **not** database FK/PK constraints, SQL joins, data movement or attribute
+lineage. A column-scoped question can show these relations as contextual only,
+with `column_evidence_status=not_proven_by_logical_relationship`. Unsupported
+or unavailable UCP/TSA projection is declared explicitly; absence of an
+exact observed TSA replica match avoids a full Task 49 model load.
+
+Task 49 published package version: `aisl-ucp-tsa-replica-er==0.1.0a4`
+(or compatible 0.1.0a4+). It depends on the existing `aisl-sdk` API client.
+No source repository is read at runtime. This integration can run before the
+separately planned common Discovery/Tantivy search endpoint is implemented.

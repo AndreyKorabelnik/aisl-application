@@ -6,9 +6,17 @@ The transient index contains ONLY public names/provenance from the pinned AISL r
 from __future__ import annotations
 
 import sqlite3
+import hashlib
+import json
 from typing import Any, Iterable
 
 from rapidfuzz import fuzz, process
+
+
+def selection_ref(row: dict[str, Any]) -> str:
+    """Digest of a search projection, NOT a published AISL object identity."""
+    encoded = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str).encode('utf-8')
+    return 'search-row-sha256:' + hashlib.sha256(encoded).hexdigest()
 
 
 class ObjectSearch:
@@ -50,7 +58,7 @@ class ObjectSearch:
             for _, score, i in process.extract(term, names, scorer=fuzz.WRatio, limit=None, score_cutoff=65):
                 matches.setdefault(i, ('fuzzy_candidate', round(float(score), 2)))
         order = {'exact': 0, 'fts5': 1, 'fuzzy_candidate': 2}
-        hits = [{**self.records[i], 'match_kind': kind, 'match_score': score}
+        hits = [{**self.records[i], 'selection_ref': selection_ref(self.records[i]), 'match_kind': kind, 'match_score': score}
                 for i, (kind, score) in sorted(matches.items(), key=lambda kv: (order[kv[1][0]], -kv[1][1], str(self.records[kv[0]].get('name')), kv[0]))]
         return {'query': query, 'total_matches': len(hits), 'items': hits[:limit],
                 'truncated': len(hits) > limit,
