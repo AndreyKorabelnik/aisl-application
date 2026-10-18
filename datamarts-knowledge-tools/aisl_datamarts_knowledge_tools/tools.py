@@ -6,6 +6,7 @@ from typing import Any
 from .gateway import Gateway
 from .search import ObjectSearch, relation_records, declared_model_records, replica_mapping_records, selection_ref
 from .replica_er import ReplicaERIndex
+from .cross_revision import CrossRevisionLineage
 
 
 class DataMartsTools:
@@ -17,6 +18,7 @@ class DataMartsTools:
         self._relations: list[dict[str, Any]] | None = None
         self._search: ObjectSearch | None = None
         self._replica_er: ReplicaERIndex | None = None
+        self._cross_revision: CrossRevisionLineage | None = None
 
     def close(self) -> None:
         if self._search:
@@ -131,8 +133,15 @@ class DataMartsTools:
 
     def get_dependencies(self, *, relation: str, column: str | None = None,
                          repo_id: str | None = None,
-                         include_candidate_details: bool = False) -> dict[str, Any]:
+                         include_candidate_details: bool = False,
+                         edge_offset: int = 0, edge_limit: int = 20,
+                         include_edge_details: bool = False,
+                         include_cross_revision_details: bool = False,
+                         include_execution_context: bool = False,
+                         ctl_entity_id: str | None = None) -> dict[str, Any]:
         """All PUBLISHED upstream target lineage, without synthesizing edges."""
+        if edge_offset < 0 or not (1 <= edge_limit <= 500):
+            raise ValueError('edge_offset >= 0 and 1 <= edge_limit <= 500 required')
         raw = self.gateway.target_lineage(relation, column=column, repo_id=repo_id)
         edges: list[dict[str, Any]] = []
         seen: set[str] = set()
@@ -199,7 +208,89 @@ class DataMartsTools:
                 replica_links = {'status': 'unavailable', 'relationship_count': 0,
                                  'gap': f'{type(exc).__name__}: {exc}',
                                  'complete_projected_model': False}
-        return {'relation': relation, 'column': column, 'edges': edges, 'edge_count': len(edges),
+        # Task46 is the sole semantic composer of UCP → TSA → SQL paths.
+        cross_revision: dict[str, Any] | None = None
+        available_cross_revision_fields: list[dict[str, Any]] = []
+        cross_status = 'not_configured' if not (self.model_gateway and self.replica_gateway) else 'not_exact_replica'
+        if replica_model:
+            if not column:
+                try:
+                    fields = replica_model.table_details(relation)['replica_fields']
+                    available_cross_revision_fields = [
+                        {'replica_column':x.get('replica_column'), 'ucp_field':x.get('ucp_field'),
+                         'ucp_type_fqcn':x.get('ucp_type_fqcn'), 'mapping_status':x.get('mapping_status')}
+                        for x in fields]
+                    cross_status = 'requires_exact_replica_column'
+                except (RuntimeError,ValueError,KeyError) as exc:
+                    cross_status = 'unavailable'
+                    cross_revision = {'status':'unavailable','complete':False,'gap':str(exc),'rows':[]}
+            else:
+                try:
+                    mapped_fields = replica_model.table_details(relation)['replica_fields']
+                    if self._cross_revision is None:
+                        self._cross_revision = CrossRevisionLineage(
+                            str(self.gateway.client.base_url),
+                            model_system=self.model_gateway.system_id, model_revision=self.model_gateway.revision_id,
+                            replica_system=self.replica_gateway.system_id, replica_revision=self.replica_gateway.revision_id,
+                            profile_system=self.gateway.system_id, profile_revision=self.gateway.revision_id)
+                    cross_revision = self._cross_revision.for_field(
+                        relation=relation, column=column, mapped_fields=mapped_fields)
+                    if not include_cross_revision_details and cross_revision['status'] == 'available':
+                        cross_revision = dict(cross_revision)
+                        cross_revision['rows'] = [
+                            {k: row.get(k) for k in ('source_type_fqcn','source_field',
+                                'replica_relation','replica_column','profile_source_relation',
+                                'profile_representation_variant','target_relation','target_column',
+                                'lineage_depth','status','gap','relation_path')}
+                            for row in cross_revision['rows']]
+                        cross_revision['details_included'] = False
+                    elif cross_revision['status'] == 'available':
+                        cross_revision['details_included'] = True
+                    cross_status = cross_revision['status']
+                except (RuntimeError, ValueError, KeyError) as exc:
+                    cross_status = 'unavailable'
+                    cross_revision = {'status': 'unavailable', 'complete': False,
+                                      'gap': f'{type(exc).__name__}: {exc}', 'rows': []}
+        sql_context = None
+        if include_execution_context:
+            qids = {str(x.get('query_id')) for x in raw.get('items', []) if x.get('query_id')}
+            workflows = set()
+            for x in raw.get('items', []):
+                for step in x.get('branch_path_json') or []:
+                    if isinstance(step, dict) and step.get('workflow_context_file'):
+                        workflows.add(str(step['workflow_context_file']))
+            try:
+                sql_context = self.gateway.sql_execution_context(qids, workflows)
+            except (RuntimeError, ValueError, KeyError) as exc:
+                sql_context = {'status': 'unavailable', 'complete': False,
+                               'gap': f'{type(exc).__name__}: {exc}'}
+        ctl_context = None
+        if ctl_entity_id is not None:
+            if not ctl_entity_id.strip():
+                raise ValueError('ctl_entity_id must not be blank')
+            try:
+                ctl_context = self.gateway.ctl_entity_context(ctl_entity_id)
+            except (RuntimeError, ValueError, KeyError) as exc:
+                ctl_context = {'status': 'unavailable', 'complete': False,
+                               'gap': f'{type(exc).__name__}: {exc}', 'entity_id': ctl_entity_id}
+        # The public API data is fully retrieved. Only the *response projection*
+        # is paged to avoid pushing megabytes into the weak-LLM context.
+        full_page = edges[edge_offset:edge_offset + edge_limit]
+        edge_page = (full_page if include_edge_details else [
+            {k: row.get(k) for k in ('lineage_id','target_relation','target_column',
+                                      'source_relation','source_column','depth','status','origin_status')}
+            for row in full_page])
+        edge_more = edge_offset + len(edge_page) < len(edges)
+        return {'relation': relation, 'column': column, 'edges': edge_page, 'edge_count': len(edges),
+                'edge_details_included':include_edge_details,
+                'edge_page': {'offset': edge_offset, 'limit': edge_limit, 'returned': len(edge_page),
+                              'total':len(edges), 'has_more':edge_more,
+                              'next_offset':edge_offset+len(edge_page) if edge_more else None},
+                'cross_revision_available_fields':available_cross_revision_fields,
+                'cross_revision_lineage': cross_revision,
+                'cross_revision_lineage_status': cross_status,
+                'sql_execution_context': sql_context,
+                'ctl_entity_context': ctl_context,
                 'replica_logical_relationships': replica_links,
                 'replica_logical_relationship_status': replica_model_status,
                 'downstream_target_candidates': display_candidates,
@@ -212,8 +303,14 @@ class DataMartsTools:
                 'gaps_truncated': raw.get('gaps_truncated', False),
                 'direction': 'upstream_confirmed_or_partial_plus_downstream_discovery_candidates',
                 'coverage': 'published_sql_target_column_lineage_and_target_candidate_discovery_plus_optional_ucp_tsa_replica_er',
+                'coverage_by_family': {'sql_lineage': 'available', 'ucp_tsa':replica_model_status,
+                                       'task46_lineage':cross_status,
+                                       'sql_execution':'not_requested' if sql_context is None else sql_context['status'],
+                                       'ctl':'not_requested' if ctl_context is None else ctl_context['status'],
+                                       'topology':'not_queried'},
                 'limitations': ['Downstream candidates are relation-level only and require separate lineage confirmation', 'Does not invent edges across revisions', 'Projected UCP/TSA replica links are logical relations, not SQL/physical joins or data flows'],
-                'complete_public_items': raw.get('item_count') == len(raw.get('items', []))}
+                'complete_public_items': raw.get('item_count') == len(raw.get('items', [])),
+                'response_is_paged': True}
 
     def find_change_locations(self, *, relation: str, column: str | None = None,
                               repo_id: str | None = None) -> dict[str, Any]:

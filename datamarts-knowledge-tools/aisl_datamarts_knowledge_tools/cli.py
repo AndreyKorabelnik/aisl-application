@@ -42,6 +42,12 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument('--relation', required=True)
             if name == 'get_dependencies':
                 p.add_argument('--include-candidate-details', action='store_true')
+                p.add_argument('--include-edge-details', action='store_true')
+                p.add_argument('--include-cross-revision-details', action='store_true')
+                p.add_argument('--edge-offset', type=int, default=0)
+                p.add_argument('--edge-limit', type=int, default=20)
+                p.add_argument('--include-execution-context', action='store_true')
+                p.add_argument('--ctl-entity-id')
             if name not in ('get_object_details',):
                 p.add_argument('--column')
     args = parser.parse_args(argv)
@@ -73,6 +79,12 @@ def main(argv: list[str] | None = None) -> int:
                 kw['column'] = args.column
             if args.command == 'get_dependencies':
                 kw['include_candidate_details'] = args.include_candidate_details
+                kw['include_edge_details'] = args.include_edge_details
+                kw['include_cross_revision_details'] = args.include_cross_revision_details
+                kw['edge_offset'] = args.edge_offset
+                kw['edge_limit'] = args.edge_limit
+                kw['include_execution_context'] = args.include_execution_context
+                kw['ctl_entity_id'] = args.ctl_entity_id
             result = getattr(tools, args.command)(**kw)
         print(json.dumps({'system_id': args.system, 'revision_id': args.revision,
                           'tool': args.command, 'result': result}, ensure_ascii=False, indent=2, default=str))
