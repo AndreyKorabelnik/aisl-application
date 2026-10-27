@@ -17,8 +17,8 @@ class Gateway:
     def revision_status(self, binding):
         self.calls["revision_status"] += 1
         if self.fail_status:
-            return {"status": "server_unavailable", "capabilities": []}
-        return {"status": "ready", "capabilities": ["workspace.attribute-path-resolver"],
+            return {"status": "server_unavailable", "available_tools": []}
+        return {"status": "ready", "available_tools": ["resolve_attribute_path"],
                 "system_id": binding.system_id, "revision_id": binding.revision_id}
 
     def resolve_attribute_paths(self, binding, *, source, selected_repo_ids, direction):

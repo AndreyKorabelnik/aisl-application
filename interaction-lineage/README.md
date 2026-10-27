@@ -46,14 +46,14 @@ explicit bindings.
 ## Check
 
 `check` is a **cheap admission preflight**. It validates exact pinned revisions,
-the published `workspace.attribute-path-resolver` capability, and whether Topology
+the pinned `resolve_attribute_path` entry in `/revision-tools`, and whether Topology
 contains observed field hints for the requested roles. The output is
-`interaction-lineage-readiness/v1` with `readiness_scope: repository_capabilities_only`.
+`interaction-lineage-readiness/v1` with `readiness_scope: repository_revision_tools_only`.
 `prerequisites_satisfied` means **only that deeper verification can be attempted**;
 it does not establish field-anchor availability, external-origin resolution, or
 any actual crossing. The explicitly non-blocking
 `attribute_path_resolution_deferred` diagnostic records this limitation.
-Missing bindings, revisions, capabilities and Topology field probes retain their
+Missing bindings, revisions, revision tools and Topology field probes retain their
 typed diagnostics. No source acquisition or analysis is attempted.
 
 Use `check --deep` to run the previous detailed readiness check: it resolves
@@ -120,13 +120,13 @@ seconds (from Runner), source digests, analysis-job state changes and AISL
 publication. Consult the KCP runtime log / job logs while the synchronous
 `prepare` request is running. Logs must be sanitized before export.
 
-The KCP built-in analysis profile is `attribute-lineage-v1`, scope `workspace`,
-selecting only `attribute-lineage` (Runner product `repository-value-flow`,
-capability `workspace.attribute-path-resolver`). It runs selected source-local
-value-flow evidence, not complete portfolio/system-interaction analysis; Nexus
-artifacts are admitted only through bounded, observed external-source demands.
-The new profile requires deploying the matching KCP release. An Application-only
-upgrade must fail closed if the server lacks this profile.
+KCP preparation requests directly select Knowledge Product `attribute-lineage`
+with `execution_scope=workspace`, through the supported generic
+`/api/v1/preparations/run` API. No Knowledge Profile or Published Capabilities
+registry is involved. The selection produces source-local value-flow evidence,
+not an eager full-portfolio interaction graph. Nexus sources are admitted only
+through bounded, observed external-source demands. A KCP runtime that does not
+support this request contract must fail closed; it is not automatically adapted.
 
 These controls do not guarantee a wall-clock/CPU bound **within** one KCP job.
 Operators must also configure/verify server-side Runner/Nexus limits before real

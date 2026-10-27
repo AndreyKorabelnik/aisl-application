@@ -16,8 +16,8 @@ from urllib.parse import urlsplit
 from .contracts import BindingIndex, BINDINGS_SCHEMA_VERSION
 from .topology import validate_topology
 
-PROFILE = "attribute-lineage-v1"
-CAPABILITY = "workspace.attribute-path-resolver"
+PRODUCT_ID = "attribute-lineage"
+REQUIRED_TOOL = "resolve_attribute_path"
 SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
@@ -81,7 +81,13 @@ def _published_candidates(client: Any, sources: Mapping[str, Mapping[str, str]])
         for revision in client.list_revisions(system.system_id):
             raw = revision.raw
             for rid, source in eligible.items():
-                if _matching_revision(raw, source) and CAPABILITY in revision.capabilities:
+                if not _matching_revision(raw, source):
+                    continue
+                # Discovery reads the revision-gated executable contract, never the
+                # removed Published Capabilities registry or a framework-global flag.
+                pinned = client.revision(system.system_id, revision.revision_id)
+                tools = pinned.revision_tools().tools
+                if REQUIRED_TOOL in {str(tool.get("name")) for tool in tools}:
                     candidates[rid].append({"repository_id": rid, "system_id": system.system_id,
                                             "revision_id": revision.revision_id})
     return candidates
@@ -102,7 +108,7 @@ def plan_missing_bundles(
                         if row["system_id"] == bound.system_id and row["revision_id"] == bound.revision_id]
         if len(matching) == 1:
             status = "ready"
-            reason = "published_exact_source_revision_and_capability"
+            reason = "published_exact_source_revision_and_revision_tool"
         elif len(matching) > 1:
             status = "ambiguous"
             reason = "multiple_published_exact_source_revisions"
@@ -113,7 +119,7 @@ def plan_missing_bundles(
             status = "requires_bundle"
             reason = "no_compatible_published_revision_confirmed"
         result.append({**source, "status": status, "reason": reason,
-                       "profile": PROFILE, "published_matches": matching})
+                       "product_id": PRODUCT_ID, "published_matches": matching})
     ready = [row["published_matches"][0] for row in result if row["status"] == "ready"]
     pending = [row for row in result if row["status"] != "ready"]
     return {
@@ -154,7 +160,7 @@ def render_preparation_script(plan: Mapping[str, Any]) -> str:
         jobs += 1
         quote = shlex.quote
         lines += [
-            f'# {rid} @ {sha}; profile {PROFILE}',
+            f'# {rid} @ {sha}; product {PRODUCT_ID}',
             f'if test -d {quote(f"work/{key}/.git")}; then',
             f'  test "$(git -C {quote(f"work/{key}")} remote get-url origin)" = {quote(url)}',
             'else',
@@ -163,7 +169,7 @@ def render_preparation_script(plan: Mapping[str, Any]) -> str:
             f'git -C {quote(f"work/{key}")} cat-file -e {quote(sha + "^{commit}")} 2>/dev/null || git -C {quote(f"work/{key}")} fetch origin {quote(sha)}',
             f'git -C {quote(f"work/{key}")} checkout --detach {quote(sha)}',
             f'test "$(git -C {quote(f"work/{key}")} rev-parse HEAD)" = {quote(sha)}',
-            f'knowledge-control-plane run --knowledge-profile {quote(PROFILE)} '
+            f'knowledge-control-plane run --product {quote(PRODUCT_ID)} --scope repository '
             f'--repository {quote(f"work/{key}")} --system-id {quote(rid)} '
             f'--output {quote(f"bundles/{key}-work")} --json > {quote(f"bundles/{key}-job.json")}',
             f'echo {quote(f"{rid}: preparation completed; see bundles/{key}-job.json for publication_bundle.path")}',

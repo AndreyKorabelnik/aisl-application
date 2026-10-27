@@ -19,6 +19,7 @@ def _topology() -> dict[str, Any]:
             "protocol": "http",
             "method": "POST",
             "matched_identity": "/v1/task/startProcesses",
+            "basis": [{"kind": "http_method_path", "value": "POST /v1/task/startProcesses"}],
             "match_classification": "exact",
             "claim_classification": "observed",
             "confidence": "high",
@@ -173,3 +174,23 @@ def test_ambiguous_wire_ref_is_resolved_only_by_exact_topology_transport_identit
             "canonical_wire_display_ref:exact_topology_transport_identity"
         )
         assert journey[side]["resolved_anchor"]["value_node_id"].endswith("-start-processes")
+
+
+def test_topology_v5_payload_match_must_not_be_used_as_rest_route() -> None:
+    from aisl_interaction_lineage.topology import route_boundary_ref
+
+    edge = {
+        "protocol": "http", "method": "POST",
+        "matched_identity": "payload:POST | SubToUcpIdRequest | SubToUcpIdResponse",
+        "basis": [{"kind": "http_method_payload_pair", "value": "POST | SubToUcpIdRequest | SubToUcpIdResponse"}],
+    }
+    assert route_boundary_ref(edge, "request", "subUcpId") is None
+    assert route_boundary_ref(edge, "response", "ucpId") is None
+
+
+def test_topology_v5_rest_path_requires_matching_typed_route_basis() -> None:
+    from aisl_interaction_lineage.topology import route_boundary_ref
+
+    edge = {"protocol": "http", "method": "POST", "matched_identity": "/kpk/subToUcpId", "basis": [{"kind": "http_method_path", "value": "POST /kpk/subToUcpId"}]}
+    assert route_boundary_ref(edge, "request", "subUcpId") == "boundary:rest:/kpk/subToUcpId:request.subUcpId"
+    assert route_boundary_ref({**edge, "basis": [{"kind": "http_method_payload_pair", "value": "POST /kpk/subToUcpId"}]}, "request", "subUcpId") is None

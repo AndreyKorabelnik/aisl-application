@@ -41,7 +41,7 @@ def test_fast_check_declares_unverified_field_anchors_without_path_queries():
     )
     assert gateway.status_calls == 2
     assert out["status"] == "prerequisites_satisfied"
-    assert out["readiness_scope"] == "repository_capabilities_only"
+    assert out["readiness_scope"] == "repository_revision_tools_only"
     assert out["summary"]["attribute_path_resolution"] == "deferred"
     assert out["preparation_requirements"] == []
     assert all("boundary_anchor_count" not in row for row in out["repositories"])
@@ -64,11 +64,11 @@ def test_fast_check_retains_missing_binding_capability_server_diagnostics():
     }
     out = check_interaction_lineage(
         candidate_topology(), edge_id="candidate-1", bindings=_bindings(),
-        gateway=NoPathGateway(revision_status={"service": {"status": "ready", "capabilities": []}}),
+        gateway=NoPathGateway(revision_status={"service": {"status": "ready", "available_tools": []}}),
         prerequisites_only=True, transport_roles=("request",),
     )
     assert out["status"] == "not_ready"
-    assert any(d["code"] == "required_capability_missing" for d in out["diagnostics"])
+    assert any(d["code"] == "required_revision_tool_missing" for d in out["diagnostics"])
 
 
 def test_fast_check_retains_missing_field_probe_and_does_not_infer_absence_of_anchors():
@@ -112,7 +112,7 @@ def test_cli_defaults_fast_and_deep_is_explicit(tmp_path, monkeypatch):
             "--bindings", str(bindings_file), "--aisl-base-url", "http://unused", "--output", str(output)]
     assert cli.main(args) == 2  # response role has no observed fields
     shallow = json.loads(output.read_text())
-    assert shallow["readiness_scope"] == "repository_capabilities_only"
+    assert shallow["readiness_scope"] == "repository_revision_tools_only"
     assert shallow["status"] == "not_ready"
     assert "resolve_attribute_paths" not in CountGateway.requests
     assert CountGateway.requests.count("revision_status") == 2

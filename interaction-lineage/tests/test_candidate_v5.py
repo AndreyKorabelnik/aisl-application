@@ -153,7 +153,7 @@ def test_v5_inventory_fingerprint_does_not_block_published_knowledge():
     ]
     gateway = ReadinessGateway(revision_status={
         repo: {
-            "status": "ready", "capabilities": ["workspace.attribute-path-resolver"],
+            "status": "ready", "available_tools": ["resolve_attribute_path"],
             # Intentionally same-looking SHA in a different provenance domain.
             "metadata": {"source_snapshot_fingerprint": "a" * 64},
         }
@@ -200,7 +200,7 @@ def test_v5_missing_binding_invokes_existing_kcp_preparation_without_git_gate():
     )
     assert len(calls) == 2
     assert {x["observed_boundary"]["repository_id"] for x in calls} == {"caller", "service"}
-    assert all(x["analysis_profile_id"] == "attribute-lineage-v1" for x in calls)
+    assert all(x["product_ids"] == ["attribute-lineage"] and x["execution_scope"] == "workspace" for x in calls)
     assert result["status"] == "prepared"
     assert result["summary"]["framework_invocation_count"] == 2
 

@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         if name == "check":
             command.add_argument(
                 "--deep", action="store_true",
-                help="Resolve field anchors and external-origin gaps; default check only verifies pinned revisions, capabilities and observed field coverage",
+                help="Resolve field anchors and external-origin gaps; default check only verifies pinned revisions, pinned revision tools and observed field coverage",
             )
 
     csv_command = sub.add_parser("csv", help="Render human-readable CSV from interaction lineage JSON")

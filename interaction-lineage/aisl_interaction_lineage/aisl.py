@@ -49,17 +49,25 @@ class KnowledgeApiGateway:
         try:
             pinned = self._client.revision(binding.system_id, binding.revision_id)
         except AislTransportError as exc:
-            return {"status": "server_unavailable", "capabilities": [], "diagnostic": str(exc)}
+            return {"status": "server_unavailable", "available_tools": [], "diagnostic": str(exc)}
         except AislApiError as exc:
             status = "missing_revision" if exc.status_code == 404 else "api_error"
-            return {"status": status, "capabilities": [], "diagnostic": str(exc)}
+            return {"status": status, "available_tools": [], "diagnostic": str(exc)}
         except AislContractError as exc:
-            return {"status": "contract_error", "capabilities": [], "diagnostic": str(exc)}
+            return {"status": "contract_error", "available_tools": [], "diagnostic": str(exc)}
+        # The immutable revision's executable tool bindings are the sole read gate.
+        # A framework-global /capabilities response cannot prove revision eligibility.
+        try:
+            tools = pinned.revision_tools().tools
+        except AislTransportError as exc:
+            return {"status": "server_unavailable", "available_tools": [], "diagnostic": str(exc)}
+        except (AislApiError, AislContractError) as exc:
+            return {"status": "contract_error", "available_tools": [], "diagnostic": str(exc)}
         return {
             "status": "ready",
             "system_id": pinned.system_id,
             "revision_id": pinned.revision_id,
-            "capabilities": list(pinned.capabilities),
+            "available_tools": sorted({str(tool.get("name")) for tool in tools if tool.get("name")}),
         }
 
     def resolve_attribute_paths(

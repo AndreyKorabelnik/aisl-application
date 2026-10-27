@@ -45,7 +45,7 @@ def test_budget_one_preparation_keeps_deferred_and_pins_server_max_steps(monkeyp
     assert result["summary"]["framework_invocation_count"] == 1
     assert result["summary"]["deferred_group_count"] >= 1
     assert len(gateway.calls) == 1 and gateway.calls[0]["max_steps"] == 1
-    assert gateway.calls[0]["analysis_profile_id"] == "attribute-lineage-v1"
+    assert gateway.calls[0]["product_ids"] == ["attribute-lineage"] and gateway.calls[0]["execution_scope"] == "workspace"
     assert any(event["event"] == "preparation.started" for event in sink)
     assert not any(event["event"] == "preparation.budget_exhausted" for event in sink)
     assert all(row["reason"] == "previous_preparation_stopped" for row in result["deferred_groups"])
