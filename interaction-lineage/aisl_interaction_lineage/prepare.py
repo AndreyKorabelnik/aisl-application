@@ -13,8 +13,7 @@ from .contracts import AislBinding, BINDINGS_SCHEMA_VERSION, BindingIndex
 from .topology import boundary_fields, select_edge
 
 PREPARATION_FORMAT = "interaction-lineage-preparation/v1"
-_PROFILE_ID = "attribute-lineage-v1"
-_REQUIRED_CAPABILITY = "workspace.attribute-path-resolver"
+_PRODUCT_ID = "attribute-lineage"
 
 
 
@@ -166,7 +165,7 @@ def _collect_readiness_requirements(
                     if isinstance(item, Mapping)]
     for row in readiness.get("repositories") or ():
         if not isinstance(row, Mapping) or str(row.get("status") or "") not in {
-            "missing_binding", "missing_compatible_revision", "missing_required_capability",
+            "missing_binding", "missing_compatible_revision", "missing_required_tool",
         }:
             continue
         repository_id = str(row.get("repository_id") or "").strip()
@@ -400,8 +399,8 @@ def prepare_interaction_lineage(
             request = {
                 "consumer_id": "interaction-lineage",
                 "journey_id": journey_id,
-                "required_capabilities": [_REQUIRED_CAPABILITY],
-                "analysis_profile_id": _PROFILE_ID,
+                "product_ids": [_PRODUCT_ID],
+                "execution_scope": "workspace",
                 "pinned_revision_context": _pinned_context(BindingIndex(list(current.values())), repository_ids),
                 "observed_boundary": (
                     external_origin_boundary
@@ -416,7 +415,7 @@ def prepare_interaction_lineage(
             if progress is not None:
                 progress({"event": "preparation.started", "edge_id": edge_id,
                           "repository_id": repository_id, "group_index": group_index + 1,
-                          "group_count": len(pending_groups), "profile_id": _PROFILE_ID,
+                          "group_count": len(pending_groups), "product_ids": [_PRODUCT_ID],
                           "max_steps": request.get("max_steps", 8)})
             try:
                 result = dict(preparation_gateway.run_preparation(request))

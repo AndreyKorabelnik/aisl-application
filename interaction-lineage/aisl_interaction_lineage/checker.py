@@ -8,7 +8,7 @@ from .contracts import BindingIndex
 from .topology import boundary_fields, select_edge, wire_display_ref
 
 READINESS_FORMAT = "interaction-lineage-readiness/v1"
-_REQUIRED_CAPABILITY = "workspace.attribute-path-resolver"
+_REQUIRED_TOOL = "resolve_attribute_path"
 
 
 def _repo_ids(edge: Mapping[str, Any], roles: Sequence[str]) -> list[str]:
@@ -268,22 +268,22 @@ def check_interaction_lineage(
             })
             continue
 
-        capabilities = sorted({str(value) for value in revision.get("capabilities") or () if str(value)})
-        if _REQUIRED_CAPABILITY not in capabilities:
+        available_tools = sorted({str(value) for value in revision.get("available_tools") or () if str(value)})
+        if _REQUIRED_TOOL not in available_tools:
             repositories[repository_id] = {
                 "repository_id": repository_id,
                 "system_id": binding.system_id,
                 "revision_id": binding.revision_id,
-                "status": "missing_required_capability",
-                "missing_capabilities": [_REQUIRED_CAPABILITY],
-                "capabilities": capabilities,
+                "status": "missing_required_tool",
+                "missing_tools": [_REQUIRED_TOOL],
+                "available_tools": available_tools,
             }
             diagnostics.append({
-                "code": "required_capability_missing",
+                "code": "required_revision_tool_missing",
                 "repository_id": repository_id,
                 "system_id": binding.system_id,
                 "revision_id": binding.revision_id,
-                "capability": _REQUIRED_CAPABILITY,
+                "tool": _REQUIRED_TOOL,
             })
             continue
 
@@ -292,7 +292,7 @@ def check_interaction_lineage(
             "system_id": binding.system_id,
             "revision_id": binding.revision_id,
             "status": "ready",
-            "capabilities": capabilities,
+            "available_tools": available_tools,
             "boundary_anchor_count": 0,
             "boundary_anchor_missing_count": 0,
         }
@@ -300,7 +300,7 @@ def check_interaction_lineage(
     if prerequisites_only:
         # A cheap admission decision: never infer that anchors, external origins,
         # or transport crossings exist merely because a pinned revision exposes
-        # the required capability. Detailed `check --deep` and `prepare` retain
+        # the required revision tool. Detailed `check --deep` and `prepare` retain
         # the full producer-evidence evaluation below.
         missing_roles = [
             role for role in transport_roles
@@ -327,12 +327,12 @@ def check_interaction_lineage(
             "code": "attribute_path_resolution_deferred",
             "edge_id": edge_id,
             "blocking": False,
-            "reason": "repository revisions/capabilities checked; per-field anchors and external-origin gaps require check --deep or build",
+            "reason": "repository revision-tools checked; per-field anchors and external-origin gaps require check --deep or build",
         })
         return {
             "format": READINESS_FORMAT,
             "status": "prerequisites_satisfied" if admitted else "not_ready",
-            "readiness_scope": "repository_capabilities_only",
+            "readiness_scope": "repository_revision_tools_only",
             "topology_id": str(topology.get("topology_id") or ""),
             "edge_id": edge_id,
             "topology_edge_status": "candidate",

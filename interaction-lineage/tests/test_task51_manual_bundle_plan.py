@@ -28,11 +28,19 @@ class FakeCatalog:
     def list_revisions(self, system_id):
         return list(self.rows)
 
+    def revision(self, system_id, revision_id):
+        matches = [row for row in self.rows if row.revision_id == revision_id]
+        if len(matches) != 1:
+            raise ValueError("ambiguous/missing exact published revision")
+        return SimpleNamespace(revision_tools=lambda: SimpleNamespace(tools=[
+            {"name": "resolve_attribute_path"}
+        ] if matches[0].tool_available else []))
+
 
 def _rev(url, commit, *, capability=True):
     return SimpleNamespace(
-        revision_id="rev-123",
-        capabilities=["workspace.attribute-path-resolver"] if capability else [],
+        revision_id="rev-123" if url.endswith("ucp_api.git") else "rev-kpk",
+        tool_available=capability,
         raw={"metadata": {"source_snapshots": [{
             "source_kind": "git", "location": url,
             "resolved_version": {"kind": "git_commit", "commit_sha": commit},
@@ -50,7 +58,8 @@ def test_only_missing_exact_source_gets_generated_bundle_script(tmp_path):
     shell = (tmp_path / "prepare-missing-bundles.sh").read_text()
     assert "https://git.example/kpk_gateway.git" in shell
     assert "https://git.example/ucp_api.git" not in shell
-    assert "--knowledge-profile attribute-lineage-v1" in shell
+    assert "--product attribute-lineage --scope repository" in shell
+    assert "--knowledge-profile" not in shell
     assert "--system-id kpk_gateway" in shell
     assert "checkout --detach" in shell
     assert "publication_bundle.path" in shell

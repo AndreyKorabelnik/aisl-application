@@ -134,6 +134,17 @@ def route_boundary_ref(edge: Mapping[str, Any], transport_role: str, field_path:
     endpoint = str(edge.get("matched_identity") or "").strip()
     if protocol != "http" or role not in {"request", "response"} or not path or not endpoint:
         return None
+    # v5 matched_identity may be a payload type-pair identity, not a URL route.
+    # Only a route-backed match can be turned into a REST boundary reference.
+    basis = edge.get("basis")
+    if not isinstance(basis, list) or not any(
+        isinstance(entry, Mapping) and entry.get("kind") == "http_method_path"
+        and entry.get("value") == f"{str(edge.get('method') or '').strip().upper()} {endpoint}"
+        for entry in basis
+    ):
+        return None
+    if not endpoint.startswith("/"):
+        return None
     return f"boundary:rest:{endpoint}:{role}.{path}"
 
 

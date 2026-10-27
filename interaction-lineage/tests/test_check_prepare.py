@@ -27,7 +27,7 @@ class ReadinessGateway:
             binding.repository_id,
             {
                 "status": "ready",
-                "capabilities": ["workspace.attribute-path-resolver"],
+                "available_tools": ["resolve_attribute_path"],
                 "system_id": binding.system_id,
                 "revision_id": binding.revision_id,
             },
@@ -93,10 +93,10 @@ def test_check_missing_binding_is_machine_readable() -> None:
 def test_check_missing_capability_is_not_ready() -> None:
     result = check_interaction_lineage(
         topology(), edge_id=EDGE_ID, bindings=bindings(),
-        gateway=ReadinessGateway(revision_status={"service": {"status": "ready", "capabilities": []}}),
+        gateway=ReadinessGateway(revision_status={"service": {"status": "ready", "available_tools": []}}),
     )
     service = next(item for item in result["repositories"] if item["repository_id"] == "service")
-    assert service["status"] == "missing_required_capability"
+    assert service["status"] == "missing_required_tool"
     assert result["status"] == "not_ready"
 
 
