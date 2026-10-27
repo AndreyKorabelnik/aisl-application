@@ -15,7 +15,8 @@ from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings, BINDINGS_SCHEMA_VERSION
 from .human_csv import write_human_csv
 from .prepare import KnowledgeControlPlaneGateway, PreparationBudget, prepare_interaction_lineage
-from .repository_sources import load_inventory_remote_sources, KcpRepositoryRegistrar
+from .repository_sources import load_inventory_remote_sources, load_topology_remote_sources, KcpRepositoryRegistrar
+from .source_plan import plan_interaction_sources
 from .topology import validate_topology
 
 
@@ -50,6 +51,16 @@ def main(argv: list[str] | None = None) -> int:
                 help="Resolve field anchors and external-origin gaps; default check only verifies pinned revisions, pinned revision tools and observed field coverage",
             )
 
+    preview = sub.add_parser("plan", help="Read-only preview of required Git repositories, published reuse and unknown Nexus artifacts")
+    preview.add_argument("--topology", required=True)
+    preview_selector = preview.add_mutually_exclusive_group(required=True)
+    preview_selector.add_argument("--edge-id")
+    preview_selector.add_argument("--all-edges", action="store_true")
+    preview.add_argument("--bindings", help="Optional exact pinned revision bindings")
+    preview.add_argument("--aisl-base-url", help="Optional read-only public AISL catalog; omitted = offline topology preview")
+    preview.add_argument("--kcp-base-url", help="Optional read-only KCP registered repository listing")
+    preview.add_argument("--output", required=True, help="JSON preview without commands or secrets")
+
     csv_command = sub.add_parser("csv", help="Render human-readable CSV from interaction lineage JSON")
     csv_command.add_argument("--input", required=True)
     csv_command.add_argument("--output", required=True)
@@ -82,6 +93,32 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:
             print(f"interaction-lineage csv failed: {type(exc).__name__}: {exc}", file=sys.stderr)
             return 2
+
+    if args.command == "plan":
+        gateway = None
+        try:
+            topology = _load_object(args.topology)
+            validate_topology(topology)
+            edge_ids = (sorted(str(edge.get("edge_id") or "") for edge in topology["edges"])
+                        if args.all_edges else [args.edge_id])
+            gateway = KnowledgeApiGateway(args.aisl_base_url) if args.aisl_base_url else None
+            result = plan_interaction_sources(
+                topology, edge_ids=edge_ids, bindings=_bindings(args.bindings),
+                aisl_client=gateway._client if gateway is not None else None,
+                kcp_base_url=args.kcp_base_url,
+            )
+            target = Path(args.output)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(json.dumps({"status": "planned", "output": str(target),
+                              **result["summary"]}, ensure_ascii=False, sort_keys=True))
+            return 0
+        except Exception as exc:
+            print(f"interaction-lineage plan failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
+        finally:
+            if gateway is not None:
+                gateway.close()
 
     if args.command == "prepare" and not (args.output or args.output_dir):
         parser.error("prepare requires --output or --output-dir")
@@ -126,9 +163,14 @@ def main(argv: list[str] | None = None) -> int:
             and (args.all_edges or str(edge.get("edge_id") or "") in edge_ids)
             for key in ("source_repository_id", "target_repository_id")
         }
-        registrar = (KcpRepositoryRegistrar(args.kcp_base_url, load_inventory_remote_sources(
-            args.inventory_manifest, selected_ids=selected_source_ids))
-                     if args.command == "prepare" and args.inventory_manifest else None)
+        source_records = None
+        if args.command == "prepare" and args.inventory_manifest:
+            source_records = load_inventory_remote_sources(args.inventory_manifest, selected_ids=selected_source_ids)
+        elif args.command == "prepare":
+            source_records = load_topology_remote_sources(
+                topology, selected_ids=selected_source_ids)
+        registrar = (KcpRepositoryRegistrar(args.kcp_base_url, source_records)
+                     if source_records else None)
 
         def progress(event: Mapping[str, Any]) -> None:
             item = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), **dict(event)}

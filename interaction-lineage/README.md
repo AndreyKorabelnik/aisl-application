@@ -299,6 +299,38 @@ can be started. A field or interaction remains a `candidate` until sufficiently
 supported by the published evidence; absence of a field probe remains an
 explicit gap, not a proven negative interaction.
 
+## Task 51 automatic selected Git source registration from Topology v5
+
+Use the accepted Topology `repositories[].repository_url` for exactly the selected
+edge's repositories. Git-source authorization boundaries belong to **KCP server configuration**, not this CLI. No repository is invented from its name, no portfolio scan,
+checkout or Nexus access occurs in the Application. KCP owns those operations.
+
+```bash
+interaction-lineage prepare \
+  --topology topology-v5.json --edge-id '<selected-edge-id>' \
+  --aisl-base-url http://127.0.0.1:8080 --kcp-base-url http://127.0.0.1:8000 \
+  --max-preparations 5 --max-kcp-steps 8 --output-dir results
+```
+
+Only selected Topology v5 repository IDs can be registered, with `defer_checkout`
+true. Unsafe Git URLs fail closed in the application. The KCP source-acquisition policy decides whether the actual Git host is authorized. If Topology lacks a
+`resolved_commit`, KCP may prepare the current exact Git commit, but it **cannot**
+claim parity with the historical Inventory source snapshot. The resulting
+immutable source identity and any confidence/gap diagnostics must remain visible.
+`--inventory-manifest` remains an optional explicit source with exact Inventory
+commit provenance for older Topology artifacts; otherwise URLs come directly from Topology.
+
+Configure HTTPS Git authorization and authentication **in KCP, never in Topology or this CLI**.
+For two independent providers set `KCP_GIT_AUTH_PROFILES_FILE` to a local JSON
+with `schema_version=kcp-git-auth-profiles/v1` and `profiles` containing exact
+Git URL scopes plus `username_env` and `secret_env` variable *names*.
+Supply actual tokens/passwords as KCP process environment secrets. A Git
+host/scope without a matching profile never inherits another provider token.
+For Maven/Nexus use existing server-side `NEXUS_BASE_URL`, `NEXUS_REPOSITORY`,
+`NEXUS_TOKEN` (or `NEXUS_USERNAME` and `NEXUS_PASSWORD`). SourceControl REST
+**API URL** used by Inventory discovery and its Git **clone URL** are not
+necessarily the same; the KCP scopes must use clone URL roots.
+
 ## Task 51 Inventory → KCP selected-source registration
 
 An optional `prepare --inventory-manifest` (repeatable) bridges **only** the selected
@@ -382,3 +414,48 @@ The output remains bounded by the explicit KCP budget. `--all-edges` visits
 all candidate edges in the provided Topology, not an exhaustive proof of every
 runtime program path. Multi-edge end-to-end composition remains a separate
 unaccepted Task 51 gate, not something this source change purports to solve.
+
+## Task 51 read-only `plan` before `prepare`
+
+`plan` is a **preview**, not source download, registration or Maven/Nexus scanning.
+It scopes its Git list to the exact selected candidate edge(s) from Topology v5,
+optionally checks public AISL metadata and the read-only KCP repository registry,
+then writes one JSON document with download decisions, missing commit evidence,
+and the set of **confirmed exact Nexus downloads** (initially empty if no GAV
+was proven). Unknown potential Maven dependencies are explicitly deferred to
+Framework/KCP demand-driven preparation.
+
+```bash
+# Fully offline: no network calls, never downloads or registers sources
+interaction-lineage plan --topology topology-v5.json \
+  --edge-id '<edge-id>' \
+  --output results/source-plan.json
+
+# More informative, still strictly GET/read-only on AISL and KCP:
+interaction-lineage plan --topology topology-v5.json \
+  --edge-id '<edge-id>' --aisl-base-url http://127.0.0.1:8080 \
+  --kcp-base-url http://127.0.0.1:8000 \
+  --output results/source-plan.json
+```
+
+- `--edge-id` selects one interaction; `--all-edges` explicitly opts into a
+  deduplicated portfolio-wide preview without scanning source.
+- A missing Topology `resolved_commit` stays `unverified_topology_snapshot`:
+  discovering current HEAD later **does not** prove compatibility with the
+  historical Inventory snapshot.
+- With no AISL address, publication reuse is `not_checked`, not implicitly
+  missing. With no KCP address, registry status is `not_checked`, not absent.
+- A URL without an approved Git origin is not authorization to download.
+- Nexus coordinates and versions cannot be extrapolated from an HTTP topology
+  route or payload name. The true Maven source set may only become known after
+  bounded code/dependency evidence extraction.
+- Unlike the older manual bundle preparation script, `plan` does not create
+  executable Git/KCP scripts, execute subprocesses, write KCP state, or touch
+  local Git checkout directories.
+
+KCP checkout persistence currently depends on execution mode: the Runner
+repository batch removes each temporary clone after analysis; KCP materialized
+checkout under its runtime `repositories/` is persistent until explicit
+operator action, and pinned job checkouts under `jobs/<job-id>/sources/`
+are not currently guaranteed to be automatically deleted after successful jobs.
+Do not assume that `plan` changes the KCP source retention policy.
