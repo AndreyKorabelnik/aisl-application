@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Protocol, Sequence
@@ -429,16 +430,19 @@ def prepare_interaction_lineage(
             # A published Framework step must report exactly the observed commit.
             if registration is not None:
                 expected_commit = str(registration.get("inventory_resolved_commit") or "").lower()
-                if not expected_commit:
-                    raise RuntimeError("Inventory snapshot commit missing from KCP registration evidence")
                 for step in result.get("steps") or ():
                     if not isinstance(step, Mapping) or step.get("status") != "published":
                         continue
                     refs = [ref for ref in step.get("source_provenance_refs") or ()
                             if isinstance(ref, Mapping) and ref.get("source_kind") == "repository"
                             and ref.get("repository_id") == repository_id]
-                    if len(refs) != 1 or str(refs[0].get("revision") or "").lower() != expected_commit:
+                    actual_commit = str(refs[0].get("revision") or "").lower() if len(refs) == 1 else ""
+                    if not re.fullmatch(r"[0-9a-f]{40}", actual_commit):
+                        raise RuntimeError(f"KCP prepared source revision does not match required exact Git commit: {repository_id}")
+                    if expected_commit and actual_commit != expected_commit:
                         raise RuntimeError(f"KCP prepared source revision does not match Inventory resolved commit: {repository_id}")
+                    # No Topology commit means fresh publication is pinned but NOT
+                    # evidence of source parity with the historical Inventory snapshot.
             elapsed = round(time.monotonic() - started, 3)
             if progress is not None:
                 source_ids = sorted({

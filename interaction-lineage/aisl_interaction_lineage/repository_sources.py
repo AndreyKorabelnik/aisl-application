@@ -1,4 +1,4 @@
-"""Bounded source registration bridge: Inventory provenance -> existing KCP registry.
+"""Bounded source registration bridge: Topology Git facts -> existing KCP registry.
 
 No Git discovery, clones, Framework analysis, or semantic source selection here.
 """
@@ -28,9 +28,12 @@ class InventoryRemoteSource:
 
 
 def _safe_git_url(value: str) -> bool:
+    if not value or any(ord(ch) < 33 for ch in value):
+        return False
     parsed = urlsplit(value)
     return (parsed.scheme in {"https", "http", "ssh"} and bool(parsed.hostname)
-            and not parsed.username and not parsed.password and not parsed.fragment)
+            and not parsed.username and not parsed.password and not parsed.fragment
+            and not parsed.query and all(part not in {".", ".."} for part in parsed.path.split("/")))
 
 
 def load_inventory_remote_sources(
@@ -63,6 +66,42 @@ def load_inventory_remote_sources(
                 raise ValueError(f"ambiguous Inventory repository_id across manifests: {repo}")
             sources[repo] = source
     return sources
+
+
+def load_topology_remote_sources(
+    topology: Mapping[str, Any], *, selected_ids: set[str]
+) -> dict[str, InventoryRemoteSource]:
+    """Use only observed URL/commit from selected Topology v5 repositories.
+
+    Missing commit permits analysis of HEAD, never snapshot-parity claims. Missing
+    URLs, unsafe URLs or duplicate repository IDs fail closed.
+    Git-host authorization belongs exclusively to the KCP source-acquisition policy.
+    """
+    repositories: dict[str, InventoryRemoteSource] = {}
+    for row in topology.get("repositories") or []:
+        if not isinstance(row, Mapping):
+            raise ValueError("topology repositories must be objects")
+        repo = str(row.get("repository_id") or "").strip()
+        if repo not in selected_ids:
+            continue
+        if repo in repositories:
+            raise ValueError(f"duplicate selected topology repository: {repo}")
+        url = str(row.get("repository_url") or "").strip()
+        commit = str(row.get("resolved_commit") or "").strip().lower()
+        if not re.fullmatch(r"[a-z0-9_]+", repo):
+            raise ValueError(f"invalid selected topology repository identity: {repo}")
+        if not url:
+            # Already published AISL knowledge might make registration unnecessary.
+            # If preparation later needs this source, registrar.ensure fails closed.
+            continue
+        if not _safe_git_url(url):
+            raise ValueError(f"unsafe Git URL for selected topology repository: {repo}")
+        if urlsplit(url).scheme != "https":
+            raise ValueError(f"Git source requires HTTPS topology repository_url: {repo}")
+        if commit and not _SHA.fullmatch(commit):
+            raise ValueError(f"invalid topology Git commit for repository: {repo}")
+        repositories[repo] = InventoryRemoteSource(repo, url, commit, None, "topology-v5")
+    return repositories
 
 
 class KcpRepositoryRegistrar:
@@ -145,18 +184,23 @@ class KcpRepositoryRegistrar:
         metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
         tracked = metadata.get("tracked_ref") if isinstance(metadata.get("tracked_ref"), Mapping) else {}
         expected = {"kind": "branch", "name": source.requested_ref} if source.requested_ref else {"kind": "head", "name": None}
-        if str(tracked.get("kind") or "") != expected["kind"] or (tracked.get("name") or None) != expected["name"]:
-            raise ValueError(f"KCP tracked Git ref conflicts with Inventory source: {repository_id}")
+        if source.requested_ref and (str(tracked.get("kind") or "") != expected["kind"]
+                                     or (tracked.get("name") or None) != expected["name"]):
+            raise ValueError(f"KCP tracked Git ref conflicts with observed source: {repository_id}")
         revision = str(item.get("revision") or "").strip().lower()
-        if revision and revision != source.resolved_commit:
+        if source.resolved_commit and revision and revision != source.resolved_commit:
             raise ValueError(f"KCP materialized revision conflicts with Inventory commit: {repository_id}")
         evidence = {
             "repository_id": repository_id,
             "kcp_repository_id": str(item.get("repository_id") or ""),
             "inventory_resolved_commit": source.resolved_commit,
             "kcp_materialized_commit": revision or None,
-            "revision_verified": bool(revision),
-            "status": "registered_exact_snapshot" if revision else "registered_ref_unverified",
+            "revision_verified": bool(source.resolved_commit and revision == source.resolved_commit),
+            "kcp_tracked_ref": dict(tracked),
+            "status": ("registered_exact_snapshot" if source.resolved_commit and revision
+                       else "registered_ref_unverified" if source.resolved_commit
+                       else "registered_git_revision_unverified_against_topology" if revision
+                       else "registered_ref_unverified_against_topology"),
         }
         if not evidence["kcp_repository_id"]:
             raise RuntimeError("KCP registered repository has no repository_id")
