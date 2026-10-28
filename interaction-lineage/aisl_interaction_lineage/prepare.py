@@ -41,6 +41,12 @@ class PreparationBudget:
 
 ProgressSink = Callable[[Mapping[str, Any]], None]
 RepositoryEnsure = Callable[[str], Mapping[str, Any]]
+PublishedLookup = Callable[[str, Mapping[str, Any]], AislBinding | None]
+
+
+class PublicationGateway(Protocol):
+    def publish(self, *, repository_id: str, result: Mapping[str, Any],
+                expected_commit: str = "") -> AislBinding: ...
 
 def _repo_ids(edge: Mapping[str, Any], roles: Sequence[str]) -> list[str]:
     values: set[str] = set()
@@ -256,6 +262,8 @@ def prepare_interaction_lineage(
     budget: PreparationBudget | None = None,
     progress: ProgressSink | None = None,
     ensure_repository: RepositoryEnsure | None = None,
+    publication_gateway: PublicationGateway | None = None,
+    published_lookup: PublishedLookup | None = None,
 ) -> dict[str, Any]:
     edge = select_edge(topology, edge_id)
     repository_ids = _repo_ids(edge, transport_roles)
@@ -344,9 +352,33 @@ def prepare_interaction_lineage(
     pending_groups = groups
     new_boundary_count = 0
     remaining_diagnostics: list[dict[str, Any]] = []
+    published_count = 0
+    awaiting_count = 0
     while pending_groups:
         rounds += 1
         for group_index, group in enumerate(pending_groups):
+            # Reuse an exact previously materialized source before consuming
+            # the costly KCP preparation budget.  KCP owns the Git SHA evidence.
+            representative_for_reuse = group[0]
+            reuse_repository_id = str(representative_for_reuse.get("repository_id") or "")
+            reuse_registration = None
+            if (reuse_repository_id and reuse_repository_id not in current
+                    and ensure_repository is not None and published_lookup is not None):
+                reuse_registration = dict(ensure_repository(reuse_repository_id))
+                reused = published_lookup(reuse_repository_id, reuse_registration)
+                if reused is not None:
+                    if reused.repository_id != reuse_repository_id:
+                        raise RuntimeError("published lookup returned a mismatched repository")
+                    state = readiness_gateway.revision_status(reused)
+                    if (state.get("status") != "ready"
+                            or "resolve_attribute_path" not in state.get("available_tools", ())):
+                        raise RuntimeError("reused revision no longer has required Knowledge Product")
+                    current[reuse_repository_id] = reused
+                    if progress is not None:
+                        progress({"event": "preparation.published_revision_reused",
+                                  "edge_id": edge_id, "repository_id": reuse_repository_id,
+                                  "system_id": reused.system_id, "revision_id": reused.revision_id})
+                    continue
             if budget is not None and not budget.reserve():
                 exhausted = True
                 deferred_groups = [{
@@ -391,8 +423,8 @@ def prepare_interaction_lineage(
                 selector_context.setdefault("repository_id", repository_id)
                 selector_context.setdefault("system_id", str(representative.get("system_id") or ""))
                 selector_context.pop("attribute_path", None)
-            registration = None
-            if ensure_repository is not None and repository_id:
+            registration = reuse_registration
+            if registration is None and ensure_repository is not None and repository_id:
                 registration = dict(ensure_repository(repository_id))
                 if progress is not None:
                     progress({"event": "repository.registration_checked", "edge_id": edge_id,
@@ -470,6 +502,52 @@ def prepare_interaction_lineage(
                 "steps": result.get("steps") or [],
                 "diagnostics": result.get("diagnostics") or [],
             })
+            if str(result.get("outcome") or "") == "awaiting_publication":
+                if publication_gateway is None:
+                    awaiting_count += 1
+                    remaining_diagnostics.append({"code": "publication_gateway_unavailable",
+                        "repository_id": repository_id,
+                        "message": "KCP bundles await an explicit Server publication"})
+                    stopped = True
+                    deferred_groups = [{"reason": "awaiting_publication",
+                        "requirements": [dict(item) for item in pending]}
+                        for pending in pending_groups[group_index + 1:]]
+                    break
+                if progress is not None:
+                    progress({"event": "publication.started", "edge_id": edge_id,
+                              "repository_id": repository_id})
+                try:
+                    bound = publication_gateway.publish(
+                        repository_id=repository_id, result=result,
+                        expected_commit=str((registration or {}).get("inventory_resolved_commit") or ""),
+                    )
+                    if not isinstance(bound, AislBinding) or bound.repository_id != repository_id:
+                        raise RuntimeError("publication gateway returned invalid repository binding")
+                    # A server-issued revision is not sufficient: the public
+                    # revision-tools read gate must confirm required knowledge.
+                    published_state = readiness_gateway.revision_status(bound)
+                    if (str(published_state.get("status") or "") != "ready"
+                            or "resolve_attribute_path" not in published_state.get("available_tools", ())):
+                        raise RuntimeError("published revision lacks pinned resolve_attribute_path tool")
+                    current[repository_id] = bound
+                    published_count += 1
+                    if progress is not None:
+                        progress({"event": "publication.completed", "edge_id": edge_id,
+                                  "repository_id": repository_id, "system_id": bound.system_id,
+                                  "revision_id": bound.revision_id})
+                except Exception as exc:
+                    awaiting_count += 1
+                    stopped = True
+                    remaining_diagnostics.append({"code": "publication_failed",
+                        "repository_id": repository_id, "exception_type": type(exc).__name__,
+                        "message": str(exc)})
+                    if progress is not None:
+                        progress({"event": "publication.failed", "edge_id": edge_id,
+                                  "repository_id": repository_id, "exception_type": type(exc).__name__})
+                    deferred_groups = [{"reason": "publication_failed",
+                        "requirements": [dict(item) for item in pending]}
+                        for pending in pending_groups[group_index + 1:]]
+                    break
             for repo, binding in _binding_updates(result).items():
                 current[repo] = binding
             if str(result.get("outcome") or "") == "step_limit":
@@ -539,6 +617,8 @@ def prepare_interaction_lineage(
         status = "prepared"
     elif exhausted:
         status = "budget_exhausted"
+    elif awaiting_count:
+        status = "awaiting_publication"
     elif "no_progress" in outcomes:
         status = "no_progress"
     elif kcp_step_limit_seen:
@@ -567,6 +647,8 @@ def prepare_interaction_lineage(
         "readiness_after": after,
         "summary": {
             "framework_invocation_count": len(framework_results),
+            "published_revision_count": published_count,
+            "awaiting_publication_count": awaiting_count,
             "readiness_recheck_round_count": rounds,
             "new_requirement_group_count": new_boundary_count,
             "deferred_group_count": len(deferred_groups),

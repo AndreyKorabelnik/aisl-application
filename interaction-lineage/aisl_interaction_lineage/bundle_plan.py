@@ -1,8 +1,8 @@
-"""Read-only, exact-source plan for manually prepared AISL publication bundles.
+"""Exact-source public revision discovery for consumer-owned orchestration.
 
-Inventory/Topology own repository discovery. KCP owns production of a bundle.
-This module owns only a consumer-side plan and an executable handoff script;
-no Git, KCP, Nexus or publishing subprocess is invoked here.
+Inventory/Topology own repository discovery; AISL Server owns publication.
+Historical manual-bundle report helpers remain standalone but are never called
+by the automatic ``prepare`` path.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 from urllib.parse import urlsplit
 
-from .contracts import BindingIndex, BINDINGS_SCHEMA_VERSION
+from .contracts import AislBinding, BindingIndex, BINDINGS_SCHEMA_VERSION
 from .topology import validate_topology
 
 PRODUCT_ID = "attribute-lineage"
@@ -198,3 +198,31 @@ def write_bundle_plan(plan: Mapping[str, Any], directory: str | Path) -> None:
     path = root / "prepare-missing-bundles.sh"
     path.write_text(render_preparation_script(plan), encoding="utf-8")
     path.chmod(0o755)
+
+
+def find_exact_published_revision(
+    client: Any, *, repository_id: str, repository_url: str, commit_sha: str,
+) -> AislBinding | None:
+    """Select the latest eligible ordinal for one exact source, never by name.
+
+    If multiple AISL systems claim the same Git source, no implicit choice is
+    justified.  Within one system, ordinal is Server-owned revision ordering.
+    """
+    if not repository_url or not SHA.fullmatch(commit_sha):
+        return None
+    source = {"repository_url": repository_url, "resolved_commit": commit_sha.lower()}
+    matches: list[tuple[str, int, str]] = []
+    for system in client.list_systems():
+        for revision in client.list_revisions(system.system_id):
+            if not _matching_revision(revision.raw, source):
+                continue
+            tools = client.revision(system.system_id, revision.revision_id).revision_tools().tools
+            if REQUIRED_TOOL not in {str(row.get("name") or "") for row in tools}:
+                continue
+            matches.append((system.system_id, int(revision.ordinal), revision.revision_id))
+    if not matches:
+        return None
+    if len({sid for sid, _, _ in matches}) != 1:
+        raise ValueError(f"multiple AISL systems publish the exact Git source for {repository_id}")
+    sid, _, revision_id = sorted(matches, key=lambda item: (item[1], item[2]))[-1]
+    return AislBinding(repository_id, sid, revision_id)
