@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import sys
 from datetime import datetime, timezone
@@ -8,13 +9,14 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .aisl import KnowledgeApiGateway
-from .bundle_plan import invalidate_bundle_plan, plan_missing_bundles, write_bundle_plan
+from .bundle_plan import plan_missing_bundles, _repo_sources, find_exact_published_revision
 from .batch_cache import BatchCachingGateway
 from .builder import build_interaction_lineage
 from .checker import check_interaction_lineage
 from .contracts import BindingIndex, load_bindings, BINDINGS_SCHEMA_VERSION
 from .human_csv import write_human_csv
 from .prepare import KnowledgeControlPlaneGateway, PreparationBudget, prepare_interaction_lineage
+from .publication import HttpPublicationGateway
 from .repository_sources import load_inventory_remote_sources, load_topology_remote_sources, KcpRepositoryRegistrar
 from .source_plan import plan_interaction_sources
 from .topology import validate_topology
@@ -75,7 +77,9 @@ def main(argv: list[str] | None = None) -> int:
     prepare.add_argument("--kcp-base-url", required=True)
     prepare.add_argument("--transport-role", choices=("request", "response", "all"), default="all")
     prepare.add_argument("--output", help="Detailed preparation JSON (default: <output-dir>/preparation.json)")
-    prepare.add_argument("--output-dir", help="Directory for missing-revisions.json, resolved-bindings.json and prepare-missing-bundles.sh; defaults to --output parent")
+    prepare.add_argument("--output-dir", help="Directory for missing-revisions.json and resolved-bindings.json; defaults to --output parent")
+    prepare.add_argument("--publication-token-env", default="INTERACTION_LINEAGE_PUBLICATION_TOKEN",
+                         help="Name of environment variable holding AISL Server publication token")
     prepare.add_argument("--max-preparations", type=int, default=1,
                          help="Hard limit on total KCP calls across all selected edges (default: 1; 0 = no KCP calls)")
     prepare.add_argument("--max-kcp-steps", type=int, default=1,
@@ -127,8 +131,8 @@ def main(argv: list[str] | None = None) -> int:
                 else output_file.parent)
     if args.command == "prepare":
         plan_dir.mkdir(parents=True, exist_ok=True)
-        # Never expose a previous run's manual bundle tasks as this run's result.
-        invalidate_bundle_plan(plan_dir)
+        # Old manually executable plan is not the normal automatic path.
+        (plan_dir / "prepare-missing-bundles.sh").unlink(missing_ok=True)
     gateway = None
     try:
         topology = _load_object(args.topology)
@@ -141,6 +145,17 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("all candidate edges must have unique nonempty IDs")
         else:
             edge_ids = [args.edge_id]
+        selected_source_ids = {
+            str(edge.get(key) or "").strip()
+            for edge in topology.get("edges") or () if isinstance(edge, Mapping)
+            and (args.all_edges or str(edge.get("edge_id") or "") in edge_ids)
+            for key in ("source_repository_id", "target_repository_id")
+        }
+        selected_edges = [edge for edge in topology.get("edges") or ()
+                          if isinstance(edge, Mapping) and str(edge.get("edge_id") or "") in edge_ids]
+        scoped_topology = {**topology, "edges": selected_edges,
+                           "repositories": [repo for repo in topology.get("repositories") or ()
+                                            if repo.get("repository_id") in selected_source_ids]}
         gateway = KnowledgeApiGateway(args.aisl_base_url)
         # Reuse compatible exact source revisions BEFORE expensive KCP preparation.
         # The catalog is the only discovery owner; it does not infer bindings from names.
@@ -149,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
             for row in topology.get("repositories") or ()
         )
         if has_exact_sources:
-            preplan = plan_missing_bundles(topology, client=gateway._client, bindings=bindings)
+            preplan = plan_missing_bundles(scoped_topology, client=gateway._client, bindings=bindings)
             bindings = bindings.merged(preplan["resolved_bindings"]["repositories"])
         query_gateway = (BatchCachingGateway(gateway)
                          if args.all_edges and args.command in ("check", "build")
@@ -157,20 +172,30 @@ def main(argv: list[str] | None = None) -> int:
         kcp = KnowledgeControlPlaneGateway(args.kcp_base_url) if args.command == "prepare" else None
         budget = (PreparationBudget(args.max_preparations, args.max_kcp_steps)
                   if args.command == "prepare" else None)
-        selected_source_ids = {
-            str(edge.get(key) or "").strip()
-            for edge in topology.get("edges") or () if isinstance(edge, Mapping)
-            and (args.all_edges or str(edge.get("edge_id") or "") in edge_ids)
-            for key in ("source_repository_id", "target_repository_id")
-        }
+        publisher = (HttpPublicationGateway(kcp_base_url=args.kcp_base_url,
+                          aisl_base_url=args.aisl_base_url,
+                          token=os.getenv(args.publication_token_env, ""))
+                     if args.command == "prepare" and os.getenv(args.publication_token_env) else None)
         source_records = None
         if args.command == "prepare" and args.inventory_manifest:
             source_records = load_inventory_remote_sources(args.inventory_manifest, selected_ids=selected_source_ids)
         elif args.command == "prepare":
             source_records = load_topology_remote_sources(
-                topology, selected_ids=selected_source_ids)
+                scoped_topology, selected_ids=selected_source_ids)
         registrar = (KcpRepositoryRegistrar(args.kcp_base_url, source_records)
                      if source_records else None)
+
+        def published_lookup(repo_id: str, registration: Mapping[str, Any]):
+            source = (source_records or {}).get(repo_id)
+            commit = str(registration.get("kcp_materialized_commit") or "").lower()
+            if source is None or not commit:
+                return None
+            if source.resolved_commit and commit != source.resolved_commit:
+                raise RuntimeError(f"KCP materialized Git commit differs from Topology for {repo_id}")
+            return find_exact_published_revision(
+                gateway._client, repository_id=repo_id,
+                repository_url=source.repository_url, commit_sha=commit,
+            )
 
         def progress(event: Mapping[str, Any]) -> None:
             item = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), **dict(event)}
@@ -195,6 +220,8 @@ def main(argv: list[str] | None = None) -> int:
                         readiness_gateway=query_gateway, preparation_gateway=kcp,
                         transport_roles=roles, budget=budget, progress=progress,
                         ensure_repository=registrar.ensure if registrar is not None else None,
+                        publication_gateway=publisher,
+                        published_lookup=published_lookup if registrar is not None else None,
                     )
                     updated = item.get("bindings")
                     if isinstance(updated, Mapping):
@@ -218,7 +245,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.all_edges:
             # A complete ledger even when individual candidates are unresolved.
             states = [str(item.get("status") or "candidate") for item in results]
-            bad = {"not_ready", "failed", "blocked", "no_progress", "step_limit", "budget_exhausted"}
+            bad = {"not_ready", "failed", "blocked", "no_progress", "step_limit", "budget_exhausted", "awaiting_publication"}
             output_status = "partial" if any(state in bad for state in states) else "complete"
             result = {
                 "format": "interaction-lineage-candidate-batch/v1",
@@ -244,32 +271,38 @@ def main(argv: list[str] | None = None) -> int:
         else:
             result = results[0]
         if args.command == "prepare":
-            # One user action: do all bounded automatic work, then generate
-            # exact-source manual bundle tasks for the residual published gaps.
-            final_plan = plan_missing_bundles(
-                topology, client=getattr(gateway, "_client", None), bindings=bindings,
-            )
-            write_bundle_plan(final_plan, plan_dir)
-            progress({
-                "event": "preparation.manual_bundles_planned",
-                "ready_count": final_plan["summary"]["ready_count"],
-                "requires_bundle_count": final_plan["summary"]["requires_bundle_count"],
-                "unresolved_count": final_plan["summary"]["unresolved_count"],
-            })
-            result["manual_bundles"] = {
-                "status": final_plan["status"],
-                "summary": final_plan["summary"],
-                "missing_revisions": str(plan_dir / "missing-revisions.json"),
+            # This is an automatic lifecycle: residual sources are diagnostics,
+            # never a second manual publication path.  The bindings ledger is
+            # always written, even when Topology has no Inventory Git SHA.
+            pinned = {binding.repository_id: binding for binding in bindings.all()}
+            sources = _repo_sources(scoped_topology)
+            missing = [{**row, "status": "unresolved", "reason":
+                        "no_pinned_published_revision"}
+                       for repo_id, row in sources.items() if repo_id not in pinned]
+            resolved = {"schema_version": BINDINGS_SCHEMA_VERSION,
+                        "repositories": [binding.to_dict() for binding in bindings.all()]}
+            (plan_dir / "resolved-bindings.json").write_text(
+                json.dumps(resolved, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            (plan_dir / "missing-revisions.json").write_text(
+                json.dumps({"format": "interaction-lineage-unresolved-sources/v1",
+                            "repositories": missing,
+                            "summary": {"unresolved_count": len(missing)}},
+                           ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            progress({"event": "preparation.source_resolution_finished",
+                      "bound_repository_count": len(pinned),
+                      "unresolved_repository_count": len(missing)})
+            result["source_resolution"] = {
                 "resolved_bindings": str(plan_dir / "resolved-bindings.json"),
-                "preparation_script": str(plan_dir / "prepare-missing-bundles.sh"),
+                "missing_revisions": str(plan_dir / "missing-revisions.json"),
+                "unresolved_repository_count": len(missing),
             }
-            if final_plan["summary"]["requires_bundle_count"] or final_plan["summary"]["unresolved_count"]:
-                if result.get("status") not in {"failed", "blocked", "no_progress", "step_limit", "budget_exhausted"}:
-                    result["status"] = "partial"
+            if missing and result.get("status") in {"complete", "prepared", "already_prepared"}:
+                result["status"] = "partial"
     except Exception as exc:
         if args.command == "prepare":
-            # Includes errors *after* plan files were partially written.
-            invalidate_bundle_plan(plan_dir)
+            # Do not preserve stale resolution ledgers when this run fails.
+            (plan_dir / "resolved-bindings.json").unlink(missing_ok=True)
+            (plan_dir / "missing-revisions.json").unlink(missing_ok=True)
         result = {
             "format": "interaction-lineage-command-result/v1",
             "status": "failed",
@@ -285,17 +318,16 @@ def main(argv: list[str] | None = None) -> int:
             gateway.close()
     output_file.parent.mkdir(parents=True, exist_ok=True)
     output_file.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    if args.command == "prepare" and isinstance(result.get("manual_bundles"), Mapping):
-        message = result["manual_bundles"]
+    if args.command == "prepare" and isinstance(result.get("source_resolution"), Mapping):
+        message = result["source_resolution"]
         print(json.dumps({
             "status": result.get("status"),
             "preparation_result": str(output_file),
-            "remaining_manual_bundles": message["summary"]["requires_bundle_count"],
-            "unresolved_source_identities": message["summary"]["unresolved_count"],
-            "prepare_missing_bundles_script": message["preparation_script"],
+            "unresolved_repositories": message["unresolved_repository_count"],
+            "resolved_bindings": message["resolved_bindings"],
             "missing_revisions": message["missing_revisions"],
         }, ensure_ascii=False, sort_keys=True))
-    return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit", "partial", "budget_exhausted"} else 2
+    return 0 if result.get("status") not in {"not_ready", "failed", "blocked", "no_progress", "step_limit", "partial", "budget_exhausted", "awaiting_publication"} else 2
 
 
 if __name__ == "__main__":

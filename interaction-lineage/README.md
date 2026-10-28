@@ -132,13 +132,47 @@ These controls do not guarantee a wall-clock/CPU bound **within** one KCP job.
 Operators must also configure/verify server-side Runner/Nexus limits before real
 bank execution; do not use `prepare --all-edges` as an unbounded analysis probe.
 
-A `prepare` invocation invalidates its previous `missing-revisions.json`,
-`resolved-bindings.json`, and executable `prepare-missing-bundles.sh` in the
-chosen output directory *before* contacting AISL. If the invocation fails
-(including a failure while rendering the bundle plan), no old/manual bundle
-script survives. The `preparation.json` result records the failure; a new
-manual script is available only after a successful planning pass. Operators
-must not reuse saved scripts from earlier invocations.
+A `prepare` invocation writes `resolved-bindings.json` (exact server-issued
+immutable revision pins) and `missing-revisions.json` (unresolved source
+identity ledger). It does **not** produce the historical executable
+`prepare-missing-bundles.sh` manual-import workflow. A failed run clears old
+resolution ledgers rather than allowing stale results to appear current.
+
+### Explicit Server publication initiated automatically by Interaction Lineage
+
+The consumer starts with read-only AISL discovery and reuses the latest
+compatible immutable revision for a **verified exact Git URL and commit**.
+When Topology has no commit, KCP may supply a previously materialized commit
+for a subsequent reuse check; no repository name or guessed HEAD is sufficient.
+If several AISL systems own that same source, the application leaves the
+selection ambiguous rather than guessing. Per-system latest means the greatest
+Server revision ordinal after checking the required pinned revision tool.
+
+When knowledge is missing, Interaction Lineage requests KCP's bounded generic
+preparation. KCP returns `awaiting_publication` and immutable artifact IDs
+for both `publication_bundle` and `attribute_catalogue_bundle`, **never** a
+fake published `revision_id`. The consumer downloads only these documented KCP
+artifact endpoints, verifies SHA-256, and explicitly calls the existing
+AISL Server importer through two authenticated HTTP endpoints:
+
+- `POST /api/knowledge/v1/publications/import`
+- `POST /api/knowledge/v1/publications/import-catalogue`
+
+The Server is the *only* publication owner. The consumer sends each exact
+archive with the `X-Bundle-SHA256` header and `Authorization: Bearer ...`.
+On the AISL Server process set `KNOWLEDGE_API_PUBLICATION_TOKEN`; on the
+Interaction Lineage process set `INTERACTION_LINEAGE_PUBLICATION_TOKEN` to the
+same secret. Credentials must be provided outside the repository and never
+logged or stored in results. Remote HTTP without TLS is not recommended;
+configure an HTTPS endpoint when running across hosts. KCP itself needs no
+publication credentials and no `knowledge-api` CLI.
+
+Only after Server confirmation and a pinned `/revision-tools` readback
+may the new revision be used. An interrupted catalogue import can be retried
+because the Server imports are idempotent; missing authorization, bad hashes,
+missing tools and uncertain source identity remain explicit blocked/partial
+states. `--max-preparations` limits new KCP calls; read-only reuse and
+Server imports do not consume the KCP budget.
 
 ## Prepare (transitional lifecycle)
 
@@ -154,7 +188,7 @@ Until that upstream discovery/preparation path is available for this journey, `p
 continues to reuse the existing Knowledge Control Plane source registry and freshness
 path rather than implementing Git/Nexus/source analysis locally:
 
-`registered remote Git -> resolve current HEAD -> immutable commit snapshot -> pinned checkout -> Runner -> AISL publication bundle`.
+`registered remote Git -> exact commit snapshot -> Runner -> publication bundles -> explicit consumer Server API import -> pinned revision`.
 
 ```bash
 interaction-lineage prepare \
@@ -164,7 +198,7 @@ interaction-lineage prepare \
   --kcp-base-url http://127.0.0.1:8000 \
   --max-preparations 12 --max-kcp-steps 8 \
   --progress-jsonl preparation-progress.jsonl \
-  --output preparation.json
+  --output-dir outputs/interaction-lineage
 ```
 
 The historical bootstrap rule that assigns `system_id = repository_id` when no binding
@@ -183,7 +217,7 @@ can be passed to `check` or `build`. The command reports READY (`prepared` or
 or BLOCKED (`blocked`) rather than claiming exhaustive discovery of all runtime
 links. A newly observed external dependency is followed only when a fresh
 public AISL check supplies an exact mechanical preparation requirement. Interaction Lineage itself owns no Git/Nexus client,
-source parser, repository discovery heuristic, or publication implementation.
+source parser, repository discovery heuristic, or independent publication implementation.
 
 ## Human CSV
 
