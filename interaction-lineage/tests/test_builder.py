@@ -10,6 +10,7 @@ from aisl_interaction_lineage.builder import (
     build_interaction_lineage,
 )
 from aisl_interaction_lineage.contracts import AislBinding, BindingIndex
+from aisl_interaction_lineage.human_csv import human_rows
 from aisl_interaction_lineage.topology import boundary_fields, select_edge, wire_display_ref
 
 
@@ -225,8 +226,16 @@ def test_missing_anchor_stays_partial_gap_without_guessing() -> None:
     result = build_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway, transport_roles=("response",))
     journey = next(item for item in result["journeys"] if item["field_path"] == "profile.id")
     assert journey["crossing"]["status"] == "candidate"
-    assert journey["target_side"]["anchor_status"] == "unresolved"
-    assert any(gap["reason"] == "target_local_anchor_unresolved" for gap in result["gaps"])
+    # The published node inventory is complete and contains no field-specific use:
+    # this is an observed local terminal, not a missing-proof gap.
+    assert journey["target_side"]["anchor_status"] == "terminal"
+    assert journey["target_side"]["terminal_proof"]["repository_value_node_scan_complete"] is True
+    assert not any(gap["reason"] == "target_local_anchor_unresolved" for gap in result["gaps"])
+    assert any(gap["reason"] == "candidate_transport_crossing_unverified" for gap in result["gaps"])
+    human = next(row for row in human_rows(result) if row["crossing_attribute"] == "profile.id")
+    assert human["consumer_attribute"] == ""
+    assert human["gap"] == "потенциальная межрепозиторная связь ещё не подтверждена"
+    assert human["full_attribute_path"].endswith("[GAP: candidate_transport_crossing_unverified]")
 
 
 def test_rejects_active_revision_binding() -> None:
@@ -261,6 +270,16 @@ def test_exact_topology_local_payload_binding_can_anchor_when_wire_ref_is_absent
 
 
 class ReverseProofGateway(FakeGateway):
+    def list_repository_value_nodes(
+        self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
+        operation: str | None = None, max_results: int = 500, page_token: str = "",
+    ) -> Mapping[str, Any]:
+        # The local catalog is incomplete, so it cannot contradict a proven
+        # exact reverse path by claiming there are no field-specific uses.
+        self.calls.append({"repo": repository_id, "list_nodes": True, "operation": operation})
+        return {"result": {"items": [], "total_count": 0, "returned_count": 0,
+                           "truncated": True, "next_token": ""}}
+
     def resolve_attribute_paths(
         self,
         binding: AislBinding,
@@ -309,6 +328,10 @@ def test_nested_leaf_ambiguity_resolves_only_with_exact_reverse_path_proof() -> 
     assert journey["target_side"]["anchor_status"] == "resolved"
     assert journey["target_side"]["resolved_anchor"]["value_node_id"] == "wanted-id"
     assert journey["target_side"]["anchor_selection_basis"] == "exact_reverse_path_to_topology_field"
+    human = next(row for row in human_rows(result) if row["crossing_attribute"] == "profile.id")
+    assert human["consumer_attribute"] == "id"
+    assert human["gap"] == "потенциальная межрепозиторная связь ещё не подтверждена"
+    assert human["full_attribute_path"].endswith("[GAP: candidate_transport_crossing_unverified]")
 
 
 class ChildExpansionGateway(FakeGateway):

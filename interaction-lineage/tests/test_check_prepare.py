@@ -18,9 +18,11 @@ class ReadinessGateway:
         *,
         revision_status: Mapping[str, Mapping[str, Any]] | None = None,
         missing_anchors: set[tuple[str, str]] | None = None,
+        node_catalog_incomplete: bool = False,
     ) -> None:
         self._revision_status = dict(revision_status or {})
         self.missing_anchors = missing_anchors or set()
+        self.node_catalog_incomplete = node_catalog_incomplete
 
     def revision_status(self, binding: AislBinding) -> Mapping[str, Any]:
         return self._revision_status.get(
@@ -56,7 +58,8 @@ class ReadinessGateway:
         self, binding: AislBinding, *, repository_id: str, node_kind: str | None = None,
         operation: str | None = None, max_results: int = 500, page_token: str = "",
     ) -> Mapping[str, Any]:
-        return {"result": {"items": [], "total_count": 0, "returned_count": 0, "truncated": False}}
+        return {"result": {"items": [], "total_count": 0, "returned_count": 0,
+                           "truncated": self.node_catalog_incomplete, "next_token": ""}}
 
 
 def bindings() -> BindingIndex:
@@ -111,7 +114,12 @@ def test_check_server_unavailable_is_not_ready_without_fallback() -> None:
 
 
 def test_check_missing_local_anchor_is_non_blocking_coverage_gap() -> None:
-    gateway = ReadinessGateway(missing_anchors={("caller", "HTTP response profile.id"), ("caller", "profile.id")})
+    # Missing local evidence is a gap only when the published node scan is
+    # incomplete; a complete empty scan instead proves a local terminal.
+    gateway = ReadinessGateway(
+        missing_anchors={("caller", "HTTP response profile.id"), ("caller", "profile.id")},
+        node_catalog_incomplete=True,
+    )
     result = check_interaction_lineage(topology(), edge_id=EDGE_ID, bindings=bindings(), gateway=gateway)
     caller = next(item for item in result["repositories"] if item["repository_id"] == "caller")
     assert caller["status"] == "ready"
